@@ -273,24 +273,6 @@ function fetchData(selectedBankId, startDate, endDate) {
     sortedTransactions = data;
 }
 
-// Function to get header columns (replace this with your actual implementation)
-function getHeaderColumnsFilterOn() {
-    return [
-        { value: 'bankNameEn', label: 'Bank Name' },
-        { value: 'termId', label: 'Terminal Id' },
-        { value: 'regionEn', label: 'Region' },
-        { value: 'cityEn', label: 'City' },
-        { value: 'txnDate', label: 'Transaction Date' },
-        { value: 'totalCWCount', label: 'Withdrawals #' },
-        { value: 'totalCWFeeAmount', label: 'Withdrawals Fee Amount' },
-        { value: 'balanceInquiryCount', label: 'Balance Inquiry #' },
-        { value: 'totalBICount', label: 'Mini Statement #' },
-        { value: 'totalBI_MSFeeAmount', label: 'Inquiry & Statement Fee Amount' },
-        { value: 'totalTxnOnUsCount', label: 'Total Txn On Us' },
-        { value: 'totalPayedAmount', label: 'Total Payed Amount' }
-    ];
-}
-
 // Function to switch to Top View
 function switchToTopView() {
     // Hide elements for Default View
@@ -315,11 +297,10 @@ function switchToTopView() {
     isApplyTopViewFilter = false; //Search Filter is applied
 
     // Populate column dropdown with header names
-    var columnOptions = getHeaderColumnsFilterOn();
     var columnDropdown = $('#columnDropdown');
     columnDropdown.empty();
-    $.each(columnOptions, function (index, column) {
-        columnDropdown.append($('<option>', { value: column.value, text: column.label }));
+    $.each(headers, function (key,value) {
+        columnDropdown.append($('<option>', { value: key, text: value }));
     });
     $('#columnDropdown').val('totalCWCount');
 
@@ -604,8 +585,8 @@ $('#btnApplyTopViewFilter').on('click', function () {
         }
 
         // Get the index of the Selected Column
-        var columnIndex = getHeaderColumnsFilterOn().findIndex(function (column) {
-            return column.value === selectedColumn;
+        var columnIndex = Object.keys(headers).findIndex(function (key) {
+            return key === selectedColumn;
         })
 
         filteredTransactions = sortedTransactions;
