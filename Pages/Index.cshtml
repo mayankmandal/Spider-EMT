@@ -1,0 +1,235 @@
+﻿@page
+@model Spider_EMT.Pages.IndexModel
+@{
+    ViewData["Title"] = "Transaction Overview";
+}
+
+<div class="container mt-2 mb-2 border rounded" style="align-content:center">
+    <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f7f7f7; height: 20%; color:gray">
+        OTHER BANKS ATM TOP PERFORMANCE ON US (@Model.CurrentBankDetailsData.CurrentBankName)
+    </div>
+    <div class="mb-2">
+        <table class="table mb-0">
+            <tbody>
+                <tr style="">
+                    <td>
+                    </td>
+                    <td>
+                        <label for="cwInput" class="">Withdrawal Fee Amount</label><br />
+                        <input id="cwInput" class="form-control" value="@Model.TransactionFeesAmount.CWTxnFee" style="font-weight:bolder; padding-inline-start:10px;  width:80%;" disabled />
+                    </td>
+                    <td>
+                        <label for="biInput" class="">Inquiry Fee Amount</label><br />
+                        <input id="biInput" class="form-control" value="@Model.TransactionFeesAmount.BITxnFee" style="font-weight:bolder; padding-inline-start:10px;  width:80%;" disabled />
+                    </td>
+                    <td>
+                        <label for="msInput" class="">Mini Statement Fee Amount</label><br />
+                        <input id="msInput" class="form-control" value="@Model.TransactionFeesAmount.MSTxnFee" style="font-weight:bolder; padding-inline-start:10px;  width:80%;" disabled />
+                    </td>
+                </tr>
+                <tr style="border-color:white;">
+                    <td></td>
+                    <td id="dateCheckValidationError" class="text-danger fw-bold"</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="allBankName" class="fw-bold">Bank Name</label><br />
+                        <select id="allBankName" class="form-select" style="width:80%;">
+                            <option value="All">All</option>
+                            <option value="None">None</option>
+                            @foreach (var bank in Model.Banks)
+                            {
+                                <option value="@bank.BankId">@bank.BankName</option>
+                            }
+                        </select>
+                    </td>
+                    <td id="tblStartDate">
+                        <label for="startDate" class="fw-bold">From Date</label><br />
+                        <input id="startDate" type="text" class="form-control datepicker ps-3" style="border-width:thin; width:80%;" />
+                        <span id="startDateValidationMsg" class="text-danger fw-bold"></span>
+                    </td>
+                    <td id="tblEndDate">
+                        <label for="endDate" class="fw-bold">To Date</label><br />
+                        <input id="endDate" type="text" class="form-control datepicker ps-3" style="border-width:thin;  width:80%;" />
+                        <span id="endDateValidationMsg" class="text-danger fw-bold"></span>
+                    </td>
+                    <td id="tblApplyFilterBtn">
+                        <br />
+                        <button id="applyDateFilterBtn" class="form-control btn btn-secondary ps-3" style=" width:80%;">Apply</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row mx-3">
+    <!-- Add radio buttons for Default View and Top View -->
+    <div class="col-2" id="viewTypeContainer">
+        <label class="form-label fw-bold mt-2">View: </label><br />
+        <label><input type="radio" name="viewType" value="default" checked> Default View</label><br />
+        <label><input type="radio" name="viewType" value="top"> Top View</label>
+    </div>
+    <!-- Elements for Top View -->
+    <div id="additionalTopFiltersContainer" style="display:none;" class="col-9 row mx-3 no-gutters mt-2">
+        <div class="col-3">
+            <label for="rowCountInput" class="form-label fw-bold">Top Transactions Count #:</label>
+            <input type="number" id="rowCountInput" value="20" class="form-control mb-2" style="width:70%;">
+            <span id="rowCountInputValidationMsg" class="text-danger fw-bold"></span>
+        </div>
+        <div class="col-4">
+            <label for="columnDropdown" class="form-label fw-bold">Filter On:</label>
+            <select id="columnDropdown" class="form-select" style="width:80%;">
+            </select>
+        </div>
+        <div class="col-2">
+            <label class="form-label fw-bold">Sort Order: </label><br />
+            <label><input type="radio" name="sortOrder" value="asc" class="form-check-input"> Ascending</label><br />
+            <label><input type="radio" name="sortOrder" value="desc" checked class="form-check-input"> Descending</label>
+        </div>
+        <div class="col-3">
+            <div class="row mb-2" style="align-content:center;">
+                <div class="col-6">
+                    <label for="btnApplyTopViewFilter" class="form-label fw-bold">Apply Filter:</label><br />
+                    <button id="btnApplyTopViewFilter" class="btn btn-light" style="width: 90%; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);" onmousedown="this.style.boxShadow='none'" onmouseup="this.style.boxShadow='2px 2px 8px rgba(0, 0, 0, 0.2)'">Apply</button>
+                </div>
+                <div class="col-6">
+                    <label for="btnClearTopViewFilter" class="form-label fw-bold">Clear Filter:</label><br />
+                    <button id="btnClearTopViewFilter" class="btn btn-light" style="width: 90%; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);" onmousedown="this.style.boxShadow='none'" onmouseup="this.style.boxShadow='2px 2px 8px rgba(0, 0, 0, 0.2)'">Clear</button>
+                </div>
+            </div>
+            <span id="applyTopViewFilterValidationMsg" class="text-danger fw-bold"></span>
+        </div>
+    </div>
+    <div class="col-2 ms-3 mt-2" id="rowsPerPageContainer">
+        <label for="rowsPerPage" class="form-label fw-bold">Rows Per Page:</label>
+        <select id="rowsPerPage" class="form-select" style="width:80%;" onchange="onRowsPerPageChange()">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+    </div>
+
+    <div id="searchfiltertransaction" class="col-7 mt-2">
+        <div class="row" style="align-content:center;">
+            <div class="col-5 ms-3">
+                <label for="rowsPerPage" class="form-label fw-bold">Search:</label>
+                <input type="text" id="filterInput" class="form-control" placeholder="Type to Filter" style="width: 90%; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);" onmousedown="this.style.boxShadow='none'" onmouseup="this.style.boxShadow='2px 2px 8px rgba(0, 0, 0, 0.2)'">
+            </div>
+            <div class="col-3">
+                <label for="applySearchFilter" class="form-label fw-bold">Apply Search:</label><br />
+                <button id="applySearchFilter" class="btn btn-light" style="width: 80%; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);" onmousedown="this.style.boxShadow='none'" onmouseup="this.style.boxShadow='2px 2px 8px rgba(0, 0, 0, 0.2)'">Apply</button>
+            </div>
+            <div class="col-3">
+                <label for="clearSearchFilter" class="form-label fw-bold">Clear Search:</label><br />
+                <button id="clearSearchFilter" class="btn btn-light" style="width: 80%; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);" onmousedown="this.style.boxShadow='none'" onmouseup="this.style.boxShadow='2px 2px 8px rgba(0, 0, 0, 0.2)'">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center my-4 mx-3">
+    <div id="paginationContainer" class="mt-2 fw-bold d-flex justify-content-end"></div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table id="bankTransactionSummaryTable" class="table table-striped m-2" style="white-space: nowrap;">
+                        <thead class="" style="background-color: #17a2b8;color:white">
+                            <tr>
+                                <th data-column="bankNameEn">Bank Name</th>
+                                <th data-column="termId">Terminal Id</th>
+                                <th data-column="regionEn">Region</th>
+                                <th data-column="cityEn">City</th>
+                                <th data-column="txnDate">Transaction Date</th>
+                                <th data-column="totalCWCount">Withdrawals #</th>
+                                <th data-column="totalCWFeeAmount">Withdrawals Fee Amount</th>
+                                <th data-column="balanceInquiryCount">Balance Inquiry #</th>
+                                <th data-column="totalBICount">Mini Statement #</th>
+                                <th data-column="totalBI_MSFeeAmount">Inquiry & Statement Fee Amount</th>
+                                <th data-column="totalTxnOnUsCount">Total Txn On Us</th>
+                                <th data-column="totalPayedAmount">Total Payed Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="downloadCointainer">
+        <!-- Added Download Buttons -->
+        <button id="downloadButton1" class="btn rounded-pill shadow mt-2 fw-bold" style="background-color: #17a2b8;color:#ffffff">Export Above Data in CSV</button>
+        <button id="downloadButton2" class="btn rounded-pill shadow mt-2 fw-bold" style="background-color: #17a2b8;color:#ffffff">Export All Data in CSV</button>
+        <button id="downloadButton3" class="btn rounded-pill shadow mt-2 fw-bold" style="background-color: #17a2b8;color:#ffffff">Export Above Data in Excel</button>
+        <button id="downloadButton4" class="btn rounded-pill shadow mt-2 fw-bold" style="background-color: #17a2b8;color:#ffffff">Export All Data in Excel</button>
+    </div>
+</div>
+
+
+
+
+<!-- Loading Spinner -->
+<div id="loadingOverlay">
+    <div class="loading-spinner">
+        <img src="/images/gifs/loading2.gif" alt="Loading..." />
+        <p>Loading...</p>
+    </div>
+</div>
+
+<!-- Add an overlay div -->
+<div class="overlay-directPage">
+    <div class="overlay-content-directPage" style="background-color:white">
+        <div class="row pb-2">
+            <h4 style="color:#17a2b8; text-align:center">Page Number #</h4>
+            <hr style="" />
+        </div>
+        <div class="mb-3">
+            <label for="directPageInputOverlay" class="form-label">Page Number:</label><br />
+            <input type="text" class="form-control mb-2" id="directPageInputOverlay" placeholder="Enter Page Number...">
+            <span id="directPage-validationMessage" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button class="btn btn-secondary" onclick="closeDirectPageInput()">Cancel</button>
+            </div>
+            <div class="col-6">
+                <button class="btn" onclick="goToPageFromInput()" style="width:70px;background-color: #17a2b8;color:white;">Go</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade mt-1" id="terminalDetailsModal" tabindex="-1" role="dialog" aria-labelledby="terminalDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog custom-modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="terminalDetailsModalLabel">Terminal Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeForm()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="row" id="terminalDetailsForm">
+                    <!-- Terminal details contents -->
+                    <div id="terminalDetailsFormColumn1" class="col-2 fw-bold"></div>
+                    <div id="terminalDetailsFormColumn2" class="col-4"></div>
+                    <div id="terminalDetailsFormColumn3" class="col-2 fw-bold"></div>
+                    <div id="terminalDetailsFormColumn4" class="col-4"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeForm()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/index.js" asp-append-version="true"></script>
+}

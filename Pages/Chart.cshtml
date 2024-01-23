@@ -1,0 +1,75 @@
+﻿@page
+@model Spider_EMT.Pages.ChartModel
+@{
+    ViewData["Title"] = "Chart Collection";
+}
+
+<div class="container mt-5">
+    <div id="formValidationError" class="text-danger fw-bold"></div>
+    <form method="post" asp-page-handler="Submit Form">
+        <div class="row mb-3" asp-validation-for="All">
+            <div class="col-3">
+                <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.FromDate" for="startDate">From Date:</label>
+                <input type="text" class="form-control datepicker" asp-for="@Model.ChartsViewModelData.FromDate" id="startDate" style="width:70%" />
+                <span asp-validation-for="@Model.ChartsViewModelData.FromDate" class="text-danger fw-bold"></span>
+            </div>
+            <div class="col-3">
+                <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.ToDate" for="endDate">To Date:</label>
+                <input type="text" class="form-control datepicker" asp-for="@Model.ChartsViewModelData.ToDate" id="endDate" style="width:70%" />
+                <span asp-validation-for="@Model.ChartsViewModelData.ToDate" class="text-danger fw-bold"></span>
+            </div>
+            <div class="col-6"></div>
+        </div>
+        
+        <div class="mb-3">
+            <span class="form-check-label fw-bold mb-0">
+                Transaction Graph Type: &nbsp; &nbsp;
+            </span>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="@Model.ChartsViewModelData.TransactionAmountType" value="CW" id="csRadio" checked />
+                <label class="form-label" asp-for="@Model.ChartsViewModelData.TransactionAmountType" for="csRadio">Cash Withdrawal</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="@Model.ChartsViewModelData.TransactionAmountType" value="MS" id="msRadio" />
+                <label class="form-label" asp-for="@Model.ChartsViewModelData.TransactionAmountType" for="msRadio">Mini Statement</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="@Model.ChartsViewModelData.TransactionAmountType" value="BI" id="biRadio" />
+                <label class="form-label" asp-for="@Model.ChartsViewModelData.TransactionAmountType" for="biRadio">Business Inquiry</label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-secondary mt-1 fw-bold shadow">Submit</button>
+        <button type="reset" class="btn btn-outline-secondary mt-1 fw-bold shadow" id="resetButton">Reset</button>
+    </form>
+    <div class="mt-4">
+        <div id="chartContainer" style="height: 100%; width: 100%;" class="">
+            <!--Area to display associated graph-->
+            @if (Model.ChartsViewModelData.ChartTransactionDataList == null || Model.ChartsViewModelData.ChartTransactionDataList.Count() < 1)
+            {
+                <script>
+                    var myViewModelList = @Json.Serialize(Model.ChartsViewModelData.ChartTransactionDataList);
+                    var currentDate = new Date(@Json.Serialize(Model.ChartsViewModelData.ToDate));
+                    var Days90Before = new Date(@Json.Serialize(Model.ChartsViewModelData.FromDate));
+                    var transactionType = '@Model.ChartsViewModelData.TransactionAmountType.ToString()';
+                </script>
+                <p>No data available currently.</p>
+            }
+            else
+            {
+                <div>
+                <script>
+                    var myViewModelList = @Json.Serialize(Model.ChartsViewModelData.ChartTransactionDataList);
+                    var currentDate = new Date(@Json.Serialize(Model.ChartsViewModelData.ToDate));
+                    var Days90Before = new Date(@Json.Serialize(Model.ChartsViewModelData.FromDate));
+                    var transactionType = '@Model.ChartsViewModelData.TransactionAmountType.ToString()';
+                </script>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/transactionChart.js" asp-append-version="true"></script>
+}
