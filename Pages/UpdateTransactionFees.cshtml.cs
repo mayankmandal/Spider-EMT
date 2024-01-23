@@ -12,12 +12,12 @@ namespace Spider_EMT.Pages
 {
     public class UpdateTransactionFeesModel : PageModel
     {
-        private readonly ITransactionFeeRepository _transactionFeeRepository;
+        private readonly ISiteSelectionRepository _siteSelectionRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        public UpdateTransactionFeesModel(ITransactionFeeRepository transactionFeeRepository, IConfiguration configuration, IHttpClientFactory clientFactory)
+        public UpdateTransactionFeesModel(ISiteSelectionRepository siteSelectionRepository, IConfiguration configuration, IHttpClientFactory clientFactory)
         {
-            _transactionFeeRepository = transactionFeeRepository;
+            _siteSelectionRepository = siteSelectionRepository;
             _configuration = configuration;
             _clientFactory = clientFactory;
         }
@@ -26,7 +26,7 @@ namespace Spider_EMT.Pages
         public async Task<IActionResult> OnGet()
         {
             // Retrieve the existing transaction fees values
-            TransactionFeeAmounts = await _transactionFeeRepository.GetTransactionFee();
+            TransactionFeeAmounts = await _siteSelectionRepository.GetTransactionFee();
             return Page();
         }
 
@@ -40,7 +40,7 @@ namespace Spider_EMT.Pages
             try
             {
                 var client = _clientFactory.CreateClient();
-                var apiUrl = $"{_configuration["ApiBaseUrl"]}/TransactionFee/UpdateTransactionFeeAmount";
+                var apiUrl = $"{_configuration["ApiBaseUrl"]}/SiteSelection/UpdateTransactionFeeAmount";
                 var jsonContent = JsonConvert.SerializeObject(TransactionFeeAmounts);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 HttpResponseMessage response;
@@ -51,7 +51,7 @@ namespace Spider_EMT.Pages
                 else
                 {
                     // API endpoint for adding new data
-                    apiUrl = $"{_configuration["ApiBaseUrl"]}/TransactionFee/AddTransactionFeeAmount";
+                    apiUrl = $"{_configuration["ApiBaseUrl"]}/SiteSelection/AddTransactionFeeAmount";
                     response = await client.PostAsync(apiUrl, httpContent);
                 }
 
