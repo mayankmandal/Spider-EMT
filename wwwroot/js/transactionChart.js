@@ -73,10 +73,36 @@ function fetchChartToDisplay() {
             break;
     }
 
-    var seriesData = myViewModelList.map(function (item) {
+    var columnColors = [
+        '#1f78b4', '#33a02c', '#e31a1c', '#ff7f00', '#6a3d9a',
+        '#b15928', '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
+        '#cab2d6', '#ffff99', '#1f78b4', '#33a02c', '#e31a1c',
+        '#ff7f00', '#6a3d9a', '#b15928', '#a6cee3', '#b2df8a',
+        '#fb9a99', '#fdbf6f', '#cab2d6', '#ffff99', '#1f78b4',
+        '#33a02c', '#e31a1c', '#ff7f00', '#6a3d9a', '#b15928',
+        '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f', '#cab2d6',
+        '#ffff99', '#1f78b4', '#33a02c', '#e31a1c', '#ff7f00',
+        '#6a3d9a', '#b15928', '#a6cee3', '#b2df8a', '#fb9a99',
+        '#fdbf6f', '#cab2d6', '#ffff99', '#1f78b4', '#33a02c',
+        '#e31a1c', '#ff7f00', '#6a3d9a', '#b15928', '#a6cee3',
+        '#b2df8a', '#fb9a99', '#fdbf6f', '#cab2d6', '#ffff99',
+        '#1f78b4', '#33a02c', '#e31a1c', '#ff7f00', '#6a3d9a',
+        '#b15928', '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
+        '#cab2d6', '#ffff99', '#1f78b4', '#33a02c', '#e31a1c',
+        '#ff7f00', '#6a3d9a', '#b15928', '#a6cee3', '#b2df8a',
+        '#fb9a99', '#fdbf6f', '#cab2d6', '#ffff99', '#1f78b4',
+        '#33a02c', '#e31a1c', '#ff7f00', '#6a3d9a', '#b15928',
+        '#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f', '#cab2d6',
+        '#ffff99', '#1f78b4', '#33a02c', '#e31a1c', '#ff7f00',
+        '#6a3d9a', '#b15928', '#a6cee3', '#b2df8a', '#fb9a99',
+        '#fdbf6f', '#cab2d6', '#ffff99'
+    ];
+
+    var seriesData = myViewModelList.map(function (item, index) {
         return {
             name: item.bankNameEn,
-            value: item.averageAmount
+            y: item.averageAmount,
+            color: columnColors[index % columnColors.length]
         };
     });
 
@@ -91,44 +117,57 @@ function fetchChartToDisplay() {
             height: '800',
             borderWidth: 1,
             shadow: {
-                color: 'rgba(0, 0, 0, 0.2)',
+                color: 'rgba(0,0,0,0.2)',
                 offsetX: 3,
-                offsetY: 3,
+                offsetX: 3,
                 opacity: 0.2,
                 width: 10
             }
         },
-        plotOptions: {
-            series: {
-                dataLabels: {
-                    enabled: true,
-                    crop: false,
-                    overflow: 'none',
-                },
-                colorByPoint: true,
-            }
-        },
         title: {
-            text: 'Total Collection By Bank'
+            text: 'Total Collection By Bank',
         },
         subtitle: {
             text: 'Banks Collection showing total ' + transactionType + ' for each banks'
         },
+        xAxis: {
+            categories: bankCategoriesData,
+            crosshair: true,
+            accessibility: {
+                description: 'Banks'
+            },
+            labels: {
+                style: {
+                    whiteSpace: 'normal'
+                },
+                useHTML: true
+            },
+            title: {
+                text: 'Banks'
+            }
+        },
         yAxis: {
+            min: 0,
             title: {
                 text: 'Total Collections (in SAR)'
-            }, 
+            }
         },
-        xAxis: {
-            title: {
-                text: 'Bank List'
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0,
+                dataLabels: {
+                    enabled: true,
+                },
+                
             },
-            categories: bankCategoriesData
         },
-        series: [{
-            //name: seriesData.map((dataPoint) => dataPoint.name),
-            data: seriesData.map((dataPoint) => dataPoint.value),
-        }],
+        series: [
+            {
+                name: '',
+                data: seriesData
+            }
+        ]
     });
 }
 document.addEventListener('DOMContentLoaded', function () {

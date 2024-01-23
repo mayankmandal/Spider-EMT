@@ -6,7 +6,7 @@
 
 <div class="container mt-5">
     <div id="formValidationError" class="text-danger fw-bold"></div>
-    <form method="post" asp-page-handler="Submit Form">
+    <form method="post" asp-page-handler="Submit Chart">
         <div class="row mb-3" asp-validation-for="All">
             <div class="col-3">
                 <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.FromDate" for="startDate">From Date:</label>
@@ -46,6 +46,7 @@
             <!--Area to display associated graph-->
             @if (Model.ChartsViewModelData.ChartTransactionDataList == null || Model.ChartsViewModelData.ChartTransactionDataList.Count() < 1)
             {
+                <div>
                 <script>
                     var myViewModelList = @Json.Serialize(Model.ChartsViewModelData.ChartTransactionDataList);
                     var currentDate = new Date(@Json.Serialize(Model.ChartsViewModelData.ToDate));
@@ -53,6 +54,7 @@
                     var transactionType = '@Model.ChartsViewModelData.TransactionAmountType.ToString()';
                 </script>
                 <p>No data available currently.</p>
+                </div>
             }
             else
             {

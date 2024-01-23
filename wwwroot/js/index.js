@@ -30,6 +30,22 @@ var currentDate = new Date();
 var Days90Before = new Date();
 Days90Before.setDate(currentDate.getDate() - 90);
 
+// Add headers to the CSV content
+var headers = {
+    "bankNameEn": "Bank Name",
+    "termId": "Terminal Id",
+    "regionEn": "Region",
+    "cityEn": "City",
+    "txnDate": "Transaction Date",
+    "totalCWCount": "Withdrawals",
+    "totalCWFeeAmount": "Withdrawals Fee Amount",
+    "totalBICount": "Balance Inquiry",
+    "totalMSCount": "Mini Statement",
+    "totalBI_MSFeeAmount": "Inquiry & Statement Fee Amount",
+    "totalTxnOnUsCount": "Total Txn On Us",
+    "totalPayedAmount": "Total Payed Amount"
+};
+
 function validateDateRange() {
     var startDateString = $('#startDate').val();
     var endDateString = $('#endDate').val();
@@ -179,56 +195,6 @@ function goToPageFromInput() {
     }
 }
 
-// Function to render the pagination
-function renderPagination(totalPages) {
-    if (totalPages > 1) {
-        var visiblePages = 5; // Number of visible pages
-        var paginationHtml = '<ul class="pagination">';
-        lastPage = totalPages; //Initialize Last Page value
-        // Previous button
-        paginationHtml += '<li class="page-item ' + (currentPage === 1 ? 'disabled' : '') + '"><a class="page-link" href="javascript:void(0);" onclick="changePage(' + (currentPage - 1) + ')">Prev</a></li>';
-
-        // First page
-        paginationHtml += '<li class="page-item ' + (currentPage === 1 ? 'active' : '') + '"><a class="page-link" href="javascript:void(0);" onclick="changePage(1)">1</a></li>';
-
-        // Pages in the middle
-        var startPage = Math.max(2, currentPage - Math.floor(visiblePages / 2));
-        var endPage = Math.min(totalPages - 1, startPage + visiblePages - 2);
-
-        for (var i = startPage; i <= endPage; i++) {
-            paginationHtml += '<li class="page-item ' + (i === currentPage ? 'active' : '') + '"><a class="page-link" href="javascript:void(0);" onclick="changePage(' + i + ')">' + i + '</a></li>';
-        }
-
-        // Display input field for direct page navigation
-        paginationHtml += '<li class="page-item">';
-        paginationHtml += '<a class="page-link" id="directPageInput" onclick="openDirectPageInput()">...</a>';
-        paginationHtml += '</li>';
-
-        // Last page
-        paginationHtml += '<li class="page-item ' + (currentPage === totalPages ? 'active' : '') + '"><a class="page-link" href="javascript:void(0);" onclick="changePage(' + totalPages + ')">' + totalPages + '</a></li>';
-
-        // Next button
-        paginationHtml += '<li class="page-item ' + (currentPage === totalPages ? 'disabled' : '') + '"><a class="page-link" href="javascript:void(0);" onclick="changePage(' + (currentPage + 1) + ')">Next</a></li>';
-
-        paginationHtml += '</ul>';
-
-        $('#paginationContainer').html(paginationHtml);
-
-        // Initialize popover for small input
-        $('#directPageInput').popover({
-            content: '<button class="btn btn-primary" onclick="openBigInput()">Go</button>',
-            html: true,
-            trigger: 'manual',
-            placement: 'bottom',
-            container: 'body'
-        });
-
-    } else {
-        // Hide pagination if there is only one page or less
-        $('#paginationContainer').empty();
-    }
-}
-
 // Function to handle rows per page change
 function onRowsPerPageChange() {
     rowsPerPage = parseInt($('#rowsPerPage').val(), 10);
@@ -236,7 +202,7 @@ function onRowsPerPageChange() {
     renderTable(currentPage, sortedTransactions);
     // Check if there is data to display pagination
     if (sortedTransactions.length > rowsPerPage) {
-        renderPagination(Math.ceil(sortedTransactions.length / rowsPerPage));
+        renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
         // Show pagination only if there is enough data to paginate
         $('#paginationContainer').show();
     } else {
@@ -251,7 +217,7 @@ function changePage(pageNumber) {
     renderTable(currentPage, sortedTransactions);
     // Check if there is data to display pagination
     if (sortedTransactions.length > rowsPerPage) {
-        renderPagination(Math.ceil(sortedTransactions.length / rowsPerPage));
+        renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
         // Show pagination only if there is enough data to paginate
         $('#paginationContainer').show();
     } else {
@@ -305,386 +271,6 @@ function fetchData(selectedBankId, startDate, endDate) {
     }
     isDateFilterApplied = true; // Set flag to indicate filter is applied
     sortedTransactions = data;
-}
-
-//Function to retrieves and displays terminal data through an AJAX request.
-function showTerminalData(terminalId) {
-    $.ajax({
-        url: '/api/SiteSelection/GetTerminalDetails/' + terminalId,
-        type: 'GET',
-        success: function (result) {
-            renderTerminalDetails(result);
-        },
-        error: function (message) {
-            console.log(message);
-        }
-    });
-}
-
-//Function rendering the details of a terminal in a modal.
-function renderTerminalDetails(terminalResult) {
-    // Clear existing content in modal body
-    $('#terminalDetailsFormColumn1').empty();
-    $('#terminalDetailsFormColumn2').empty();
-    $('#terminalDetailsFormColumn3').empty();
-    $('#terminalDetailsFormColumn4').empty();
-
-    // Define the columns
-    var column1 = $('#terminalDetailsFormColumn1');
-    var column2 = $('#terminalDetailsFormColumn2');
-    var column3 = $('#terminalDetailsFormColumn3');
-    var column4 = $('#terminalDetailsFormColumn4');
-
-    // Create label and input elements for each property in Column 1
-    var label11 = $('<label>', { 'for': 'TermId', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Term Id' });
-    var input11 = $('<input>', { 'type': 'text', 'id': 'TermId', 'class': 'form-control mb-1 py-1', 'value': terminalResult.termId, 'disabled': 'disabled' });
-    column1.append(label11).append('<br>');
-    column2.append(input11);
-
-    var label12 = $('<label>', { 'for': 'BankNameEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Bank Name' });
-    var input12 = $('<input>', { 'type': 'text', 'id': 'BankNameEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.bankNameEn, 'disabled': 'disabled', 'style': 'color: #dc6f26' });
-    column1.append(label12).append('<br>');
-    column2.append(input12);
-
-    var label13 = $('<label>', { 'for': 'CityEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'City Name English' });
-    var input13 = $('<input>', { 'type': 'text', 'id': 'CityEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.cityEn, 'disabled': 'disabled' });
-    column1.append(label13).append('<br>');
-    column2.append(input13);
-
-    var label14 = $('<label>', { 'for': 'DistrictEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'District Name' });
-    var input14 = $('<input>', { 'type': 'text', 'id': 'DistrictEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.districtEn, 'disabled': 'disabled' });
-    column1.append(label14).append('<br>');
-    column2.append(input14);
-
-    var label15 = $('<label>', { 'for': 'Longitude', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Longitude' });
-    var input15 = $('<input>', { 'type': 'text', 'id': 'Longitude', 'class': 'form-control mb-1 py-1', 'value': terminalResult.longitude, 'disabled': 'disabled' });
-    column1.append(label15).append('<br>');
-    column2.append(input15);
-
-    var label16 = $('<label>', { 'for': 'AddressEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Address English' });
-    var input16 = $('<input>', { 'type': 'text', 'id': 'AddressEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.addressEn, 'disabled': 'disabled' });
-    column1.append(label16).append('<br>');
-    column2.append(input16);
-
-    var label17 = $('<label>', { 'for': 'AtmBrand', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Brand Name' });
-    var input17 = $('<input>', { 'type': 'text', 'id': 'AtmBrand', 'class': 'form-control mb-1 py-1', 'value': terminalResult.atmBrand, 'disabled': 'disabled' });
-    column1.append(label17).append('<br>');
-    column2.append(input17);
-
-    var label18 = $('<label>', { 'for': 'SiteTypeEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Site Type' });
-    var input18 = $('<input>', { 'type': 'text', 'id': 'SiteTypeEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.siteTypeEn, 'disabled': 'disabled' });
-    column1.append(label18).append('<br>');
-    column2.append(input18);
-
-    var label19 = $('<label>', { 'for': 'CashCenterNameEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Cash Center Name' });
-    var input19 = $('<input>', { 'type': 'text', 'id': 'CashCenterNameEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.cashCenterNameEn, 'disabled': 'disabled' });
-    column1.append(label19).append('<br>');
-    column2.append(input19);
-
-    var label20 = $('<label>', { 'for': 'ForeignCurrWdl', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Foreign Currency Withdrawal' });
-    var input20 = $('<input>', { 'type': 'text', 'id': 'ForeignCurrWdl', 'class': 'form-control mb-1 py-1', 'value': terminalResult.foreignCurrWdl, 'disabled': 'disabled' });
-    column1.append(label20).append('<br>');
-    column2.append(input20);
-
-    var label01 = $('<label>', { 'for': 'Deposit', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Deposit' });
-    var input01 = $('<input>', { 'type': 'text', 'id': 'Deposit', 'class': 'form-control mb-1 py-1', 'value': terminalResult.deposit, 'disabled': 'disabled' });
-    column1.append(label01).append('<br>');
-    column2.append(input01);
-
-    var label02 = $('<label>', { 'for': 'ConnectionType', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Connection Type' });
-    var input02 = $('<input>', { 'type': 'text', 'id': 'ConnectionType', 'class': 'form-control mb-1 py-1', 'value': terminalResult.connectionType, 'disabled': 'disabled' });
-    column1.append(label02).append('<br>');
-    column2.append(input02);
-
-
-    // Create label and input elements for each property in Column 2
-    var label21 = $('<label>', { 'for': 'BankNameAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Bank Name Arabic' });
-    var input21 = $('<input>', { 'type': 'text', 'id': 'BankNameAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.bankNameAr, 'disabled': 'disabled', 'style': 'color: #dc6f26' });
-    column3.append(label21).append('<br>');
-    column4.append(input21);
-
-    var label22 = $('<label>', { 'for': 'RegionEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Region Name' });
-    var input22 = $('<input>', { 'type': 'text', 'id': 'RegionEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.regionEn, 'disabled': 'disabled' });
-    column3.append(label22).append('<br>');
-    column4.append(input22);
-
-    var label23 = $('<label>', { 'for': 'CityAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'City Name Arabic' });
-    var input23 = $('<input>', { 'type': 'text', 'id': 'CityAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.cityAr, 'disabled': 'disabled' });
-    column3.append(label23).append('<br>');
-    column4.append(input23);
-
-    var label24 = $('<label>', { 'for': 'StreetEn', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Street Name' });
-    var input24 = $('<input>', { 'type': 'text', 'id': 'StreetEn', 'class': 'form-control mb-1 py-1', 'value': terminalResult.streetEn, 'disabled': 'disabled' });
-    column3.append(label24).append('<br>');
-    column4.append(input24);
-
-    var label25 = $('<label>', { 'for': 'Latitude', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Lattitude' });
-    var input25 = $('<input>', { 'type': 'text', 'id': 'Latitude', 'class': 'form-control mb-1 py-1', 'value': terminalResult.latitude, 'disabled': 'disabled' });
-    column3.append(label25).append('<br>');
-    column4.append(input25);
-
-    var label26 = $('<label>', { 'for': 'AddressAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Address Arabic' });
-    var input26 = $('<input>', { 'type': 'text', 'id': 'AddressAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.addressAr, 'disabled': 'disabled' });
-    column3.append(label26).append('<br>');
-    column4.append(input26);
-
-    var label27 = $('<label>', { 'for': 'AtmType', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'ATM Type' });
-    var input27 = $('<input>', { 'type': 'text', 'id': 'AtmType', 'class': 'form-control mb-1 py-1', 'value': terminalResult.atmType, 'disabled': 'disabled' });
-    column3.append(label27).append('<br>');
-    column4.append(input27);
-
-    var label28 = $('<label>', { 'for': 'DistrictAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'District Arabic' });
-    var input28 = $('<input>', { 'type': 'text', 'id': 'DistrictAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.districtAr, 'disabled': 'disabled' });
-    column3.append(label28).append('<br>');
-    column4.append(input28);
-
-    var label29 = $('<label>', { 'for': 'CashCenterNameAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Cash Center Name Arabic' });
-    var input29 = $('<input>', { 'type': 'text', 'id': 'CashCenterNameAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.cashCenterNameAr, 'disabled': 'disabled' });
-    column3.append(label29).append('<br>');
-    column4.append(input29);
-
-    var label30 = $('<label>', { 'for': 'SiteTypeAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Site Type Arabic' });
-    var input30 = $('<input>', { 'type': 'text', 'id': 'SiteTypeAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.siteTypeAr, 'disabled': 'disabled' });
-    column3.append(label30).append('<br>');
-    column4.append(input30);
-
-    var label31 = $('<label>', { 'for': 'StreetAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Street Arabic' });
-    var input31 = $('<input>', { 'type': 'text', 'id': 'StreetAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.streetAr, 'disabled': 'disabled' });
-    column3.append(label31).append('<br>');
-    column4.append(input31);
-
-    var label32 = $('<label>', { 'for': 'RegionAr', 'class': 'form-label py-0', 'style': ' margin-bottom: 12px;', text: 'Region Arabic' });
-    var input32 = $('<input>', { 'type': 'text', 'id': 'RegionAr', 'class': 'form-control mb-1 py-1', 'value': terminalResult.regionAr, 'disabled': 'disabled' });
-    column3.append(label32).append('<br>');
-    column4.append(input32);
-
-    // Show the modal
-    $('#terminalDetailsModal').modal('show');
-}
-
-//Function for Terminal Details Columns to closes the modal and clears its content.
-function closeForm() {
-    // Clear the content in modal elements
-    $('#terminalDetailsFormColumn1').empty();
-    $('#terminalDetailsFormColumn2').empty();
-    $('#terminalDetailsFormColumn3').empty();
-    $('#terminalDetailsFormColumn4').empty();
-
-    // Hide the modal
-    $('#terminalDetailsModal').modal('hide');
-}
-
-// Function to export table data to CSV file
-function exportDataToCsvCurrentPage() {
-    var csvContent = "data:text/csv;charset=utf-8,";
-
-    // Add headers to the CSV content
-    var headers = [
-        "Bank Name",
-        "Terminal Id",
-        "Region",
-        "City",
-        "Transaction Date",
-        "Withdrawals",
-        "Withdrawals Fee Amount",
-        "Balance Inquiry",
-        "Mini Statement",
-        "Inquiry & Statement Fee Amount",
-        "Total Txn On Us",
-        "Total Payed Amount"
-    ];
-    csvContent += headers.join(",") + "\r\n";
-
-    // Add data rows to the CSV content
-    $("#bankTransactionSummaryTable tbody tr").each(function () {
-        var rowData = $(this).find('td').map(function () {
-            // Remove leading " - " from Bank Name column
-            if (headers[this.cellIndex] === 'Bank Name') {
-                return $(this).text().replace(/^ - /, '');
-            }
-            return $(this).text();
-        }).get();
-        csvContent += rowData.join(",") + "\r\n";
-    });
-
-    // Create a Blob and generate a download link
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "transaction_data.csv");
-    document.body.appendChild(link);
-
-    // Trigger a click on the link to start the download
-    link.click();
-
-    // Remove the link from the DOM
-    document.body.removeChild(link);
-}
-
-function exportDataToCsvAllPages() {
-    var csvContent = "data:text/csv;charset=utf-8,";
-
-    // Define headers for the CSV content
-    var headers = {
-        "bankNameEn": "Bank Name",
-        "termId": "Terminal Id",
-        "regionEn": "Region",
-        "cityEn": "City",
-        "txnDate": "Transaction Date",
-        "totalCWCount": "Withdrawals",
-        "totalCWFeeAmount": "Withdrawals Fee Amount",
-        "totalBICount": "Balance Inquiry",
-        "totalMSCount": "Mini Statement",
-        "totalBI_MSFeeAmount": "Inquiry & Statement Fee Amount",
-        "totalTxnOnUsCount": "Total Txn On Us",
-        "totalPayedAmount": "Total Payed Amount"
-    };
-
-    // Add headers to the CSV content
-    csvContent += Object.values(headers).join(",") + "\r\n";
-
-    // Add data rows to the CSV content
-    sortedTransactions.forEach(function (transaction) {
-        var rowData = Object.keys(headers).map(function (header) {
-            // Exclude 'bankLogoPath' from the data
-            return transaction[header] || '';
-        });
-        csvContent += rowData.join(",") + "\r\n";
-    });
-
-    // Create a Blob and generate a download link
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "all_transactions_data.csv");
-    document.body.appendChild(link);
-
-    // Trigger a click on the link to start the download
-    link.click();
-
-    // Remove the link from the DOM
-    document.body.removeChild(link);
-}
-
-// Function to export table data to Excel file
-function exportDataToExcelCurrentPage() {
-    // Extract data from the table
-    var headers = [];
-    var dataRows = [];
-
-    // Extract headers
-    $("#bankTransactionSummaryTable th").each(function () {
-        headers.push($(this).text());
-    });
-
-    // Extract data rows
-    $("#bankTransactionSummaryTable tbody tr").each(function () {
-        var rowData = $(this).find('td').map(function () {
-            // Remove leading " - " from Bank Name column
-            if (headers[this.cellIndex] === 'Bank Name') {
-                return $(this).text().replace(/^ - /, '');
-            }
-            return $(this).text();
-        }).get();
-        dataRows.push(rowData);
-    });
-
-    // Create XML content for Excel
-    var xmls = '<?xml version="1.0"?>\n';
-    xmls += '<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n';
-    xmls += '<ss:Worksheet ss:Name="Sheet1">\n';
-    xmls += '<ss:Table>\n';
-
-    // Add headers
-    xmls += '<ss:Row>\n';
-    headers.forEach(function (header) {
-        xmls += '<ss:Cell><ss:Data ss:Type="String">' + header + '</ss:Data></ss:Cell>\n';
-    });
-    xmls += '</ss:Row>\n';
-
-    // Add data rows
-    dataRows.forEach(function (rowData) {
-        xmls += '<ss:Row>\n';
-        rowData.forEach(function (value) {
-            xmls += '<ss:Cell><ss:Data ss:Type="String">' + value + '</ss:Data></ss:Cell>\n';
-        });
-        xmls += '</ss:Row>\n';
-    });
-
-    xmls += '</ss:Table>\n';
-    xmls += '</ss:Worksheet>\n';
-    xmls += '</ss:Workbook>';
-
-    // Create a Blob and generate a download link
-    var blob = new Blob([xmls], { type: 'application/vnd.ms-excel' });
-    var link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'currentPageData.xls';
-
-    // Trigger a click on the link to start the download
-    document.body.appendChild(link);
-    link.click();
-
-    // Remove the link from the DOM
-    document.body.removeChild(link);
-}
-
-function exportDataToExcelAllPages() {
-    var data = sortedTransactions;
-
-    var xmls = '<?xml version="1.0"?>\n';
-    xmls += '<ss:Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n';
-    xmls += '<ss:Worksheet ss:Name="Sheet1">\n';
-    xmls += '<ss:Table>\n';
-
-    // Define headers for the Excel content
-    var headers = {
-        "bankNameEn": "Bank Name",
-        "termId": "Terminal Id",
-        "regionEn": "Region",
-        "cityEn": "City",
-        "txnDate": "Transaction Date",
-        "totalCWCount": "Withdrawals",
-        "totalCWFeeAmount": "Withdrawals Fee Amount",
-        "totalBICount": "Balance Inquiry",
-        "totalMSCount": "Mini Statement",
-        "totalBI_MSFeeAmount": "Inquiry & Statement Fee Amount",
-        "totalTxnOnUsCount": "Total Txn On Us",
-        "totalPayedAmount": "Total Payed Amount"
-    };
-
-    xmls += '<ss:Row>\n';
-    Object.values(headers).forEach(function (header) {
-        xmls += '<ss:Cell><ss:Data ss:Type="String">' + header + '</ss:Data></ss:Cell>\n';
-    });
-    xmls += '</ss:Row>\n';
-
-    // Add data rows
-    data.forEach(function (transaction) {
-        xmls += '<ss:Row>\n';
-        Object.keys(headers).forEach(function (key) {
-            // Exclude 'bankLogoPath' from the data
-            xmls += '<ss:Cell><ss:Data ss:Type="String">' + (key !== 'bankLogoPath' ? transaction[key] : '') + '</ss:Data></ss:Cell>\n';
-        });
-        xmls += '</ss:Row>\n';
-    });
-
-    xmls += '</ss:Table>\n';
-    xmls += '</ss:Worksheet>\n';
-    xmls += '</ss:Workbook>';
-
-    // Create a Blob and generate a download link
-    var blob = new Blob([xmls], { type: 'application/vnd.ms-excel' });
-    var link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'all_transactions_data.xls';
-
-    // Trigger a click on the link to start the download
-    document.body.appendChild(link);
-    link.click();
-
-    // Remove the link from the DOM
-    document.body.removeChild(link);
 }
 
 // Function to get header columns (replace this with your actual implementation)
@@ -763,7 +349,7 @@ function switchToDefaultView() {
 
     // Check if there is data to display pagination
     if (sortedTransactions.length > rowsPerPage) {
-        renderPagination(Math.ceil(sortedTransactions.length / rowsPerPage));
+        renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
         // Show pagination only if there is enough data to paginate
         $('#paginationContainer').show();
     } else {
@@ -869,7 +455,7 @@ $('#applySearchFilter').click(function () {
 
         // Check if there is data to display pagination
         if (sortedTransactions.length > rowsPerPage) {
-            renderPagination(Math.ceil(sortedTransactions.length / rowsPerPage));
+            renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
             // Show pagination only if there is enough data to paginate
             $('#paginationContainer').show();
         } else {
@@ -892,7 +478,7 @@ $('#clearSearchFilter').click(function () {
         renderTable(currentPage, sortedTransactions);
         // Check if there is data to display pagination
         if (sortedTransactions.length > rowsPerPage) {
-            renderPagination(Math.ceil(sortedTransactions.length / rowsPerPage));
+            renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
             // Show pagination only if there is enough data to paginate
             $('#paginationContainer').show();
         } else {
@@ -920,6 +506,7 @@ $('#allBankName').change(function () {
             switchToTopView();
         }
     } else {
+        $('#dateCheckValidationError').text('');
         $('#tblStartDate').hide();
         $('#tblEndDate').hide();
         $('#tblApplyFilterBtn').hide();
@@ -965,22 +552,22 @@ $('#bankTransactionSummaryTable th').on('click', function () {
 // Event listener for the Download buttons
 $('#downloadButton1').click(function () {
     // Call a function to handle data export in CSV Format for current page
-    exportDataToCsvCurrentPage();
+    exportDataToCsvCurrentPage(headers, $("#bankTransactionSummaryTable tbody tr"));
 });
 
 $('#downloadButton2').click(function () {
     // Call a function to handle data export in CSV Format for all pages
-    exportDataToCsvAllPages();
+    exportDataToCsvAllPages(headers, sortedTransactions);
 });
 
 $('#downloadButton3').click(function () {
     // Call a function to handle data export in Excel for current page
-    exportDataToExcelCurrentPage();
+    exportDataToExcelCurrentPage(headers, $("#bankTransactionSummaryTable tbody tr"));
 });
 
 $('#downloadButton4').click(function () {
     // Call a function to handle data export in Excel for all pages
-    exportDataToExcelAllPages();
+    exportDataToExcelAllPages(headers, sortedTransactions);
 });
 
 // Event listener for Bootstrap modal hidden event
