@@ -3,12 +3,12 @@
 function exportDataToExcelCurrentPage(headers, tableTbodyTRSelector) {
     // Extract data from the table
     var dataRows = [];
-
+    var headerValues = Object.values(headers);
     // Extract data rows
     tableTbodyTRSelector.each(function () {
         var rowData = $(this).find('td').map(function () {
             // Remove leading " - " from Bank Name column
-            if (headers[this.cellIndex] === 'Bank Name') {
+            if (headerValues[this.cellIndex] === 'Bank Name') {
                 return $(this).text().replace(/^ - /, '');
             }
             return $(this).text();
@@ -24,7 +24,7 @@ function exportDataToExcelCurrentPage(headers, tableTbodyTRSelector) {
 
     // Add headers
     xmls += '<ss:Row>\n';
-    headers.forEach(function (header) {
+    headerValues.forEach(function (header) {
         xmls += '<ss:Cell><ss:Data ss:Type="String">' + header + '</ss:Data></ss:Cell>\n';
     });
     xmls += '</ss:Row>\n';
