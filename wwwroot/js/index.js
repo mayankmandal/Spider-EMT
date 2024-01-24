@@ -263,7 +263,6 @@ function switchToTopView() {
         sortedTransactions = filteredTransactions;
         filteredTransactions = [];
     }
-    isApplyTopViewFilter = false; //Search Filter is applied
 
     // Populate column dropdown with header names
     var columnDropdown = $('#columnDropdown');
@@ -433,8 +432,11 @@ $('#clearSearchFilter').click(function () {
         isSearchFilterApplied = false;
         $('#searchfilterValidationMsg').text('');
         $('#applySearchFilter').removeClass('border-danger');
-        sortedTransactions = filteredTransactions;
-        filteredTransactions = [];
+        if (filteredTransactions.length > 0) {
+            sortedTransactions = filteredTransactions;
+            filteredTransactions = [];
+        }
+        
 
         // Render the table with the original data
         renderTable(currentPage, sortedTransactions);
