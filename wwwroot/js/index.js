@@ -30,7 +30,7 @@ var currentDate = new Date();
 var Days90Before = new Date();
 Days90Before.setDate(currentDate.getDate() - 90);
 
-// Add headers to the CSV content
+// Add headers to the CSV/XLS content
 var headers = {
     "bankNameEn": "Bank Name",
     "termId": "Terminal Id",
@@ -99,21 +99,6 @@ function clearTransactionsData() {
 
     //Hide Pagination since no transactions
     $('#paginationContainer').empty();
-}
-
-// Function to handle sorting arrow indicators and highlight the sorted column
-function updateSortIndicators(displayIndex) {
-    $('#bankTransactionSummaryTable th').removeClass('sort-asc sort-desc sorted');
-
-    var sortColumnIndex = displayIndex + 1; // Assuming display indices start from 0
-    var sortDirection = isAscending ? 'asc' : 'desc'; // Set 'asc' or 'desc' based on the sorting direction
-
-    // Update the sorting indicators based on the sorting direction
-    if (sortColumnIndex) {
-        $('#bankTransactionSummaryTable th:nth-child(' + sortColumnIndex + ')')
-            .addClass('sort-' + sortDirection)
-            .addClass('sorted');
-    }
 }
 
 //Function renders the bank transaction summary table based on the provided data.
@@ -226,28 +211,6 @@ function changePage(pageNumber) {
     }
 }
 
-// Function to get the value from an object based on index
-function getValueByIndex(obj, index) {
-    return Object.values(obj)[index];
-}
-
-//Function sorts the bank transactions based on the selected column and updates the table.
-function sortColumn(displayIndex, transactionsdata) {
-    // Convert display index to internal index
-    var index = displayIndex + 1; // Assuming display indices start from 0
-
-    // Update the sortedTransactions array based on sorting
-    sortedTransactions = transactionsdata.slice(0);
-    sortedTransactions.sort(function (a, b) {
-        var aValue = getValueByIndex(a, index);
-        var bValue = getValueByIndex(b, index);
-
-        if (aValue < bValue) return isAscending ? -1 : 1;
-        if (aValue > bValue) return isAscending ? 1 : -1;
-        return 0;
-    });
-}
-
 // Function to fetch data from the API and initialize the page
 function fetchData(selectedBankId, startDate, endDate) {
     try{
@@ -320,13 +283,13 @@ function switchToDefaultView() {
     isApplyTopViewFilter = false; //Search Filter is applied
 
     // Sort by "withdrawalsCount" in descending order by default
-    sortColumn(sortedColumnIndex, sortedTransactions);
+    sortedTransactions = sortColumn(sortedColumnIndex, sortedTransactions, isAscending);
 
     // Update the rendering with sorted data
     renderTable(currentPage, sortedTransactions);
 
     // Highlight the sorted column with arrow
-    updateSortIndicators(sortedColumnIndex);
+    updateSortIndicators(sortedColumnIndex, $('#bankTransactionSummaryTable th'), isAscending);
 
     // Check if there is data to display pagination
     if (sortedTransactions.length > rowsPerPage) {
@@ -521,13 +484,13 @@ $('#bankTransactionSummaryTable th').on('click', function () {
     sortedColumnIndex = index;
 
     // Sort the column
-    sortColumn(index, sortedTransactions);
+    sortedTransactions = sortColumn(index, sortedTransactions, isAscending);
 
     // Update the rendering with sorted data
     renderTable(currentPage, sortedTransactions);
 
     // Highlight the sorted column with arrow
-    updateSortIndicators(index);
+    updateSortIndicators(index, $('#bankTransactionSummaryTable th'), isAscending);
 });
 
 // Event listener for the Download buttons
@@ -598,7 +561,7 @@ $('#btnApplyTopViewFilter').on('click', function () {
         }
 
         // Sort the column
-        sortColumn(columnIndex, sortedTransactions);
+        sortedTransactions = sortColumn(columnIndex, sortedTransactions, isAscending);
 
         isApplyTopViewFilter = true; //Top View Filter is applied
 
@@ -619,7 +582,8 @@ $('#btnApplyTopViewFilter').on('click', function () {
         sortedColumnIndex = columnIndex;
 
         // Highlight the sorted column with arrow
-        updateSortIndicators(columnIndex);
+        updateSortIndicators(columnIndex, $('#bankTransactionSummaryTable th'), isAscending);
+
     }
     else if (isApplyTopViewFilter === true) {
         $('#applyTopViewFilterValidationMsg').text('Clear the Existing applied Top View Filter');
