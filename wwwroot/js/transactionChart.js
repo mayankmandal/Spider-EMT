@@ -164,7 +164,7 @@ function fetchChartToDisplay() {
         },
         series: [
             {
-                name: '',
+                name: 'Total Collections (in SAR)',
                 data: seriesData
             }
         ]

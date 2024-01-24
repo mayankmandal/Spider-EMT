@@ -455,6 +455,7 @@ $('#allBankName').change(function () {
 
     var selectedBank = $(this).val();
     if (selectedBank !== 'None') {
+        $('#allBankNameDateValidationMsg').text('');
         $('#tblStartDate').show();
         $('#tblEndDate').show();
         $('#tblApplyFilterBtn').show();
@@ -468,6 +469,7 @@ $('#allBankName').change(function () {
             switchToTopView();
         }
     } else {
+        $('#allBankNameDateValidationMsg').text('Select All or Any Bank from the below');
         $('#dateCheckValidationError').text('');
         $('#tblStartDate').hide();
         $('#tblEndDate').hide();

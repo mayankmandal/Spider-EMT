@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
-using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 
 namespace Spider_EMT.Controllers

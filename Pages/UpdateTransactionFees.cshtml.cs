@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
-using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
-using System.Net.Http;
 using System.Text;
 
 namespace Spider_EMT.Pages
