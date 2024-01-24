@@ -95,7 +95,8 @@ function clearTransactionsData() {
     $('#filterInput').val('');
     isSearchFilterApplied = false;
     isApplyTopViewFilter = false;
-    $('#applySearchFilter').removeClass('disabled');
+    $('#searchfilterValidationMsg').text('');
+    $('#applySearchFilter').removeClass('border-danger');
 
     // Clear the existing data in tbody
     $('#bankTransactionSummaryTable tbody').empty();
@@ -402,7 +403,6 @@ $('#applySearchFilter').click(function () {
         // Since single value search based, hence first page only
         currentPage = 1;
         isSearchFilterApplied = true; //Search Filter is applied
-        $('#applySearchFilter').addClass('disabled');
         // Render the table with the filtered data
         renderTable(currentPage, sortedTransactions);
 
@@ -411,7 +411,7 @@ $('#applySearchFilter').click(function () {
 
         // Check if there is data to display pagination
         if (sortedTransactions.length > rowsPerPage) {
-            renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
+            renderPagination($('#paginationContainer'), Math.ceil(sortedTransactions.length / rowsPerPage));
             // Show pagination only if there is enough data to paginate
             $('#paginationContainer').show();
         } else {
@@ -419,6 +419,9 @@ $('#applySearchFilter').click(function () {
             $('#paginationContainer').empty();
             $('#bankTransactionSummaryTable th').removeClass('sort-asc sort-desc sorted');
         }
+    } else {
+        $('#searchfilterValidationMsg').text('Clear the Existing applied Text Search');
+        $('#applySearchFilter').addClass('border-danger');
     }
 });
 
@@ -428,7 +431,8 @@ $('#clearSearchFilter').click(function () {
         // Clear the search input field
         $('#filterInput').val('');
         isSearchFilterApplied = false;
-        $('#applySearchFilter').removeClass('disabled');
+        $('#searchfilterValidationMsg').text('');
+        $('#applySearchFilter').removeClass('border-danger');
         sortedTransactions = filteredTransactions;
         filteredTransactions = [];
 
