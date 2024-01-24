@@ -135,7 +135,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body p-0">
-                <div class="table-responsive" style="overflow-x: auto;">
+                <div id="tableContainer" class="table-responsive" style="overflow-x: auto;">
                     <table id="bankTransactionSummaryTable" class="table table-striped m-2" style="white-space: nowrap;">
                         <thead class="" style="background-color: #17a2b8;color:white">
                             <tr>
@@ -159,7 +159,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <div id="downloadCointainer">
         <!-- Added Download Buttons -->
@@ -230,7 +229,7 @@
 </div>
 
 <link href="~/css/index.css" rel="stylesheet" asp-append-version="true" />
-<link rel="stylesheet" href ="~/css/pagination.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />

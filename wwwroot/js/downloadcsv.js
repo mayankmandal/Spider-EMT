@@ -17,10 +17,12 @@ function exportDataToCsvCurrentPage(headers, tableTbodyTRSelector) {
     });
 
     // Create a Blob and generate a download link
+    var dateTimeString = getCurrentFormattedDateTime();
+    var fileName = "transaction_data_" + dateTimeString + ".csv";
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "transaction_data.csv");
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
 
     // Trigger a click on the link to start the download
@@ -46,10 +48,12 @@ function exportDataToCsvAllPages(headers, eachTableRowData) {
     });
 
     // Create a Blob and generate a download link
+    var dateTimeString = getCurrentFormattedDateTime();
+    var fileName = "all_transactions_data_" + dateTimeString + ".csv";
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "all_transactions_data.csv");
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
 
     // Trigger a click on the link to start the download

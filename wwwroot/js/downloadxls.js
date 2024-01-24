@@ -43,10 +43,12 @@ function exportDataToExcelCurrentPage(headers, tableTbodyTRSelector) {
     xmls += '</ss:Workbook>';
 
     // Create a Blob and generate a download link
+    var dateTimeString = getCurrentFormattedDateTime();
+    var fileName = "currentPageData_" + dateTimeString + ".xls";
     var blob = new Blob([xmls], { type: 'application/vnd.ms-excel' });
     var link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'currentPageData.xls';
+    link.download = fileName;
 
     // Trigger a click on the link to start the download
     document.body.appendChild(link);
@@ -82,10 +84,12 @@ function exportDataToExcelAllPages(headers, eachTableRowData) {
     xmls += '</ss:Workbook>';
 
     // Create a Blob and generate a download link
+    var dateTimeString = getCurrentFormattedDateTime();
+    var fileName = "all_transactions_data_" + dateTimeString + ".xls";
     var blob = new Blob([xmls], { type: 'application/vnd.ms-excel' });
     var link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'all_transactions_data.xls';
+    link.download = fileName;
 
     // Trigger a click on the link to start the download
     document.body.appendChild(link);

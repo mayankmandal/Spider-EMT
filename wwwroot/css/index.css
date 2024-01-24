@@ -58,6 +58,7 @@
     background-color: #0056b3;
 }
 
+/* For Spinner When there is a API Call for requesting Bank Transactions */
 #loadingOverlay {
     display: none;
     position: fixed;
@@ -84,6 +85,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow effect */
 }
 
+/* Overlay for Page Number Navigation with Page Number# */
 .overlay-directPage {
     display: none;
     position: fixed;

@@ -46,6 +46,9 @@ var headers = {
     "totalPayedAmount": "Total Payed Amount"
 };
 
+var isDragging = false;
+var startX, scrollLeft;
+
 function validateDateRange() {
     var startDateString = $('#startDate').val();
     var endDateString = $('#endDate').val();
@@ -228,7 +231,9 @@ function fetchData(selectedBankId, startDate, endDate) {
     } catch (error) {
         console.error('Error fetching data', error);
         // Hide loading overlay on error
-        $('#loadingOverlay').hide();
+        setTimeout(function () {
+            $('#loadingOverlay').hide();
+        }, 100);
         clearTransactionsData(); // Clear data on error
         return;
     }
@@ -268,7 +273,9 @@ function switchToTopView() {
     $('#columnDropdown').val('totalCWCount');
 
     // Hide loading overlay after data is loaded
-    $('#loadingOverlay').hide();
+    setTimeout(function () {
+        $('#loadingOverlay').hide();
+    }, 100);
 }
 
 // Function to switch to Default View
@@ -302,7 +309,9 @@ function switchToDefaultView() {
     }
 
     // Hide loading overlay after data is loaded
-    $('#loadingOverlay').hide();
+    setTimeout(function () {
+        $('#loadingOverlay').hide();
+    }, 100);
 }
 
 //All Event Listeners
@@ -397,6 +406,9 @@ $('#applySearchFilter').click(function () {
         // Render the table with the filtered data
         renderTable(currentPage, sortedTransactions);
 
+        // Highlight the sorted column with arrow
+        updateSortIndicators(sortedColumnIndex, $('#bankTransactionSummaryTable th'), isAscending);
+
         // Check if there is data to display pagination
         if (sortedTransactions.length > rowsPerPage) {
             renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
@@ -405,6 +417,7 @@ $('#applySearchFilter').click(function () {
         } else {
             // Hide pagination if there is not enough data
             $('#paginationContainer').empty();
+            $('#bankTransactionSummaryTable th').removeClass('sort-asc sort-desc sorted');
         }
     }
 });
@@ -418,8 +431,13 @@ $('#clearSearchFilter').click(function () {
         $('#applySearchFilter').removeClass('disabled');
         sortedTransactions = filteredTransactions;
         filteredTransactions = [];
+
         // Render the table with the original data
         renderTable(currentPage, sortedTransactions);
+
+        // Highlight the sorted column with arrow
+        updateSortIndicators(sortedColumnIndex, $('#bankTransactionSummaryTable th'), isAscending);
+
         // Check if there is data to display pagination
         if (sortedTransactions.length > rowsPerPage) {
             renderPagination($('#paginationContainer'),Math.ceil(sortedTransactions.length / rowsPerPage));
@@ -615,6 +633,26 @@ $('#btnClearTopViewFilter').on('click', function () {
     }
 });
 
+// Enable horizontal scrolling when dragging inside the content area
+$('#tableContainer')
+.mousedown(function (e) {
+    isDragging = true;
+    startX = e.pageX - $('#tableContainer').offset().left;
+    scrollLeft = $('#tableContainer').scrollLeft();
+})
+.mousemove(function (e) {
+    if (!isDragging) return;
+    var x = e.pageX - $('#tableContainer').offset().left;
+    var walk = (x - startX) * 1.5; // Adjust the sensitivity as needed
+    $('#tableContainer').scrollLeft(scrollLeft - walk);
+})
+.mouseup(function () {
+    isDragging = false;
+})
+.mouseleave(function () {
+    isDragging = false;
+});
+
 $(document).ready(function () {
     // Trigger initial data load on page load
     $('#startDate').datepicker('setDate', Days90Before);
@@ -636,5 +674,4 @@ $(document).ready(function () {
     } else if (viewTypeCheck === 'top') {
         switchToTopView();
     }
-
 });
