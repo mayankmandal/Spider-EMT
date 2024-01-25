@@ -156,7 +156,7 @@ function fetchChartToDisplay() {
         yAxis: {
             min: 0,
             title: {
-                text: 'Total Collections (in SAR)'
+                text: 'Total Collections'
             }
         },
         legend: {
