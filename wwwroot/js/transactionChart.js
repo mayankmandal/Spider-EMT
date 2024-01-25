@@ -102,12 +102,13 @@ function fetchChartToDisplay() {
         return {
             name: item.bankNameEn,
             y: item.averageAmount,
-            color: columnColors[index % columnColors.length]
+            color: columnColors[index % columnColors.length],
+            key: item.bankShortName
         };
     });
 
-    // Extract bank names from the seriesData for xAxis categories
-    var bankCategoriesData = seriesData.map(dataPoint => dataPoint.name);
+    // Create an array of categories using bankShortName
+    var bankCategoriesData = seriesData.map(dataPoint => dataPoint.key);
 
     // Create the Highcharts bar graph
     Highcharts.chart('chartContainer', {
@@ -138,9 +139,15 @@ function fetchChartToDisplay() {
             },
             labels: {
                 style: {
-                    whiteSpace: 'normal'
+                    whiteSpace: 'normal',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden'
                 },
-                useHTML: true
+                useHTML: true,
+                formatter: function () {
+                    // Use key (bankShortName) as xAxis label
+                    return this.value.key;
+                }
             },
             title: {
                 text: 'Banks'
@@ -152,22 +159,35 @@ function fetchChartToDisplay() {
                 text: 'Total Collections (in SAR)'
             }
         },
+        legend: {
+            enabled: true,
+            layout: 'vertical',
+            align: 'center',
+            verticalAlign: 'bottom',
+            labelFormatter: function () {
+                // Customize legend label to include bank name and short name
+                var point = seriesData.find(p => p.name === this.name);
+                return point.key + ' (' + point.name + ')';
+            },
+        },
         plotOptions: {
             column: {
                 pointPadding: 0.2,
                 borderWidth: 0,
                 dataLabels: {
                     enabled: true,
+                    format: '{point.y}'
                 },
-                
+                stacking: null
             },
         },
-        series: [
-            {
-                name: 'Total Collections (in SAR)',
-                data: seriesData
-            }
-        ]
+        series: seriesData.map(function (dataPoint) {
+            return {
+                name: dataPoint.name,
+                data: [dataPoint],
+                color: dataPoint.color
+            };
+        })
     });
 }
 document.addEventListener('DOMContentLoaded', function () {

@@ -257,8 +257,8 @@ namespace Spider_EMT.Repository.Domain
                                      _ => 0 // Default value if transactionAmountType is not recognized
                                  }
                              };
-                /*chartsViewModel.ChartTransactionDataList = result.Where(data => data.BankShortName != null && !data.BankShortName.Contains("\r\n")).ToList();*/
-                chartsViewModel.ChartTransactionDataList = result.ToList();
+                chartsViewModel.ChartTransactionDataList = result.Where(data => data.BankShortName != null && !data.BankShortName.Contains("\r\n")).ToList();
+                //chartsViewModel.ChartTransactionDataList = result.ToList();
                 chartsViewModel.FromDate = startDate;
                 chartsViewModel.ToDate = endDate;
                 chartsViewModel.TransactionAmountType = transactionAmountType;
