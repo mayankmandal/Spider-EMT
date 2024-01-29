@@ -49,6 +49,9 @@ var headers = {
 var isDragging = false;
 var startX, scrollLeft;
 
+var terminalMap = null;
+var terminalMarkerGroup = null;
+
 function validateDateRange() {
     var startDateString = $('#startDate').val();
     var endDateString = $('#endDate').val();
