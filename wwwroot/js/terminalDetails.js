@@ -1,18 +1,17 @@
 ﻿// Function to create a Leaflet map with a marker and popup
 function createLeafletMap(terminalData) {
-
-    var map = L.map('mapContainer').setView([terminalData.latitude, terminalData.longitude], 20);
-
+    terminalMap = L.map('mapContainer').setView([terminalData.latitude, terminalData.longitude], 20);
+    terminalMap.zoomControl.setPosition('bottomleft');
     // Create a layer group for markers
-    var markerGroup = L.layerGroup().addTo(map);
+    terminalMarkerGroup = L.layerGroup().addTo(terminalMap);
 
     // Add a marker to the map
     var singleMarker = L.marker([terminalData.latitude, terminalData.longitude]);
-    singleMarker.addTo(markerGroup);
+    singleMarker.addTo(terminalMarkerGroup);
 
     // Add a popup to the marker
-    var mapPopUp = singleMarker.bindPopup(`<b>${terminalData.addressEn}</b><br>${terminalData.bankNameEn}`);
-    mapPopUp.openPopup().addTo(map);
+    var mapPopUp = singleMarker.addTo(terminalMap).bindPopup(`<b>${terminalData.addressAr}</b><br>${terminalData.districtAr}`);
+    mapPopUp.openPopup();
 
     // Google Map Streets Layer
     var googleStreets = L.tileLayer('https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
@@ -51,31 +50,10 @@ function createLeafletMap(terminalData) {
     };
 
     // Set Google Street Map as the default layer
-    googleStreets.addTo(map);
+    googleStreets.addTo(terminalMap);
 
     // Add layer control
-    L.control.layers(baseLayers, overLaysMarker).addTo(map);
-
-    return { map, markerGroup };
-}
-
-// Function to update the map with new coordinates
-function updateMap(terminalData) {
-    // Clear previous markers if they exist
-    if (terminalMarkerGroup) {
-        terminalMarkerGroup.clearLayers();
-    }
-
-    // Add new marker
-    var singleMarker = L.marker([terminalData.latitude, terminalData.longitude]);
-    singleMarker.addTo(terminalMarkerGroup);
-
-    // Add a popup to the new marker
-    var mapPopUp = singleMarker.bindPopup(`<b>${terminalData.addressEn}</b><br>${terminalData.bankNameEn}`);
-    mapPopUp.addTo(terminalMap);
-
-    // Set the view to the new coordinates
-    terminalMap.setView([terminalData.latitude, terminalData.longitude], 20);
+    L.control.layers(baseLayers, overLaysMarker).addTo(terminalMap);
 }
 
 // Function to remove all previous markers
@@ -93,16 +71,28 @@ function clearMarkers() {
 
 //Function to retrieves and displays terminal data through an AJAX request.
 function showTerminalData(terminalId) {
-    $.ajax({
-        url: '/api/SiteSelection/GetTerminalDetails/' + terminalId,
-        type: 'GET',
-        success: function (result) {
-            renderTerminalDetails(result);
-        },
-        error: function (message) {
-            console.log(message);
-        }
-    });
+    try {
+        var result = $.ajax({
+            url: '/api/SiteSelection/GetTerminalDetails/' + terminalId,
+            type: 'GET',
+            async: false
+        }).responseJSON;
+    } catch (error) {
+        console.error('Error fetching data', error);
+        return;
+    }
+    renderTerminalDetails(result);
+
+    // Check if the map container already has a map instance
+    var existingMap = L.DomUtil.get('mapContainer');
+
+    // If a map already exists, remove it before initializing a new one
+    if (existingMap) {
+        existingMap._leaflet_id = null;
+    }
+
+    // Initialize the map
+    createLeafletMap(result);
 }
 
 //Function rendering the details of a terminal in a modal.
@@ -244,26 +234,6 @@ function renderTerminalDetails(terminalResult) {
 
     // Show the modal
     $('#terminalDetailsModal').modal('show');
-
-    // Check if the map container already has a map instance
-    var existingMap = L.DomUtil.get('mapContainer');
-
-    // If a map already exists, remove it before initializing a new one
-    if (existingMap) {
-        existingMap._leaflet_id = null;
-    }
-
-    // Initialize the map
-    var leafletMapResult = createLeafletMap(terminalResult);
-    terminalMap = leafletMapResult.map;
-    terminalMarkerGroup = leafletMapResult.markerGroup;
-    // Function to update the map with new coordinates
-    function updateMapWithNewCoordinates(terminalResult) {
-        updateMap(terminalResult, terminalMap, terminalMarkerGroup);
-    }
-
-    // Call this function whenever you want to update the map with new coordinates
-    updateMapWithNewCoordinates(terminalResult);
 }
 
 //Function for Terminal Details Columns to closes the modal and clears its content.
