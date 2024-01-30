@@ -9,10 +9,17 @@ function createLeafletMap(terminalData) {
     var singleMarker = L.marker([terminalData.latitude, terminalData.longitude]);
 
     // Customize tooltip content with HTML
-    var tooltipContent = `<div class="map-tooltip-content">
-                         <div><b>${terminalData.addressAr}</b></div>
-                         <div>${terminalData.districtAr}</div>
-                      </div>`;
+    var tooltipContent = `
+        <div class="map-tooltip-content">
+            <div class="map-bank-name">${terminalData.bankNameEn}</div>
+            <div class="map-address-info">
+                <div>${terminalData.cityAr}</div>
+                <div>&nbsp;|&nbsp;</div>
+                <div>${terminalData.streetAr}</div>
+                <div>&nbsp;|&nbsp;</div>
+                <div>${terminalData.districtAr}</div>
+            </div>
+        </div>`;
 
     // Set an offset to position the tooltip correctly
     var tooltipOffset = L.point(0, -28); // Adjust the offset as needed
