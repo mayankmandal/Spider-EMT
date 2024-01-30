@@ -1,39 +1,58 @@
 ﻿// Function to create a Leaflet map with a marker and popup
 function createLeafletMap(terminalData) {
-    terminalMap = L.map('mapContainer').setView([terminalData.latitude, terminalData.longitude], 20);
-    terminalMap.zoomControl.setPosition('bottomleft');
+    terminalMap = L.map('mapContainer').setView([terminalData.latitude, terminalData.longitude], 18);
+    terminalMap.zoomControl.setPosition('bottomright');
     // Create a layer group for markers
     terminalMarkerGroup = L.layerGroup().addTo(terminalMap);
 
     // Add a marker to the map
     var singleMarker = L.marker([terminalData.latitude, terminalData.longitude]);
-    singleMarker.addTo(terminalMarkerGroup);
 
-    // Add a popup to the marker
-    var mapPopUp = singleMarker.addTo(terminalMap).bindPopup(`<b>${terminalData.addressAr}</b><br>${terminalData.districtAr}`);
-    mapPopUp.openPopup();
+    // Customize tooltip content with HTML
+    var tooltipContent = `<div class="map-tooltip-content">
+                         <div><b>${terminalData.addressAr}</b></div>
+                         <div>${terminalData.districtAr}</div>
+                      </div>`;
+
+    // Set an offset to position the tooltip correctly
+    var tooltipOffset = L.point(0, -28); // Adjust the offset as needed
+
+    // Create a red transparent circle around the marker
+    var circle = L.circle([terminalData.latitude, terminalData.longitude], {
+        radius: 10, 
+        color: '#e83815',
+        fillOpacity: 0.4,
+    });
+
+    // Add the circle to the layer group
+    circle.addTo(terminalMarkerGroup);
+
+    singleMarker.bindTooltip(tooltipContent, { direction: 'top', permanent: true, opacity: 0.7, offset: tooltipOffset }).openTooltip();
+
+    // Add the marker to the layer group
+    singleMarker.addTo(terminalMarkerGroup);
 
     // Google Map Streets Layer
     var googleStreets = L.tileLayer('https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
+        maxZoom: 22,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
     // Google Map Hybrid Layer
     var googleHybrid = L.tileLayer('https://{s}.google.com/vt?lyrs=s,h&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
+        maxZoom: 22,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
     // Google Map Satellite Layer
     var googleSatellite = L.tileLayer('https://{s}.google.com/vt?lyrs=s&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
+        maxZoom: 22,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
     // Google Map Terrain Layer
     var googleTerrain = L.tileLayer('https://{s}.google.com/vt?lyrs=p&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
+        maxZoom: 22,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
@@ -71,28 +90,16 @@ function clearMarkers() {
 
 //Function to retrieves and displays terminal data through an AJAX request.
 function showTerminalData(terminalId) {
-    try {
-        var result = $.ajax({
-            url: '/api/SiteSelection/GetTerminalDetails/' + terminalId,
-            type: 'GET',
-            async: false
-        }).responseJSON;
-    } catch (error) {
-        console.error('Error fetching data', error);
-        return;
-    }
-    renderTerminalDetails(result);
-
-    // Check if the map container already has a map instance
-    var existingMap = L.DomUtil.get('mapContainer');
-
-    // If a map already exists, remove it before initializing a new one
-    if (existingMap) {
-        existingMap._leaflet_id = null;
-    }
-
-    // Initialize the map
-    createLeafletMap(result);
+    $.ajax({
+        url: '/api/SiteSelection/GetTerminalDetails/' + terminalId,
+        type: 'GET',
+        success: function (result) {
+            renderTerminalDetails(result);
+        },
+        error: function (message) {
+            console.log(message);
+        }
+    });
 }
 
 //Function rendering the details of a terminal in a modal.
@@ -234,6 +241,22 @@ function renderTerminalDetails(terminalResult) {
 
     // Show the modal
     $('#terminalDetailsModal').modal('show');
+
+    // Check if the map container already has a map instance
+    var existingMap = L.DomUtil.get('mapContainer');
+
+    // If a map already exists, remove it before initializing a new one
+    if (existingMap) {
+        existingMap._leaflet_id = null;
+    }
+
+    // Initialize the map
+    createLeafletMap(terminalResult);
+
+    // Listen for the Bootstrap modal shown event and call invalidateSize when the modal is fully shown
+    $('#terminalDetailsModal').on('shown.bs.modal', function () {
+        terminalMap.invalidateSize();
+    });
 }
 
 //Function for Terminal Details Columns to closes the modal and clears its content.

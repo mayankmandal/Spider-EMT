@@ -111,3 +111,11 @@
     height: 400px; 
     width: 98%;
 }
+
+.map-tooltip-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 400px;
+}
