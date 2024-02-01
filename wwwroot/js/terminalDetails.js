@@ -63,12 +63,18 @@ function createLeafletMap(terminalData) {
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
 
+    //Open Street Map Layer
+    var openStreetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 22,
+    });
+
     // Layer Control
     var baseLayers = {
         "Google Street Map": googleStreets,
         "Google Satellite Map": googleSatellite,
         "Google Terrain Map": googleTerrain,
         "Google Hybrid Map": googleHybrid,
+        "Open Street Map": openStreetMap,
     };
 
     var overLaysMarker = {
