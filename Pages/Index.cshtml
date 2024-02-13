@@ -4,9 +4,32 @@
     ViewData["Title"] = "Transaction Overview";
 }
 
+@if (TempData["success"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.success('@TempData["success"]');
+    </script>
+}
+@if (TempData["error"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.error('@TempData["error"]');
+    </script>
+}
+
 <div class="container mt-2 mb-2 border rounded" style="align-content:center">
     <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f7f7f7; height: 20%; color:gray">
-        OTHER BANKS ATM TOP PERFORMANCE ON US (@Model.CurrentBankDetailsData.CurrentBankName)
+        OTHER BANKS ATM TOP PERFORMANCE ON US (@Model.CurrentBankDetailsData.CurrentBankName <img src="@Model.CurrentBankDetailsData.CurrentBankLogoPath" alt="@Model.CurrentBankDetailsData.CurrentBankName" style="max-width: 70px; height:auto;" loading="lazy" />)
     </div>
     <div class="mb-2">
         <table class="table mb-0">

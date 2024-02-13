@@ -4,5 +4,6 @@
     {
         public int CurrentBankId { get; set; }
         public string CurrentBankName { get; set; }
+        public string CurrentBankLogoPath { get; set; }
     }
 }

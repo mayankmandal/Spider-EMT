@@ -55,6 +55,11 @@
                         <input asp-for="@Model.TransactionFeeAmounts.MSTxnFee" class="form-control" />
                         <span asp-validation-for="@Model.TransactionFeeAmounts.MSTxnFee" class="text-danger"></span>
                     </div>
+                    <div class="mb-3">
+                        <label asp-for="@Model.TransactionFeeAmounts.ChangePin"></label>
+                        <input asp-for="@Model.TransactionFeeAmounts.ChangePin" class="form-control" />
+                        <span asp-validation-for="@Model.TransactionFeeAmounts.ChangePin" class="text-danger"></span>
+                    </div>
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="col-3 me-3">
@@ -95,6 +100,11 @@
                         <label asp-for="TransactionFeeAmounts.MSTxnFee">Mini Statement Fee Amount</label>
                         <input asp-for="TransactionFeeAmounts.MSTxnFee" class="form-control" value="" />
                         <span asp-validation-for="TransactionFeeAmounts.MSTxnFee" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TransactionFeeAmounts.ChangePin">Mini Statement Fee Amount</label>
+                        <input asp-for="TransactionFeeAmounts.ChangePin" class="form-control" value="" />
+                        <span asp-validation-for="TransactionFeeAmounts.ChangePin" class="text-danger"></span>
                     </div>
                     <div class="row">
                         <div class="col-2"></div>

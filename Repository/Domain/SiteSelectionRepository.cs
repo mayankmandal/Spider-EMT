@@ -283,7 +283,8 @@ namespace Spider_EMT.Repository.Domain
                     currentbankdetails = new CurrentBankDetails
                     {
                         CurrentBankId = (int)row["CurrentBankId"],
-                        CurrentBankName = row["CurrentBankName"].ToString()
+                        CurrentBankName = row["CurrentBankName"].ToString(),
+                        CurrentBankLogoPath = $"{BankLogoFolderPath}{row["CurrentBankShortName"]}" + ".png"
                     };
                 }
                 return currentbankdetails;

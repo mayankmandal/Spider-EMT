@@ -62,12 +62,13 @@ namespace Spider_EMT.Pages
                     {
                         TempData["success"] = "Transaction Fee Amounts Added Successfully";
                     }
-                    // Redirect back to the same page
-                    return RedirectToPage();
+                    // Redirect to the Index page
+                    return RedirectToPage("/Index");
                 }
                 else
                 {
                     TempData["error"] = "Error occured in response with status : " + response.StatusCode;
+                    // Redirect to the Same page if error occurs
                     return Page();
                 }
             }
