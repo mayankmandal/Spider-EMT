@@ -22,6 +22,9 @@ builder.Services.AddTransient<ISiteSelectionRepository>(provider =>
     return new SiteSelectionRepository(ssDataFilePath, mapper);
 });
 
+builder.Services.AddTransient<INavigationRepository, NavigationRepository>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

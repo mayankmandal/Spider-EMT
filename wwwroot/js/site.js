@@ -16,3 +16,8 @@ function getCurrentFormattedDateTime() {
 
     return formattedDateTime;
 }
+
+$(document).ready(function () {
+    var currentYear = new Date().getFullYear();
+    $('#copyright-year').text(currentYear);
+});

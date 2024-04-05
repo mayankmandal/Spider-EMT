@@ -1,0 +1,124 @@
+﻿@page
+@model Spider_EMT.Pages.AddUserProfileModel
+@{
+    ViewData["Title"] = "Create Profile";
+}
+
+@if (TempData["success"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.success('@TempData["success"]');
+    </script>
+}
+@if (TempData["error"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.error('@TempData["error"]');
+    </script>
+}
+
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <form method="post">
+        <div id="viewProfileSection" class="container form-control border-2 mt-2 mb-3 bottomDiv" style="width:auto; height:auto; background-color: #f4f0ec;">
+
+            <div class="container border p-3 mt-4" style="background-color:white; width:fit-content;">
+                <div class="row pb-2">
+                    <h2 style="color:#17a2b8; text-align:center">Create New Profile</h2>
+                    <hr style="width:90%" />
+                </div>
+                <div class="mb-3" style="">
+                    <label asp-for="userProfile.ProfileName"></label>
+                    <input asp-for="userProfile.ProfileName" class="form-control" value="" />
+                    <span asp-validation-for="userProfile.ProfileName" class="text-danger"></span>
+                </div>
+            </div>
+
+
+            <!-- Pages -->
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;width:max-content;">
+                <!-- Left Side -->
+                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
+                    <h3>Available Pages</h3>
+                    <div id="availablePages" class="scrollableProfile">
+                        @foreach (var eachpage in Model.Pages)
+                        {
+                            <div class="page">@eachpage.PageDescription</div>
+                        }
+                    </div>
+                </div>
+                <!-- Buttons to Move Pages -->
+                <div style="align-self:center;">
+                    <button class="btn rounded-circle" id="moveLeftBtnPage" style="background-color:#C7D3D4">&lt;</button>
+                    <button class="btn rounded-circle" id="moveRightBtnPage" style="background-color:#C7D3D4">&gt;</button>
+                </div>
+                <!-- Right Side -->
+                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
+                    <h3>Selected Pages</h3>
+                    <div id="selectedPages" class="scrollableProfile">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Categories -->
+
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;width:max-content">
+                <!-- Left Side -->
+                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
+                    <h3>Available Categories</h3>
+                    <div id="availableCategories" class="scrollableProfile">
+                        @foreach (var category in Model.PageCategories)
+                        {
+                            <div class="category">@category.CategoryName</div>
+                        }
+                    </div>
+                </div>
+                <!-- Buttons to Move Categories -->
+                <div style="align-self:center;">
+                    <button class="btn rounded-circle" id="moveLeftBtnCategory" style="background-color:#C7D3D4">&lt;</button>
+                    <button class="btn rounded-circle" id="moveRightBtnCategory" style="background-color:#C7D3D4">&gt;</button>
+                </div>
+                <!-- Right Side -->
+                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
+                    <h3>Selected Categories</h3>
+                    <div id="selectedCategories" class="scrollableProfile">
+                    </div>
+                </div>
+            </div>
+
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;width:max-content">
+
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-3 me-4">
+                        <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Add</button>
+                    </div>
+                    <div class="col-4 ms-3">
+                        <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/userProfile.js" asp-append-version="true"></script>
+    <script>
+        // Serialize the pages and categories models into JSON objects
+        var availablePages = @Html.Raw(Json.Serialize(Model.Pages));
+        var availableCategories = @Html.Raw(Json.Serialize(Model.PageCategories));
+    </script>
+}
