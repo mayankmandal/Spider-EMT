@@ -4,7 +4,7 @@ using Spider_EMT.Models.ViewModels;
 
 namespace Spider_EMT.Configuration
 {
-    public class AutoMapperConfig : Profile
+    public class AutoMapperConfig : AutoMapper.Profile
     {
         public AutoMapperConfig()
         {

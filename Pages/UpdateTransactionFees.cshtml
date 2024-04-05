@@ -30,14 +30,14 @@
 <div class="mt-2 bottomDiv">
     @if (Model.TransactionFeeAmounts != null && Model.TransactionFeeAmounts.TxnFeeId > 0)
     {
-        <div class="container form-control border-2" style="width:40%; background-color: #f4f0ec">
+        <div class="container form-control border-2" style="width:40%; height:auto; background-color: #f4f0ec">
             <form method="post">
                 <input hidden asp-for="@Model.TransactionFeeAmounts.TxnFeeId" />
 
                 <div class="border p-3 mt-4" style="background-color:white">
                     <div class="row pb-2">
                         <h2 style="color:#17a2b8; text-align:center">Transaction Fee Details</h2>
-                        <hr style="" />
+                        <hr style="width:95%" />
                     </div>
                     <div class="mb-3">
                         <label asp-for="@Model.TransactionFeeAmounts.CWTxnFee"></label>
@@ -79,30 +79,30 @@
     else
     {
         <!-- No data, perform add -->
-        <div class="container form-control border-2" style="width:40%; background-color: #f4f0ec">
+        <div class="container form-control border-2" style="width:40%; height:auto; background-color: #f4f0ec">
             <form method="post">
                 <div class="border p-3 mt-4" style="background-color:white">
                     <div class="row pb-2">
                         <h2 style="color:#17a2b8; text-align:center">Transaction Fee Details</h2>
-                        <hr />
+                        <hr style="width:95%" />
                     </div>
                     <div class="mb-3">
-                        <label asp-for="TransactionFeeAmounts.CWTxnFee">Withdrawal Fee Amount</label>
+                        <label asp-for="TransactionFeeAmounts.CWTxnFee"></label>
                         <input asp-for="TransactionFeeAmounts.CWTxnFee" class="form-control" value="" />
                         <span asp-validation-for="TransactionFeeAmounts.CWTxnFee" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label asp-for="TransactionFeeAmounts.BITxnFee">Inquiry Fee Amount</label>
+                        <label asp-for="TransactionFeeAmounts.BITxnFee"></label>
                         <input asp-for="TransactionFeeAmounts.BITxnFee" class="form-control" value="" />
                         <span asp-validation-for="TransactionFeeAmounts.BITxnFee" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label asp-for="TransactionFeeAmounts.MSTxnFee">Mini Statement Fee Amount</label>
+                        <label asp-for="TransactionFeeAmounts.MSTxnFee"></label>
                         <input asp-for="TransactionFeeAmounts.MSTxnFee" class="form-control" value="" />
                         <span asp-validation-for="TransactionFeeAmounts.MSTxnFee" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label asp-for="TransactionFeeAmounts.ChangePin">Mini Statement Fee Amount</label>
+                        <label asp-for="TransactionFeeAmounts.ChangePin"></label>
                         <input asp-for="TransactionFeeAmounts.ChangePin" class="form-control" value="" />
                         <span asp-validation-for="TransactionFeeAmounts.ChangePin" class="text-danger"></span>
                     </div>
