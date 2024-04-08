@@ -1,119 +1,88 @@
 ﻿// Sample data for available and selected pages
-let selectedPages = [];
+let selectedPagesLst = [];
 
 // Sample data for available and selected Categories
-let selectedCategories = [];
+let selectedCategoriesLst = [];
 
-// Function to display selected pages
-function displaySelectedPages() {
-    const selectedPagesDiv = $('#selectedPages');
-    selectedPagesDiv.empty();
-    selectedPages.forEach(page => {
-        const pageDiv = $('<div></div>').text(page).addClass('page selected');
+// Function to render available pages
+function renderAvailablePages(pages) {
+    const availablePagesDiv = $('#availablePages');
+    availablePagesDiv.empty();
+    pages.forEach(page => {
+        const pageDiv = $('<div></div>').text(page.pageDescription).addClass('page');
         pageDiv.on('click', function () {
             $(this).toggleClass('selected');
         });
-        selectedPagesDiv.append(pageDiv);
+        availablePagesDiv.append(pageDiv);
     });
 }
 
-// Function to move page from available to selected
-function selectPage(page) {
-    const index = availablePages.indexOf(page);
-    if (index !== -1) {
-        availablePages.splice(index, 1);
-        selectedPages.push(page);
-        displaySelectedPages();
-
-        $(`#selectedPages .page:contains(${page})`).addClass('selected-page');
-    }
-}
-
-// Function to move page from selected to available
-function deselectPage(page) {
-    const index = selectedPages.indexOf(page);
-    if (index !== -1) {
-        selectedPages.splice(index, 1);
-        availablePages.push(page);
-        displaySelectedPages();
-
-        $(`#selectedPages .page:contains(${page})`).removeClass('selected-page');
-    }
-}
-
-// Event listener for moving page to the left
-$('#moveLeftBtnPage').on('click', () => {
-    $('.selected').each(function () {
-        const pageToMove = $(this).text();
-        deselectPage(pageToMove);
-    });
-    $('.page').removeClass('selected');
-});
-
-// Event listener for moving page to the right
-$('#moveRightBtnPage').on('click', () => {
-    $('.selected').each(function () {
-        const pageToMove = $(this).text();
-        selectPage(pageToMove);
-    });
-    $('.page').removeClass('selected');
-});
-
-// Function to display selected categories
-function displaySelectedCategories() {
-    const selectedCategoriesDiv = $('#selectedCategories');
-    selectedCategoriesDiv.empty();
-    selectedCategories.forEach(category => {
-        const categoryDiv = $('<div></div>').text(category).addClass('category selected');
+// Function to render available categories
+function renderAvailableCategories(categories) {
+    const availableCategoriesDiv = $('#availableCategories');
+    availableCategoriesDiv.empty();
+    categories.forEach(category => {
+        const categoryDiv = $('<div></div>').text(category.categoryName).addClass('category');
         categoryDiv.on('click', function () {
             $(this).toggleClass('selected');
         });
-        selectedCategoriesDiv.append(categoryDiv);
+        availableCategoriesDiv.append(categoryDiv);
     });
 }
 
-// Function to move category from available to selected
-function selectCategory(category) {
-    const index = availableCategories.indexOf(category);
-    if (index !== -1) {
-        availableCategories.splice(index, 1);
-        selectedCategories.push(category);
-        displaySelectedCategories();
-
-        $(`#selectedCategories .category:contains(${category})`).addClass('selected-category');
-    }
-}
-
-// Function to move category from selected to available
-function deselectCategory(category) {
-    const index = selectedCategories.indexOf(category);
-    if (index !== -1) {
-        selectedCategories.splice(index, 1);
-        availableCategories.push(category);
-        displaySelectedCategories();
-
-        $(`#selectedCategories .category:contains(${category})`).removeClass('selected-category');
-    }
-}
-
-// Event listener for moving category to the left
-$('#moveLeftBtnCategory').on('click', () => {
-    $('.selected').each(function () {
-        const categoryToMove = $(this).text();
-        deselectCategory(categoryToMove);
+// Function to move selected items from available to selected list
+function moveSelectedItems(sourceList, targetList, sourceContainer, targetContainer) {
+    const selectedItems = sourceContainer.find('.selected');
+    selectedItems.each(function () {
+        const selectedItem = $(this);
+        const selectedItemText = selectedItem.text();
+        selectedItem.removeClass('selected');
+        targetContainer.append(selectedItem);
+        targetList.push(selectedItemText);
+        const index = sourceList.indexOf(selectedItemText);
+        if (index > -1) {
+            sourceList.splice(index, 1);
+        }
     });
-    $('.category').removeClass('selected');
+}
+
+// Function to handle item selection and movement
+function handleItemMovement(sourceList, targetList, sourceContainer, targetContainer) {
+    const selectedItems = sourceContainer.find('.selected');
+    selectedItems.each(function () {
+        const selectedItem = $(this);
+        const selectedItemText = selectedItem.text();
+        selectedItem.removeClass('selected');
+        targetContainer.append(selectedItem);
+        targetList.push(selectedItemText);
+        const index = sourceList.indexOf(selectedItemText);
+        if (index > -1) {
+            sourceList.splice(index, 1);
+        }
+    });
+}
+
+// Move selected pages to selected list
+$('#moveRightBtnPage').on('click', function () {
+    moveSelectedItems(availablePagesLst, selectedPagesLst, $('#availablePages'), $('#selectedPages'));
 });
 
-// Event listener for moving category to the right
-$('#moveRightBtnCategory').on('click', () => {
-    $('.selected').each(function () {
-        const categoryToMove = $(this).text();
-        selectCategory(categoryToMove);
-    });
-    $('.category').removeClass('selected');
+$('#moveLeftBtnPage').on('click', function () {
+    moveSelectedItems(selectedPagesLst, availablePagesLst, $('#selectedPages'), $('#availablePages'));
+});
+
+// Move selected categories to selected list
+$('#moveRightBtnCategory').on('click', function () {
+    moveSelectedItems(availableCategoriesLst, selectedCategoriesLst, $('#availableCategories'), $('#selectedCategories'));
+});
+
+$('#moveLeftBtnCategory').on('click', function () {
+    moveSelectedItems(selectedCategoriesLst, availableCategoriesLst, $('#selectedCategories'), $('#availableCategories'));
 });
 
 $(document).ready(function () {
-    
+
+    // Call the functions to render available pages and categories
+    renderAvailablePages(availablePagesLst);
+    renderAvailableCategories(availableCategoriesLst);
 });

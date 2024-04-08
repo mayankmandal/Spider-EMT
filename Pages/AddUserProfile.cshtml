@@ -29,12 +29,14 @@
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post">
-        <div id="viewProfileSection" class="container form-control border-2 mt-2 mb-3 bottomDiv" style="width:auto; height:auto; background-color: #f4f0ec;">
+        <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;">
 
-            <div class="container border p-3 mt-4" style="background-color:white; width:fit-content;">
-                <div class="row pb-2">
-                    <h2 style="color:#17a2b8; text-align:center">Create New Profile</h2>
-                    <hr style="width:90%" />
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;">
+                <div class="row pb-1 pt-2">
+                    <h2  style="color:#17a2b8; text-align:center">Create New Profile</h2>
+                    <div>
+                        <hr />
+                    </div>
                 </div>
                 <div class="mb-3" style="">
                     <label asp-for="userProfile.ProfileName"></label>
@@ -43,9 +45,8 @@
                 </div>
             </div>
 
-
             <!-- Pages -->
-            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;width:max-content;">
+            <div class="container form-control border-2 mb-2" style="display: flex; justify-content:space-around;height:auto;">
                 <!-- Left Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
                     <h3>Available Pages</h3>
@@ -58,8 +59,8 @@
                 </div>
                 <!-- Buttons to Move Pages -->
                 <div style="align-self:center;">
-                    <button class="btn rounded-circle" id="moveLeftBtnPage" style="background-color:#C7D3D4">&lt;</button>
-                    <button class="btn rounded-circle" id="moveRightBtnPage" style="background-color:#C7D3D4">&gt;</button>
+                    <button type="button" class="btn rounded-circle" id="moveLeftBtnPage" style="background-color:#C7D3D4">&lt;</button>
+                    <button type="button" class="btn rounded-circle" id="moveRightBtnPage" style="background-color:#C7D3D4">&gt;</button>
                 </div>
                 <!-- Right Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
@@ -69,10 +70,8 @@
                 </div>
             </div>
 
-
             <!-- Categories -->
-
-            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;width:max-content">
+            <div class="container form-control border-2 mb-2" style="display: flex; justify-content:space-around;height:auto;">
                 <!-- Left Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
                     <h3>Available Categories</h3>
@@ -85,8 +84,8 @@
                 </div>
                 <!-- Buttons to Move Categories -->
                 <div style="align-self:center;">
-                    <button class="btn rounded-circle" id="moveLeftBtnCategory" style="background-color:#C7D3D4">&lt;</button>
-                    <button class="btn rounded-circle" id="moveRightBtnCategory" style="background-color:#C7D3D4">&gt;</button>
+                    <button type="button" class="btn rounded-circle" id="moveLeftBtnCategory" style="background-color:#C7D3D4">&lt;</button>
+                    <button type="button" class="btn rounded-circle" id="moveRightBtnCategory" style="background-color:#C7D3D4">&gt;</button>
                 </div>
                 <!-- Right Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
@@ -96,8 +95,7 @@
                 </div>
             </div>
 
-            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;width:max-content">
-
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="col-3 me-4">
@@ -109,6 +107,7 @@
                     <div class="col-3"></div>
                 </div>
             </div>
+
         </div>
     </form>
 </div>
@@ -118,7 +117,7 @@
     <script src="~/js/userProfile.js" asp-append-version="true"></script>
     <script>
         // Serialize the pages and categories models into JSON objects
-        var availablePages = @Html.Raw(Json.Serialize(Model.Pages));
-        var availableCategories = @Html.Raw(Json.Serialize(Model.PageCategories));
+        var availablePagesLst = @Html.Raw(Json.Serialize(Model.Pages));
+        var availableCategoriesLst = @Html.Raw(Json.Serialize(Model.PageCategories));
     </script>
 }
