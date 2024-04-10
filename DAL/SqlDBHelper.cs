@@ -180,5 +180,46 @@ namespace Spider_EMT.DAL
 
             return ds;
         }
+
+        internal static List<DataTable> ExecuteParameterizedNonQuery(string CommandName, CommandType cmdType, SqlParameter[] param)
+        {
+            List<DataTable> tables = new List<DataTable>();
+
+            using (SqlConnection con = new SqlConnection(CONNECTION_STRING))
+            {
+                using (SqlCommand cmd = con.CreateCommand())
+                {
+                    cmd.CommandType = cmdType;
+                    cmd.CommandText = CommandName;
+                    cmd.Parameters.AddRange(param);
+                    cmd.CommandTimeout = CONNECTION_TIMEOUT;
+
+                    try
+                    {
+                        if (con.State != ConnectionState.Open)
+                        {
+                            con.Open();
+                        }
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            DataSet ds = new DataSet();
+                            da.Fill(ds);
+
+                            foreach (DataTable dt in ds.Tables)
+                            {
+                                tables.Add(dt);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return tables;
+        }
     }
 }

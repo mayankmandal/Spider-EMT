@@ -5,6 +5,6 @@
         public int PageCatId { get; set; }
         public string CategoryName { get; set; }
         // Navigation property for Pages
-        public ICollection<Page> Pages { get; set; }
+        public int PageId {  get; set; }
     }
 }

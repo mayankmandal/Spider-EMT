@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Spider_EMT.Models
 {
-    public class Profile
+    public class ProfileSite
     {
         public int ProfileId { get; set; }
         [Required(ErrorMessage = "Profile Name is required")]

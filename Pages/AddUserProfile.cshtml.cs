@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
+using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using System.Text;
-using Page = Spider_EMT.Models.Page;
 
 namespace Spider_EMT.Pages
 {
@@ -20,87 +20,64 @@ namespace Spider_EMT.Pages
             _clientFactory = httpClientFactory;
         }
         [BindProperty]
-        public Profile userProfile { get; set; }
+        public ProfileSite userProfileData { get; set; }
+        public List<PageSite> PagesData { get; set; }
+        public List<PageCategory> PageCategoriesData { get; set; }
         [BindProperty]
-        public IEnumerable<Page> Pages { get; set; }
+        public string SelectedPagesJson { get; set; }
+
         [BindProperty]
-        public IEnumerable<PageCategory> PageCategories { get; set; }
-        public async Task OnGet()
+        public string SelectedCategoriesJson { get; set; }
+        public async Task<IActionResult> OnGet()
         {
             await LoadPagesData();
-            await LoadCategoryData();
+            return Page();
         }
         private async Task LoadPagesData()
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
-            Pages = JsonConvert.DeserializeObject<IEnumerable<Page>>(response);
-        }
-        private async Task LoadCategoryData()
-        {
-            var client = _clientFactory.CreateClient();
-            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPageCategories");
-            PageCategories = JsonConvert.DeserializeObject<IEnumerable<PageCategory>>(response);
+            PagesData = JsonConvert.DeserializeObject<List<PageSite>>(response);
         }
         public async Task<IActionResult> OnPost() 
         {
             if (!ModelState.IsValid)
             {
-                return Page();
+                return BadRequest(ModelState);
             }
             try
             {
+                PagesData = JsonConvert.DeserializeObject<List<PageSite>>(SelectedPagesJson);
+                PageCategoriesData = JsonConvert.DeserializeObject<List<PageCategory>>(SelectedCategoriesJson);
+
+                UserProfileDTO userProfileDTO = new UserProfileDTO
+                {
+                    Profile = userProfileData,
+                    Pages = PagesData,
+                    PageCategories = PageCategoriesData,
+                };
+
                 var client = _clientFactory.CreateClient();
-                var apiUrlforUserProfile = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateUserProfile";
-                var jsonContentforUserProfile = JsonConvert.SerializeObject(userProfile);
-                var httpContentforUserProfile = new StringContent(jsonContentforUserProfile, Encoding.UTF8, "application/json");
-                HttpResponseMessage responseMessageforUserProfile;
+                var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/AddUserProfile";
+                var jsonContent = JsonConvert.SerializeObject(userProfileDTO);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                HttpResponseMessage response;
+                response = await client.PostAsync(apiUrl, httpContent);
 
-                if(userProfile.ProfileId > 0)
+                if (response.IsSuccessStatusCode)
                 {
-                    responseMessageforUserProfile = await client.PutAsync(apiUrlforUserProfile, httpContentforUserProfile);
+                    TempData["success"] = "Profile Created Successfully";
+                    return RedirectToPage("/AddUserProfile");
                 }
                 else
                 {
-                    // API endpoint adding new data
-                    apiUrlforUserProfile = $"{_configuration["ApiBaseUrl"]}/Navigation/AddUserProfile";
-                    responseMessageforUserProfile = await client.PostAsync(apiUrlforUserProfile, httpContentforUserProfile);
-
-                    /*var apiUrlforPages = $"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages";
-                    var jsonContentforPages = JsonConvert.SerializeObject(pages);
-                    var httpContentforPages = new StringContent(jsonContentforPages, Encoding.UTF8, "application/json");
-                    HttpResponseMessage responseMessageforPages;
-
-                    if (pages.Count > 0)
-                    {
-                        responseMessageforPages = await client.PostAsync(apiUrlforPages, httpContentforPages);
-                    }*/
-                }
-
-                if (responseMessageforUserProfile.IsSuccessStatusCode)
-                {
-                    if(userProfile.ProfileId > 0)
-                    {
-                        TempData["success"] = "Profile Updated Successfully";
-                    }
-                    else
-                    {
-                        TempData["success"] = "Profile Created Successfully";
-                    }
-                    // Redirect to Index Page
-                    return RedirectToPage("/Index");
-                }
-                else
-                {
-                    TempData["error"] = "Error occured in response with status : " + responseMessageforUserProfile.StatusCode;
-                    // Redirect to the same page  if error occured
+                    TempData["error"] = "Error occured in response with status : " + response.StatusCode + response.RequestMessage + response.ReasonPhrase;
                     return Page();
                 }
-
             }
             catch (Exception ex)
             {
-                TempData["error"] = "Error Occured : " + ex.Message;
+                TempData["error"] = "Error occured : " + ex.Message;
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }

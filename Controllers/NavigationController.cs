@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
@@ -22,7 +22,7 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                IEnumerable<Profile> allProfilesData = _navigationRepository.GetAllProfiles();
+                IEnumerable<ProfileSite> allProfilesData = _navigationRepository.GetAllProfiles();
                 return Ok(allProfilesData);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                IEnumerable<Page> allPagesData = _navigationRepository.GetAllPages();
+                IEnumerable<PageSite> allPagesData = _navigationRepository.GetAllPages();
                 return Ok(allPagesData);
             }
             catch (Exception ex)
@@ -71,15 +71,15 @@ namespace Spider_EMT.Controller
             }
         }
         [HttpPost("AddUserProfile")]
-        public async Task<IActionResult> AddUserProfile([FromBody] Profile profile)
+        public async Task<IActionResult> AddUserProfile([FromBody] UserProfileDTO userProfileDTO)
         {
             try
             {
-                if(profile == null)
+                if(userProfileDTO.Profile.ProfileId != 0 || userProfileDTO.Profile.ProfileName.IsNullOrEmpty())
                 {
-                    return BadRequest();
+                    return BadRequest("Invalid Request Payload");
                 }
-                await _navigationRepository.AddUserProfile(profile);
+                await _navigationRepository.AddUserProfile(userProfileDTO.Profile, userProfileDTO.Pages, userProfileDTO.PageCategories);
                 return Ok();
             }
             catch (Exception ex)
@@ -99,6 +99,24 @@ namespace Spider_EMT.Controller
                 }
                 await _navigationRepository.AddUserPermissions(userPermission);
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpPost("GetPageToCategories")]
+        public async Task<IActionResult> GetPageToCategories([FromBody] List<int> pageList)
+        {
+            try
+            {
+                if(pageList == null)
+                {
+                    return BadRequest();
+                }
+                List<PageCategory> pageCategories = new List<PageCategory>();
+                pageCategories = _navigationRepository.GetPageToCategories(pageList);
+                return Ok(pageCategories);
             }
             catch (Exception ex)
             {
