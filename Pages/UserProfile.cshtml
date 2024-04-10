@@ -1,7 +1,6 @@
 ﻿@page
-@model Spider_EMT.Pages.AddUserProfileModel
+@model Spider_EMT.Pages.UserProfileModel
 @{
-    ViewData["Title"] = "Create Profile";
 }
 
 @if (TempData["success"] != null)
@@ -33,7 +32,7 @@
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
                 <div class="row pb-1 pt-2">
-                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">Create New Profile</h2>
+                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">User Profile</h2>
                     <div>
                         <hr />
                     </div>
@@ -47,20 +46,9 @@
 
             <!-- Pages -->
             <div class="container form-control border-2 mb-2" style="display: flex; justify-content:space-around;height:auto;">
-                <!-- Left Side -->
+                <!-- Only Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
-                    <h3>Available Pages</h3>
-                    <div id="availablePages" class="scrollableProfile">
-                    </div>
-                </div>
-                <!-- Buttons to Move Pages -->
-                <div style="align-self:center;">
-                    <button type="button" class="btn rounded-circle" id="moveLeftBtnPage" style="background-color:#C7D3D4">&lt;</button>
-                    <button type="button" class="btn rounded-circle" id="moveRightBtnPage" style="background-color:#C7D3D4">&gt;</button>
-                </div>
-                <!-- Right Side -->
-                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
-                    <h3>Selected Pages</h3>
+                    <h3>Access to Pages</h3>
                     <input type="hidden" id="selectedPagesJson" name="SelectedPagesJson" />
                     <div id="selectedPages" class="scrollableProfile">
                     </div>
@@ -68,37 +56,13 @@
             </div>
 
             <!-- Categories -->
-            <div class="container form-control border-2 mb-2" id="categoriesSection" style="display:none;justify-content:space-around;height:auto;">
-                <!-- Left Side -->
+            <div class="container form-control border-2 mb-2" id="categoriesSection" style="display:flex;justify-content:space-around;height:auto;">
+                <!-- Only Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
-                    <h3>Available Categories</h3>
-                    <div id="availableCategories" class="scrollableProfile">
-                    </div>
-                </div>
-                <!-- Buttons to Move Categories -->
-                <div style="align-self:center;">
-                    <button type="button" class="btn rounded-circle" id="moveLeftBtnCategory" style="background-color:#C7D3D4">&lt;</button>
-                    <button type="button" class="btn rounded-circle" id="moveRightBtnCategory" style="background-color:#C7D3D4">&gt;</button>
-                </div>
-                <!-- Right Side -->
-                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
-                    <h3>Selected Categories</h3>
+                    <h3>Access to Categories</h3>
                     <input type="hidden" id="selectedCategoriesJson" name="SelectedCategoriesJson" />
                     <div id="selectedCategories" class="scrollableProfile">
                     </div>
-                </div>
-            </div>
-
-            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
-                <div class="row">
-                    <div class="col-2"></div>
-                    <div class="col-3 me-4">
-                        <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Add</button>
-                    </div>
-                    <div class="col-4 ms-3">
-                        <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
-                    </div>
-                    <div class="col-3"></div>
                 </div>
             </div>
         </div>
@@ -107,7 +71,7 @@
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/addUserProfile.js" asp-append-version="true"></script>
+    <script src="~/js/userProfile.js" asp-append-version="true"></script>
     <script>
         // Serialize the pages and categories models into JSON objects
         var availablePagesLst = @Html.Raw(Json.Serialize(Model.PagesData));

@@ -15,7 +15,7 @@ namespace Spider_EMT.Controller
         {
             _navigationRepository = navigationRepository;
         }
-
+        // Not in Use
         [HttpGet]
         [Route("GetAllProfiles")]
         public IActionResult GetAllProfiles()
@@ -43,6 +43,7 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+        // Not in Use
         [HttpGet("GetAllPageCategories")]
         public IActionResult GetAllPageCategories() 
         {
@@ -56,7 +57,7 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-
+        // Not in Use
         [HttpGet("GetCurrentProfiles")]
         public IActionResult GetCurrentProfiles()
         {
@@ -87,7 +88,7 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-
+        // Not in Use
         [HttpPost("AddUserPermissions")]
         public async Task<IActionResult> AddUserPermissions([FromBody] UserPermission userPermission)
         {
