@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Utility\DataBase\StoredProcedures\" />
+    <Folder Include="wwwroot\images\extra\" />
   </ItemGroup>
 
 </Project>

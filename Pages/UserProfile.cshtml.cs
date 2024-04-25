@@ -28,16 +28,29 @@ namespace Spider_EMT.Pages
         public string SelectedCategoriesJson { get; set; }
         public async Task<IActionResult> OnGet()
         {
-            //await LoadUserProfile();
+            await LoadUserProfile();
             await LoadPagesData();
-            //await LoadCategoriesData();
+            await LoadCategoriesData();
             return Page();
+        }
+        private async Task LoadUserProfile()
+        {
+            var client = _clientFactory.CreateClient();
+            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserProfile");
+            userProfileData = JsonConvert.DeserializeObject<ProfileSite>(response);
+
         }
         private async Task LoadPagesData()
         {
             var client = _clientFactory.CreateClient();
-            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
+            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserPages");
             PagesData = JsonConvert.DeserializeObject<List<PageSite>>(response);
+        }
+        private async Task LoadCategoriesData()
+        {
+            var client = _clientFactory.CreateClient();
+            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserCategories");
+            PageCategoriesData = JsonConvert.DeserializeObject<List<PageCategory>>(response);
         }
     }
 }

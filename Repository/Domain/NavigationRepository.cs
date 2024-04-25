@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Spider_EMT.DAL;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
+using System.Collections.Generic;
 using System.Data;
 
 namespace Spider_EMT.Repository.Domain
@@ -15,7 +17,76 @@ namespace Spider_EMT.Repository.Domain
         {
 
         }
+        public CurrentUser GetCurrentUser()
+        {
+            try
+            {
+                string commandText = "SELECT UserId,Username,Userimgpath FROM tblCurrentUser";
 
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                CurrentUser currentUser = null;
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        currentUser = new CurrentUser
+                        {
+                            UserId = (int)row["UserId"],
+                            UserName = row["Username"].ToString(),
+                            UserImgPath = row["Userimgpath"].ToString()
+                        };
+                    }
+                }
+                return currentUser;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Current User Profile.", ex);
+            }
+        }
+        public List<ProfileUser> GetAllProfileUsers()
+        {
+            try
+            {
+                string commandText = "SELECT UserId,FirstName,LastName,BirthDate FROM tblUsers";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<ProfileUser> profileUsers = new List<ProfileUser>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        ProfileUser profileUser = new ProfileUser
+                        {
+                            UserId = (int)row["UserId"],
+                            FirstName = row["FirstName"].ToString(),
+                            LastName = row["LastName"].ToString(),
+                            BirthDate = (DateTime)row["BirthDate"],
+                        };
+                        profileUsers.Add(profileUser);
+                    }
+                }
+                return profileUsers;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting All Users Data.", ex);
+            }
+        }
         public List<ProfileSite> GetAllProfiles()
         {
             try
@@ -47,10 +118,9 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 // Log or handle other exceptions
-                throw new Exception("Error in GetAllProfiles.", ex);
+                throw new Exception("Error in Getting All Profiles.", ex);
             }
         }
-
         public List<PageSite> GetAllPages()
         {
             try
@@ -84,10 +154,9 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 // Log or handle other exceptions
-                throw new Exception("Error in tblPage.", ex);
+                throw new Exception("Error in Getting All the Pages.", ex);
             }
         }
-
         public List<PageCategory> GetAllPageCategories()
         {
             try
@@ -120,16 +189,193 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 // Log or handle other exceptions
-                throw new Exception("Error in GetAllPageCategories.", ex);
+                throw new Exception("Error in Get All the Page Categories.", ex);
             }
         }
-        public List<PageCategory> GetPageToCategories(List<int> pageList) 
+        public ProfileSite GetCurrentUserProfile()
+        {
+            try
+            {
+                string commandText = "SELECT tp.* FROM tblProfile tp INNER JOIN tblUserProfile tbup on tp.ProfileId = tbup.ProfileId INNER JOIN tblCurrentUser tcu on tbup.UserId = tcu.UserId";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                ProfileSite profileSite = new ProfileSite();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        profileSite = new ProfileSite
+                        {
+                            ProfileId = (int)row["ProfileId"],
+                            ProfileName = row["ProfileName"].ToString(),
+                        };
+                    }
+                }
+                return profileSite;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Current User Profile.", ex);
+            }
+        }
+        public List<PageSite> GetCurrentUserPages()
+        {
+            try
+            {
+                string commandText = "SELECT DISTINCT tbp.* from tblPage tbp INNER JOIN tblUserPermission tup on tbp.PageId = tup.PageId INNER JOIN tblProfile tp on tup.ProfileId = tp.ProfileId INNER JOIN tblUserProfile tbup on tbup.ProfileId = tp.ProfileId INNER JOIN tblCurrentUser tcu on tbup.UserId = tcu.UserId";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<PageSite> pages = new List<PageSite>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        PageSite page = new PageSite
+                        {
+                            PageId = (int)row["PageId"],
+                            MenuImgPath = row["MenuImgPath"].ToString(),
+                            PageCatId = (int)row["PageCatId"],
+                            PageDescription = row["PageDescription"].ToString(),
+                            PageUrl = row["PageUrl"].ToString(),
+                        };
+                        pages.Add(page);
+                    }
+                }
+                return pages;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Current User Pages.", ex);
+            }
+        }
+        public List<PageCategory> GetCurrentUserCategories()
+        {
+            try
+            {
+                string commandText = "SELECT DISTINCT tbpc.*,tbp.PageId from tblPageCatagory tbpc INNER JOIN tblPage tbp on tbp.PageCatId = tbpc.PageCatId INNER JOIN tblUserPermission tup on tbp.PageId = tup.PageId INNER JOIN tblProfile tp on tup.ProfileId = tp.ProfileId INNER JOIN tblUserProfile tbup on tbup.ProfileId = tp.ProfileId INNER JOIN tblCurrentUser tcu on tbup.UserId = tcu.UserId";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<PageCategory> pageCategories = new List<PageCategory>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        PageCategory pageCategory = new PageCategory
+                        {
+                            PageId = (int)row["PageId"],
+                            CategoryName = row["CatagoryName"].ToString(),
+                            PageCatId = (int)row["PageCatId"],
+                        };
+                        pageCategories.Add(pageCategory);
+                    }
+                }
+                return pageCategories;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Current User Categories.", ex);
+            }
+        }
+        public List<PageSite> GetNewUserPages()
+        {
+            try
+            {
+                string commandText = "SELECT DISTINCT tbp.PageUrl,tbp.PageId,tbp.PageDescription,tbp.PageCatId,tbp.MenuImgPath FROM tblPage tbp LEFT JOIN tblUserPermission tup ON tbp.PageId = tup.PageId LEFT JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId LEFT JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId LEFT JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId WHERE tbp.PageId NOT IN ( SELECT DISTINCT tbp.PageId  FROM tblPage tbp  INNER JOIN tblUserPermission tup ON tbp.PageId = tup.PageId  INNER JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId  INNER JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId  INNER JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId)";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<PageSite> pages = new List<PageSite>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        PageSite page = new PageSite
+                        {
+                            PageId = (int)row["PageId"],
+                            MenuImgPath = row["MenuImgPath"].ToString(),
+                            PageCatId = (int)row["PageCatId"],
+                            PageDescription = row["PageDescription"].ToString(),
+                            PageUrl = row["PageUrl"].ToString(),
+                        };
+                        pages.Add(page);
+                    }
+                }
+                return pages;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting new user pages.", ex);
+            }
+        }
+        public List<PageCategory> GetNewUserCategories()
+        {
+            try
+            {
+                string commandText = "SELECT DISTINCT tbpc.*, tbp.PageId FROM tblPageCatagory tbpc INNER JOIN tblPage tbp ON tbp.PageCatId = tbpc.PageCatId INNER JOIN tblUserPermission tup ON tbp.PageId = tup.PageId INNER JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId INNER JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId INNER JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId WHERE tbpc.PageCatId NOT IN (    SELECT DISTINCT tbpc.PageCatId FROM tblPageCatagory tbpc INNER JOIN tblPage tbp ON tbp.PageCatId = tbpc.PageCatId INNER JOIN tblUserPermission tup ON tbp.PageId = tup.PageId INNER JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId INNER JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId INNER JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId)";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<PageCategory> pageCategories = new List<PageCategory>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        PageCategory pageCategory = new PageCategory
+                        {
+                            PageId = (int)row["PageId"],
+                            CategoryName = row["CatagoryName"].ToString(),
+                            PageCatId = (int)row["PageCatId"],
+                        };
+                        pageCategories.Add(pageCategory);
+                    }
+                }
+                return pageCategories;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting new user categories.", ex);
+            }
+        }
+        public List<PageCategory> GetPageToCategories(List<int> pageList)
         {
             try
             {
                 List<PageCategory> pageCategories = new List<PageCategory>();
 
-                foreach(int pageId in pageList)
+                foreach (int pageId in pageList)
                 {
                     string commandText = "SELECT DISTINCT tpc.PageCatId, tpc.CatagoryName from tblPageCatagory tpc INNER JOIN tblPage tp on tpc.PageCatId = tp.PageCatId WHERE tp.PageId = @PageId";
                     SqlParameter[] sqlParameter =
@@ -165,10 +411,9 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 // Log or handle other exceptions
-                throw new Exception("Error in GetAllPageCategories.", ex);
+                throw new Exception("Error in Getting Page to Categories.", ex);
             }
         }
-
         public List<CurrentUserProfileViewModel> GetCurrentProfiles()
         {
             try
@@ -201,10 +446,9 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 // Log or handle other exceptions
-                throw new Exception("Error in GetAllPageCategories.", ex);
+                throw new Exception("Error in Getting Current Profiles.", ex);
             }
         }
-
         public async Task<bool> AddUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories)
         {
             try
@@ -243,12 +487,12 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId}
                     };
 
-                    bool isSuccess = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
-                    if (!isSuccess)
+                    bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
                     {
                         return false;
                     }
-                    
+
                 }
 
                 // Filter out pages with matching PageCatId
@@ -264,8 +508,8 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pagesite.PageCatId}
                     };
 
-                    bool isSuccess = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
-                    if (!isSuccess)
+                    bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
                     {
                         return false;
                     }
@@ -273,45 +517,139 @@ namespace Spider_EMT.Repository.Domain
             }
             catch (SqlException sqlEx)
             {
-                throw new Exception("Error adding transaction fees - SQL Exception.", sqlEx);
+                throw new Exception("Error while adding User Profile - SQL Exception.", sqlEx);
                 return false;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error adding transaction fees.", ex);
+                throw new Exception("Error while adding User Profile.", ex);
                 return false;
             }
             return true;
         }
-
-        public async Task<bool> AddUserPermissions(UserPermission userPermission)
+        public async Task<bool> UpdateUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories)
         {
             try
             {
-                string commandText = "INSERT INTO tblUserPermission (ProfileId, PageId, PageCatId) VALUES (@ProfileId, @PageId, @PageCatId)";
-
-                // Parameters
+                // User Profile Creation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@ProfileId", SqlDbType.VarChar, 50) { Value = userPermission.ProfileId },
-                    new SqlParameter("@PageId", SqlDbType.Int) { Value = userPermission.PageId },
-                    //new SqlParameter("@PageCatId", SqlDbType.Int){Value = userPermission.PageCatId ?? DBNull.Value}
+                    new SqlParameter("@ProfileId", SqlDbType.Int) { Value = profile.ProfileId },
+                    new SqlParameter("@NewProfileName", SqlDbType.VarChar, 50) { Value = profile.ProfileName }
                 };
 
                 // Execute the command
-                bool isSuccess = SqlDBHelper.ExecuteNonQuery(commandText, CommandType.Text, sqlParameters);
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_UpdateUserProfile, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
+                {
+                    return false;
+                }
 
-                return isSuccess;
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@ProfileId", SqlDbType.Int) { Value = profile.ProfileId }
+                };
+                isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
+                {
+                    return false;
+                }
 
+                // User Permission Allotment based on categories list provided already having associated pages linked
+                foreach (PageCategory pageCategory in pageCategories)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profile.ProfileId},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageCategory.PageId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId}
+                    };
+
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+
+                }
+
+                // Filter out pages with matching PageCatId
+                var filteredPages = pages.Where(p => !pageCategories.Any(pc => pc.PageCatId == p.PageCatId)).ToList();
+
+                // User Permission Allotment based on pages list provided, removed already inserted categories asscoaited pages
+                foreach (PageSite pagesite in filteredPages)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profile.ProfileId},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pagesite.PageId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pagesite.PageCatId}
+                    };
+
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
             }
             catch (SqlException sqlEx)
             {
-                throw new Exception("Error adding transaction fees - SQL Exception.", sqlEx);
+                throw new Exception("Error while updating User Profile - SQL Exception.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error adding transaction fees.", ex);
+                throw new Exception("Error while updating User Profile.", ex);
             }
+            return true;
+        }
+        public async Task<bool> AddNewUserProfile(List<ProfileSite> profiles, List<ProfileUser> profileUsers)
+        {
+            try
+            {
+                SqlParameter[] sqlParameters;
+                // Deletion of existing access for profiles for a user
+                foreach (ProfileUser profileUser in profileUsers)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@UserId", SqlDbType.Int){Value = profileUser.UserId},
+                    };
+
+                    bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserProfile, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
+                // User Profile Access Allotment
+                foreach (ProfileUser profileUser in profileUsers)
+                {
+                    foreach (ProfileSite profileSite in profiles)
+                    {
+                        sqlParameters = new SqlParameter[]
+                        {
+                            new SqlParameter("@ProfileId", SqlDbType.Int){Value = profileSite.ProfileId},
+                            new SqlParameter("@UserId", SqlDbType.Int){Value = profileUser.UserId},
+                        };
+
+                        bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddNewUserProfile, CommandType.StoredProcedure, sqlParameters);
+                        if (isFailure)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user profile.", ex);
+            }
+            return true;
         }
     }
 }

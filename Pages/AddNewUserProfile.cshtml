@@ -1,0 +1,97 @@
+﻿@page
+@model Spider_EMT.Pages.AddNewUserProfileModel
+@{
+    ViewData["Title"] = "Add New User Profile";
+}
+
+@if (TempData["success"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.success('@TempData["success"]');
+    </script>
+}
+@if (TempData["error"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.error('@TempData["error"]');
+    </script>
+}
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <form method="post" onsubmit="prepareFormSubmission();">
+        <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;font-size:2rem;">
+
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
+                <div class="row pb-1 pt-2">
+                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">Assign User Profiles</h2>
+                    <div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="container form-control border-2 mb-2" style="display: flex; justify-content:space-around;height:auto;">
+                <!-- Left Side -->
+                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
+                    <input type="hidden" id="SelectedProfileUsersJson" name="SelectedProfileUsersJson" />
+                    <div class="mb-3">
+                        <label for="profileUsers" class="form-label" style="font-size:1.2rem;">Select Profile Users</label>
+                        <select id="profileUsers" class="form-control" multiple style="font-size:1.2rem;">
+                            @foreach (var user in Model.ProfileUsersData)
+                            {
+                                <option value="@user.UserId">@user.FirstName @user.LastName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <!-- Buttons to Move Pages -->
+                <div style="align-self:center;">
+                    <button type="button" class="btn rounded-circle" id="moveLeftBtnPage" style="background-color:#C7D3D4">=</button>
+                </div>
+                <!-- Right Side -->
+                <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
+                    <input type="hidden" id="SelectedProfilesJson" name="SelectedProfilesJson" />
+                    <div class="mb-3">
+                        <label for="profiles" class="form-label" style="font-size:1.2rem;">Select Profiles</label>
+                        <select id="profiles" class="form-control" multiple style="font-size:1.2rem;">
+                            @foreach (var profile in Model.ProfilesData)
+                            {
+                                <option value="@profile.ProfileId">@profile.ProfileName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-3 me-4">
+                        <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Add</button>
+                    </div>
+                    <div class="col-4 ms-3">
+                        <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Serialize the pages and categories models into JSON objects
+        var allProfileUsersLst = @Html.Raw(Json.Serialize(Model.ProfileUsersData));
+        var allProfilesLst = @Html.Raw(Json.Serialize(Model.ProfilesData));
+    </script>
+    <script src="~/js/addNewUserProfile.js"></script>
+}

@@ -29,7 +29,6 @@
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post">
         <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;font-size:2rem;">
-
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
                 <div class="row pb-1 pt-2">
                     <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">User Profile</h2>
@@ -38,9 +37,9 @@
                     </div>
                 </div>
                 <div class="mb-3" style="">
-                    <label asp-for="userProfileData.ProfileName" class="form-label" style="font-size:1.2rem;"></label>
-                    <input id="profileNameInput" asp-for="userProfileData.ProfileName" class="form-control" style="font-size:1.2rem;" value="" />
-                    <span asp-validation-for="userProfileData.ProfileName" class="mt-auto text-danger fw-bold" style="font-size:1.2rem;"></span>
+                    <label asp-for="@Model.userProfileData.ProfileName" class="form-label" style="font-size:1.2rem;"></label>
+                    <input id="profileNameInput" asp-for="@Model.userProfileData.ProfileName" class="form-control" style="font-size:1.2rem;" value="@Model.userProfileData.ProfileName" disabled />
+                    <span asp-validation-for="@Model.userProfileData.ProfileName" class="mt-auto text-danger fw-bold" style="font-size:1.2rem;"></span>
                 </div>
             </div>
 
@@ -49,8 +48,11 @@
                 <!-- Only Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
                     <h3>Access to Pages</h3>
-                    <input type="hidden" id="selectedPagesJson" name="SelectedPagesJson" />
                     <div id="selectedPages" class="scrollableProfile">
+                        @foreach(var pagedata in Model.PagesData)
+                        {
+                            <div disabled>@pagedata.PageDescription</div>
+                        }
                     </div>
                 </div>
             </div>
@@ -60,8 +62,11 @@
                 <!-- Only Side -->
                 <div class="ms-2 me-4 mt-2 mb-2" style="align-self:flex-start">
                     <h3>Access to Categories</h3>
-                    <input type="hidden" id="selectedCategoriesJson" name="SelectedCategoriesJson" />
                     <div id="selectedCategories" class="scrollableProfile">
+                        @foreach (var category in Model.PageCategoriesData)
+                        {
+                            <div disabled>@category.CategoryName</div>
+                        }
                     </div>
                 </div>
             </div>
