@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE NavbarSearch.js
+ * SpiderWeb NavbarSearch.js
  * License MIT
  * --------------------------------------------
  */

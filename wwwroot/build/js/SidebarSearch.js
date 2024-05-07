@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE SidebarSearch.js
+ * SpiderWeb SidebarSearch.js
  * License MIT
  * --------------------------------------------
  */

@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE CardRefresh.js
+ * SpiderWeb CardRefresh.js
  * License MIT
  * --------------------------------------------
  */

@@ -10,5 +10,11 @@
         public const string SP_DeleteUserPermission = "dbo.uspDeleteUserPermission";
         public const string SP_AddNewUserProfile = "dbo.uspAddNewUserProfile";
         public const string SP_DeleteUserProfile = "dbo.uspDeleteUserProfile";
+        public static class UserStatus
+        {
+            public static string IsActive = "AC";
+            public static string IsActiveDirectoryUser = "AD";
+            public static string ChangePassword = "CH";
+        };
     }
 }

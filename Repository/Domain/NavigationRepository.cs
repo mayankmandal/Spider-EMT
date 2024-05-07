@@ -67,9 +67,6 @@ namespace Spider_EMT.Repository.Domain
                         ProfileUser profileUser = new ProfileUser
                         {
                             UserId = (int)row["UserId"],
-                            FirstName = row["FirstName"].ToString(),
-                            LastName = row["LastName"].ToString(),
-                            BirthDate = (DateTime)row["BirthDate"],
                         };
                         profileUsers.Add(profileUser);
                     }
@@ -207,7 +204,6 @@ namespace Spider_EMT.Repository.Domain
                     {
                         profileSite = new ProfileSite
                         {
-                            ProfileId = (int)row["ProfileId"],
                             ProfileName = row["ProfileName"].ToString(),
                         };
                     }
@@ -449,16 +445,22 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current Profiles.", ex);
             }
         }
-        public async Task<bool> AddUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories)
+        public async Task<bool> CreateUserProfile(ProfileUser userProfileData)
         {
             try
             {
-                int ProfileId = 0;
+                int UserIdentity = 0;
 
                 // User Profile Creation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@NewProfileName", SqlDbType.VarChar, 50) { Value = profile.ProfileName }
+                    new SqlParameter("@NewUserId", SqlDbType.Int) { Value = userProfileData.UserId },
+                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 20) { Value = userProfileData.IdNumber },
+                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userProfileData.FullName },
+                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
+                    new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
+                    new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
+                    new SqlParameter("@NewUserStatus", SqlDbType.VarChar, 5) { Value = userProfileData.Status },
                 };
 
                 // Execute the command
@@ -469,47 +471,9 @@ namespace Spider_EMT.Repository.Domain
                     if (dataTable.Rows.Count > 0)
                     {
                         DataRow dataRow = dataTable.Rows[0];
-                        ProfileId = (int)dataRow["ProfileId"];
+                        UserIdentity = (int)dataRow["UserIdentity"];
                     }
                     else
-                    {
-                        return false;
-                    }
-                }
-
-                // User Permission Allotment based on categories list provided already having associated pages linked
-                foreach (PageCategory pageCategory in pageCategories)
-                {
-                    sqlParameters = new SqlParameter[]
-                    {
-                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = ProfileId},
-                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageCategory.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId}
-                    };
-
-                    bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
-                    if (isFailure)
-                    {
-                        return false;
-                    }
-
-                }
-
-                // Filter out pages with matching PageCatId
-                var filteredPages = pages.Where(p => !pageCategories.Any(pc => pc.PageCatId == p.PageCatId)).ToList();
-
-                // User Permission Allotment based on pages list provided, removed already inserted categories asscoaited pages
-                foreach (PageSite pagesite in filteredPages)
-                {
-                    sqlParameters = new SqlParameter[]
-                    {
-                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = ProfileId},
-                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pagesite.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pagesite.PageCatId}
-                    };
-
-                    bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
-                    if (isFailure)
                     {
                         return false;
                     }
@@ -518,12 +482,10 @@ namespace Spider_EMT.Repository.Domain
             catch (SqlException sqlEx)
             {
                 throw new Exception("Error while adding User Profile - SQL Exception.", sqlEx);
-                return false;
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while adding User Profile.", ex);
-                return false;
             }
             return true;
         }
@@ -603,41 +565,35 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> AddNewUserProfile(List<ProfileSite> profiles, List<ProfileUser> profileUsers)
+        public async Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {
                 SqlParameter[] sqlParameters;
                 // Deletion of existing access for profiles for a user
-                foreach (ProfileUser profileUser in profileUsers)
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId}
+                };
+
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
+                {
+                    return false;
+                }
+                // User Profile Access Allotment
+                foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
                 {
                     sqlParameters = new SqlParameter[]
                     {
-                        new SqlParameter("@UserId", SqlDbType.Int){Value = profileUser.UserId},
+                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageSite.PageCatId},
                     };
-
-                    bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserProfile, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
-                    }
-                }
-                // User Profile Access Allotment
-                foreach (ProfileUser profileUser in profileUsers)
-                {
-                    foreach (ProfileSite profileSite in profiles)
-                    {
-                        sqlParameters = new SqlParameter[]
-                        {
-                            new SqlParameter("@ProfileId", SqlDbType.Int){Value = profileSite.ProfileId},
-                            new SqlParameter("@UserId", SqlDbType.Int){Value = profileUser.UserId},
-                        };
-
-                        bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddNewUserProfile, CommandType.StoredProcedure, sqlParameters);
-                        if (isFailure)
-                        {
-                            return false;
-                        }
                     }
                 }
             }

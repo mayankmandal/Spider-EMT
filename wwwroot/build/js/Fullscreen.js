@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE Fullscreen.js
+ * SpiderWeb Fullscreen.js
  * License MIT
  * --------------------------------------------
  */

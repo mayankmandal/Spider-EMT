@@ -15,8 +15,8 @@ namespace Spider_EMT.Repository.Skeleton
         List<PageSite> GetNewUserPages();
         List<PageCategory> GetCurrentUserCategories();
         List<PageCategory> GetNewUserCategories();
-        Task<bool> AddUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories);
-        Task<bool> AddNewUserProfile(List<ProfileSite> profiles, List<ProfileUser> profileUsers);
+        Task<bool> CreateUserProfile(ProfileUser profileUsersData);
+        Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> UpdateUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories);
         List<PageCategory> GetPageToCategories(List<int> pageList);
     }

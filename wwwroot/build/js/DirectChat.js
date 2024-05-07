@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE DirectChat.js
+ * SpiderWeb DirectChat.js
  * License MIT
  * --------------------------------------------
  */

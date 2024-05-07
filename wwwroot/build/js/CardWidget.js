@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE CardWidget.js
+ * SpiderWeb CardWidget.js
  * License MIT
  * --------------------------------------------
  */

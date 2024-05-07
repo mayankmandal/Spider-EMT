@@ -1,5 +1,5 @@
 /*!
- * AdminLTE v3.2.0 (https://adminlte.io)
+ * SpiderWeb v3.2.0 
  * Copyright 2014-2022 Colorlib <https://colorlib.com>
  * Licensed under MIT (https://github.com/ColorlibHQ/AdminLTE/blob/master/LICENSE)
  */
@@ -15,7 +15,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE CardRefresh.js
+   * SpiderWeb CardRefresh.js
    * License MIT
    * --------------------------------------------
    */
@@ -182,7 +182,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE CardWidget.js
+   * SpiderWeb CardWidget.js
    * License MIT
    * --------------------------------------------
    */
@@ -408,7 +408,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE ControlSidebar.js
+   * SpiderWeb ControlSidebar.js
    * License MIT
    * --------------------------------------------
    */
@@ -724,7 +724,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE DirectChat.js
+   * SpiderWeb DirectChat.js
    * License MIT
    * --------------------------------------------
    */
@@ -803,7 +803,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE Dropdown.js
+   * SpiderWeb Dropdown.js
    * License MIT
    * --------------------------------------------
    */
@@ -943,7 +943,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE ExpandableTable.js
+   * SpiderWeb ExpandableTable.js
    * License MIT
    * --------------------------------------------
    */
@@ -1065,7 +1065,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE Fullscreen.js
+   * SpiderWeb Fullscreen.js
    * License MIT
    * --------------------------------------------
    */
@@ -1183,7 +1183,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE IFrame.js
+   * SpiderWeb IFrame.js
    * License MIT
    * --------------------------------------------
    */
@@ -1678,7 +1678,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE Layout.js
+   * SpiderWeb Layout.js
    * License MIT
    * --------------------------------------------
    */
@@ -1930,7 +1930,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE PushMenu.js
+   * SpiderWeb PushMenu.js
    * License MIT
    * --------------------------------------------
    */
@@ -2156,7 +2156,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE SidebarSearch.js
+   * SpiderWeb SidebarSearch.js
    * License MIT
    * --------------------------------------------
    */
@@ -2452,7 +2452,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE NavbarSearch.js
+   * SpiderWeb NavbarSearch.js
    * License MIT
    * --------------------------------------------
    */
@@ -2560,7 +2560,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE Toasts.js
+   * SpiderWeb Toasts.js
    * License MIT
    * --------------------------------------------
    */
@@ -2762,7 +2762,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE TodoList.js
+   * SpiderWeb TodoList.js
    * License MIT
    * --------------------------------------------
    */
@@ -2876,7 +2876,7 @@
 
   /**
    * --------------------------------------------
-   * AdminLTE Treeview.js
+   * SpiderWeb Treeview.js
    * License MIT
    * --------------------------------------------
    */

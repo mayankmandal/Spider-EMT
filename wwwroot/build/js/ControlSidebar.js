@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------
- * AdminLTE ControlSidebar.js
+ * SpiderWeb ControlSidebar.js
  * License MIT
  * --------------------------------------------
  */

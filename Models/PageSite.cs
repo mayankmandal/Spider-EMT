@@ -7,5 +7,6 @@
         public string PageDescription { get; set; }
         public int PageCatId { get; set; }
         public string MenuImgPath { get; set; }
+        public bool isSelected { get; set; }
     }
 }

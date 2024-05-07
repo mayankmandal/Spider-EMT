@@ -149,23 +149,6 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-        [HttpPost("AddUserProfile")]
-        public async Task<IActionResult> AddUserProfile([FromBody] UserProfileDTO userProfileDTO)
-        {
-            try
-            {
-                if(userProfileDTO.Profile.ProfileId != 0 || userProfileDTO.Profile.ProfileName.IsNullOrEmpty())
-                {
-                    return BadRequest("Invalid Request Payload");
-                }
-                await _navigationRepository.AddUserProfile(userProfileDTO.Profile, userProfileDTO.Pages, userProfileDTO.PageCategories);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
         [HttpPut("UpdateUserProfile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileDTO userProfileDTO)
         {
@@ -201,16 +184,33 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-        [HttpPost("AddNewUserProfile")]
-        public async Task<IActionResult> AddNewUserProfile([FromBody] UserToProfileDTO userToProfileDTO)
+        [HttpPost("CreateUserAccess")]
+        public async Task<IActionResult> CreateUserAccess([FromBody] ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {
-                if (userToProfileDTO == null)
+                if (profilePagesAccessDTO == null)
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.AddNewUserProfile(userToProfileDTO.Profiles, userToProfileDTO.ProfileUsers);
+                await _navigationRepository.CreateUserAccess(profilePagesAccessDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpPost("CreateUserProfile")]
+        public async Task<IActionResult> CreateUserProfile([FromBody] ProfileUser profileUsersData)
+        {
+            try
+            {
+                if (profileUsersData == null)
+                {
+                    return BadRequest();
+                }
+                await _navigationRepository.CreateUserProfile(profileUsersData);
                 return Ok();
             }
             catch (Exception ex)
