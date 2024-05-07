@@ -64,16 +64,8 @@
                     <!-- Checkboxes to select pages -->
                     <div class="mb-3">
                         <label class="form-label" style="font-size:1.2rem;">Select Pages</label>
-                        <div class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
-                            @foreach (var pageSite in Model.AllPageSites)
-                            {
-                                <div style="flex: 0 0 32%; display: flex; align-items: center; justify-content: flex-start; padding: 5px; box-sizing: border-box; font-size: 1rem;">
-                                    <input class="form-check-input" type="checkbox" id="@pageSite.PageId" name="SelectedPages" value="@pageSite.PageId" />
-                                    <label class="form-check-label" for="@pageSite.PageId" style="margin-left: 5px;">
-                                        @pageSite.PageDescription
-                                    </label>
-                                </div>
-                            }
+                        <div id="pageCheckboxContainer" class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
+                            <!-- Checkboxes will be dynamically rendered here -->
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,36 @@
 ﻿$(document).ready(function () {
+    function renderPageCheckboxes() {
+        var container = $('#pageCheckboxContainer'); // container to append checkboxes
+
+        // Clear the container before rendering new content
+        container.empty();
+
+        // If selectedPages is empty, render checkboxes disabled
+        availablePagesLst.forEach(function (pageSite) {
+            var checkboxDiv = $('<div>', { style: 'flex: 0 0 32%; display:flex; align-items:center; justify-content:flex-start; padding:5px; box-sizing:border-box; font-size:1rem;' });
+
+            var checkbox = $('<input>', {
+                type: 'checkbox',
+                class: 'form-check-input',
+                id: pageSite.pageId,
+                name: 'SelectedPages',
+                value: pageSite.pageId,
+            });
+
+            var label = $('<label>', {
+                class: 'form-check-label',
+                for: pageSite.pageId,
+                text: pageSite.pageDescription,
+                style: 'margin-left: 5px;',
+            });
+
+            checkboxDiv.append(checkbox);
+            checkboxDiv.append(label);
+
+            container.append(checkboxDiv);
+        });
+    }
+
     // This function is called before form submission
     function prepareFormSubmission() {
         // Initialize the list of selected pages
@@ -38,6 +70,9 @@
         // Store the selected pages as JSON in a hidden field
         $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
     }
+
+    // Initial render of the checkboxes without selections
+    renderPageCheckboxes();
 
     // Attach the prepare function to the form submission event
     $('form').submit(function (e) {

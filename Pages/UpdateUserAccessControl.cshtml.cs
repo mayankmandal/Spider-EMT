@@ -71,7 +71,7 @@ namespace Spider_EMT.Pages
                 };
 
                 var client = _clientFactory.CreateClient();
-                var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/CreateUserAccess";
+                var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateUserAccess";
                 var jsonContent = JsonConvert.SerializeObject(profilePageDTO);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 HttpResponseMessage response;
@@ -79,7 +79,7 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = "Profile Created Successfully";
+                    TempData["success"] = "User Access Control Updated Successfully";
                     return RedirectToPage("/Index");
                 }
                 else

@@ -1,120 +1,147 @@
-﻿// Function to empty categories lists and hide categories section
-function resetCategories() {
-    availableCategoriesLst = [];
-    selectedCategoriesLst = [];
-    $('#availableCategories').empty();
-    $('#selectedCategories').empty();
-    $('#categoriesSection').css('display', 'none');
-}
-
-// Function to fetch categories based on selected page IDs
-function fetchCategoriesForPages(pageIds) {
-    $.ajax({
-        url: '/api/navigation/GetPageToCategories',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(pageIds),
-        success: function (data) {
-            availableCategoriesLst = data;
-            renderPagesOrCategories(availableCategoriesLst, $('#availableCategories'), false);
-            $('#categoriesSection').css('display', 'flex'); // Show the categories section
-        },
-        error: function (xhr, status, error) {
-            console.error('Error: ', error);
-        }
-    });
-}
-
-// Generic function to render either pages or categories
-function renderPagesOrCategories(list, container, isPage) {
-    container.empty(); // Clear the container first
-    list.forEach(item => {
-        const div = $('<div></div>')
-            .text(isPage ? item.pageDescription : item.categoryName)
-            .addClass(isPage ? 'page' : 'category')
-            .on('click', function () {
-                $(this).toggleClass('selected');
-            });
-        container.append(div);
-    });
-}
-
-// Function to move selected items from available to selected list and update UI
-function moveItemsAndUpdateUI(sourceList, targetList, sourceContainerId, targetContainerId, isPage) {
-    let selectedItems = $(`#${sourceContainerId} .selected`);
-    selectedItems.each(function () {
-        let selectedItemText = $(this).text();
-        // Find the corresponding object in the source list
-        let foundItem = sourceList.find(item =>
-            isPage ? item.pageDescription === selectedItemText : item.categoryName === selectedItemText
-        );
-        if (foundItem) {
-            // Move the found item from source to target list
-            sourceList.splice(sourceList.indexOf(foundItem), 1);
-            targetList.push(foundItem);
-        }
-        $(this).removeClass('selected');
-    });
-
-    // Re-render both lists after the update
-    renderPagesOrCategories(sourceList, $(`#${sourceContainerId}`), isPage);
-    renderPagesOrCategories(targetList, $(`#${targetContainerId}`), isPage);
-}
-
-// Bind event listeners to buttons
-$('#moveRightBtnPage').on('click', function () {
-    moveItemsAndUpdateUI(availablePagesLst, selectedPagesLst, 'availablePages', 'selectedPages', true);
-    resetCategories();
-    var pageIds = selectedPagesLst.map(page => page.pageId);
-    if (pageIds.length === 0) {
-        resetCategories(); // Reset categories if no selected pages
-    } else {
-        fetchCategoriesForPages(pageIds); // Fetch categories for selected pages
-    }
-});
-
-$('#moveLeftBtnPage').on('click', function () {
-    moveItemsAndUpdateUI(selectedPagesLst, availablePagesLst, 'selectedPages', 'availablePages', true);
-    resetCategories();
-    var pageIds = selectedPagesLst.map(page => page.pageId);
-    if (pageIds.length === 0) {
-        resetCategories(); // Reset categories if no selected pages
-    } else {
-        fetchCategoriesForPages(pageIds); // Fetch categories for selected pages
-    }
-});
-
-// Bind event listener to button for moving categories
-$('#moveRightBtnCategory').on('click', function () {
-    moveItemsAndUpdateUI(availableCategoriesLst, selectedCategoriesLst, 'availableCategories', 'selectedCategories', false);
-});
-
-$('#moveLeftBtnCategory').on('click', function () {
-    moveItemsAndUpdateUI(selectedCategoriesLst, availableCategoriesLst, 'selectedCategories', 'availableCategories', false);
-});
-
-// Function to handle form submission
-function prepareData() {
-    var selectedPages = selectedPagesLst;
-    var selectedCategories = selectedCategoriesLst;
-    $('#selectedPagesJson').val(JSON.stringify(selectedPages));
-    $('#selectedCategoriesJson').val(JSON.stringify(selectedCategories));
-}
-
-$('form').on('submit', function () {
-    prepareData();
-});
-
+﻿// Call the function to render the checkboxes when the page loads
 $(document).ready(function () {
-    // Call the functions to render available pages and categories
-    renderPagesOrCategories(availablePagesLst, $('#availablePages'), true);
-    renderPagesOrCategories(selectedPagesLst, $('#selectedPages'), true);
-    renderPagesOrCategories(availableCategoriesLst, $('#availableCategories'), false);
-    renderPagesOrCategories(selectedCategoriesLst, $('#selectedCategories'), false);
+    // Function to render the checkboxes dynamically from availablePagesLst
+    function renderPageCheckboxes(selectedPages) {
+        var container = $('#pageCheckboxContainer'); // container to append checkboxes
+        var updateBtn = $('button[type="submit"]'); // update button for submission
+        updateBtn.prop('disabled', true);
 
-    // Check if there are selected categories
-    if (selectedCategoriesLst.length > 0) {
-        $('#categoriesSection').css('display', 'flex'); // Show the categories section
+        // Clear the container before rendering new content
+        container.empty();
+
+        if (Array.isArray(selectedPages) && selectedPages.length > 0) {
+            // If selectedPages is not empty, render checkboxes with selections
+            availablePagesLst.forEach(function (pageSite) {
+                // Create a div for each checkbox
+                var checkboxDiv = $('<div>', { style: 'flex: 0 0 32%; display:flex; align-items:center;justify-content:flex-start;padding:5px; box-sizing:border-box; font-size:1rem;' });
+
+                // Check if the page should be selected
+                var isChecked = selectedPages.some(function (page) {
+                    return page.pageId === pageSite.pageId; // Check if any object in the array has a matching pageId
+                });
+
+                // Create the checkbox inputl
+                var checkbox = $('<input>', {
+                    type: 'checkbox',
+                    class: 'form-check-input',
+                    id: pageSite.pageId,
+                    name: 'SelectedPages',
+                    value: pageSite.pageId,
+                    checked: isChecked, // Check if the page should be selected
+                });
+
+                // Create the label for the checkbox
+                var label = $('<label>', {
+                    class: 'form-check-label',
+                    for: pageSite.pageId,
+                    text: pageSite.pageDescription,
+                    style: 'margin-left: 5px;',
+                });
+
+                // Append the checkbox and label to the div
+                checkboxDiv.append(checkbox);
+                checkboxDiv.append(label);
+
+                // Append the div to the container
+                container.append(checkboxDiv);
+            });
+
+            // Enable the Update button
+            updateBtn.prop('disabled', false);
+        } else {
+            // If selectedPages is empty, render checkboxes disabled
+            availablePagesLst.forEach(function (pageSite) {
+                var checkboxDiv = $('<div>', { style: 'flex: 0 0 32%; display:flex; align-items:center; justify-content:flex-start; padding:5px; box-sizing:border-box; font-size:1rem;' });
+
+                var checkbox = $('<input>', {
+                    type: 'checkbox',
+                    class: 'form-check-input',
+                    id: pageSite.pageId,
+                    name: 'SelectedPages',
+                    value: pageSite.pageId,
+                    disabled: true, // Disable the checkbox
+                });
+
+                var label = $('<label>', {
+                    class: 'form-check-label',
+                    for: pageSite.pageId,
+                    text: pageSite.pageDescription,
+                    style: 'margin-left: 5px;',
+                });
+
+                checkboxDiv.append(checkbox);
+                checkboxDiv.append(label);
+
+                container.append(checkboxDiv);
+            });
+
+            // Disable the Update button
+            updateBtn.prop('disabled', true);
+        }
     }
-});
 
+    // Ajax call to fetch selected pages for the chosen profile
+    $('#ProfileId').change(function () {
+        var selectedProfileId = $(this).val();
+        
+        $.ajax({
+            url: '/api/Navigation/GetProfilePageData/',
+            data: { profileId: selectedProfileId },
+            method: 'GET',
+            success: function (response) {
+                renderPageCheckboxes(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching profile pages: ', error);
+            }
+        });
+    });
+
+    // Initial render of the checkboxes without selections
+    renderPageCheckboxes([]);
+
+    // This function is called before form submission
+    function prepareFormSubmission() {
+        // Initialize the list of selected pages
+        selectedPagesLst = [];
+
+        // Get the selected profile ID
+        var selectedProfileId = $('#ProfileId').val();
+
+        // Get the selected profile name based on the selected option
+        var selectedProfileName = $('#ProfileId option:selected').text();
+
+        // Set the hidden fields with ProfileId and ProfileName
+        $('#SelectedProfileId').val(selectedProfileId);
+        $('#SelectedProfileName').val(selectedProfileName);
+
+        // Loop through all checkboxes and get their associated data
+        $('input[name="SelectedPages"]').each(function () {
+            var pageId = parseInt($(this).val());
+            var isSelected = $(this).is(':checked'); // Check if the checkbox is selected
+            if (isSelected) {
+                // Find the corresponding data in availablePagesLst
+                var selectedPage = availablePagesLst.find(page => page.pageId === pageId);
+                if (selectedPage) {
+                    // Add the selected page to selectedPageLst
+                    selectedPagesLst.push({
+                        PageId: selectedPage.pageId,
+                        PageUrl: selectedPage.pageUrl,
+                        PageDescription: selectedPage.pageDescription,
+                        PageCatId: selectedPage.pageCatId,
+                        MenuImgPath: selectedPage.menuImgPath,
+                        isSelected: true
+                    });
+                }
+            }
+        });
+
+        // Store the selected pages as JSON in a hidden field
+        $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
+    }
+
+    // Attach the prepare function to the form submission event
+    $('form').submit(function (e) {
+        prepareFormSubmission();
+    });
+});

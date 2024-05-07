@@ -12,11 +12,13 @@ namespace Spider_EMT.Repository.Skeleton
         List<PageCategory> GetAllPageCategories();
         ProfileSite GetCurrentUserProfile();
         List<PageSite> GetCurrentUserPages();
+        List<PageSite> GetProfilePageData(string profileId);
         List<PageSite> GetNewUserPages();
         List<PageCategory> GetCurrentUserCategories();
         List<PageCategory> GetNewUserCategories();
         Task<bool> CreateUserProfile(ProfileUser profileUsersData);
         Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
+        Task<bool> UpdateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> UpdateUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories);
         List<PageCategory> GetPageToCategories(List<int> pageList);
     }

@@ -110,6 +110,19 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+        [HttpGet("GetProfilePageData")]
+        public IActionResult GetProfilePageData(string profileId)
+        {
+            try
+            {
+                List<PageSite> pageSites = _navigationRepository.GetProfilePageData(profileId);
+                return Ok(pageSites);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
         [HttpGet("GetCurrentUserCategories")]
         public IActionResult GetCurrentUserCategories()
         {
@@ -194,6 +207,23 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
                 await _navigationRepository.CreateUserAccess(profilePagesAccessDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpPost("UpdateUserAccess")]
+        public async Task<IActionResult> UpdateUserAccess([FromBody] ProfilePagesAccessDTO profilePagesAccessDTO)
+        {
+            try
+            {
+                if (profilePagesAccessDTO == null)
+                {
+                    return BadRequest();
+                }
+                await _navigationRepository.UpdateUserAccess(profilePagesAccessDTO);
                 return Ok();
             }
             catch (Exception ex)

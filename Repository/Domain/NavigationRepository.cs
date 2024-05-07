@@ -258,6 +258,44 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Pages.", ex);
             }
         }
+
+        public List<PageSite> GetProfilePageData(string profileId)
+        {
+            try
+            {
+                string commandText = $"SELECT DISTINCT tbp.* from tblPage tbp INNER JOIN tblUserPermission tup on tbp.PageId = tup.PageId WHERE tup.ProfileId = {profileId}";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<PageSite> pages = new List<PageSite>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        PageSite page = new PageSite
+                        {
+                            PageId = (int)row["PageId"],
+                            MenuImgPath = row["MenuImgPath"].ToString(),
+                            PageCatId = (int)row["PageCatId"],
+                            PageDescription = row["PageDescription"].ToString(),
+                            PageUrl = row["PageUrl"].ToString(),
+                        };
+                        pages.Add(page);
+                    }
+                }
+                return pages;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.\n", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting associated pages for profile.\n", ex);
+            }
+        }
         public List<PageCategory> GetCurrentUserCategories()
         {
             try
@@ -566,6 +604,48 @@ namespace Spider_EMT.Repository.Domain
             return true;
         }
         public async Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO)
+        {
+            try
+            {
+                SqlParameter[] sqlParameters;
+                // Deletion of existing access for profiles for a user
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId}
+                };
+
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
+                {
+                    return false;
+                }
+                // User Profile Access Allotment
+                foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageSite.PageCatId},
+                    };
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user profile.", ex);
+            }
+            return true;
+        }
+        public async Task<bool> UpdateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {

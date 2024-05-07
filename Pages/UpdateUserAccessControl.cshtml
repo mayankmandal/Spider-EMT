@@ -27,22 +27,22 @@
     </script>
 }
 
-<div class="mb-2 container" style="display:flex; flex-direction:row; justify-content:space-between; align-content:center;">
+<div class="mb-2" style="display:flex; flex-direction:row; justify-content:space-evenly; align-content:center;">
     <div class="fw-bolder" style="font-size:1.5rem; color:#17a2b8">User Access Control List</div>
     <a class="btn btn-outline-secondary" href="/CreateUserAccessControl">
-        <i class="icon ion-plus"></i> 
+        <i class="icon ion-plus"></i>
         Create User Access Control List
     </a>
 </div>
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post" onsubmit="prepareFormSubmission();">
-        <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;font-size:2rem;">
+        <div id="createProfileSection" class="form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;font-size:2rem;">
             <input type="hidden" id="SelectedProfileId" name="SelectedProfileId" />
             <input type="hidden" id="SelectedProfileName" name="SelectedProfileName" />
             <input type="hidden" id="SelectedPagesJson" name="SelectedPagesJson" />
 
-            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
+            <div class="form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
                 <div class="row pb-1 pt-2">
                     <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">Update User Access Control List</h2>
                     <div>
@@ -64,15 +64,15 @@
                     <!-- Checkboxes to select pages -->
                     <div class="mb-3">
                         <label class="form-label" style="font-size:1.2rem;">Select Pages</label>
-                        <div class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
-                            
+                        <div id="pageCheckboxContainer" class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
+                            <!-- Checkboxes will be dynamically rendered here -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Buttons for form submission -->
-            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
+            <div class="form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="col-3 me-4">

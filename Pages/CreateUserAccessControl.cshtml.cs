@@ -79,7 +79,7 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = "Profile Created Successfully";
+                    TempData["success"] = "User Access Control Created Successfully";
                     return RedirectToPage("/Index");
                 }
                 else
