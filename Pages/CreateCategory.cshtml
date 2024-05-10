@@ -1,0 +1,91 @@
+﻿@page
+@model Spider_EMT.Pages.CreateCategoryModel
+@{
+    ViewData["Title"] = "Category Creation";
+}
+
+@if (TempData["success"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.success('@TempData["success"]');
+    </script>
+}
+@if (TempData["error"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.error('@TempData["error"]');
+    </script>
+}
+
+<div class="mb-2 container" style="display:flex; flex-direction:row; justify-content:space-between; align-content:center;">
+    <div class="fw-bolder" style="font-size:1.5rem; color:#17a2b8">Category Creation</div>
+    <a class="btn btn-outline-secondary" href="/UpdateUserAccessControl">
+        <i class="icon ion-edit"></i>
+        Update User Access Control List
+    </a>
+</div>
+
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <form method="post" onsubmit="prepareFormSubmission();">
+        <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;font-size:2rem;">
+            <input type="hidden" id="SelectedPagesJson" name="SelectedPagesJson" />
+
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
+                <div class="row pb-1 pt-2">
+                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">Create Category</h2>
+                    <div>
+                        <hr />
+                    </div>
+                    <!-- Profile Dropdown -->
+                    <div class="mb-3">
+                        <label asp-for="SelectedPageCategory.CategoryName" class="form-label" style="font-size:1.2rem;"></label>
+                        <input asp-for="SelectedPageCategory.CategoryName" placeholder="Category Name" class="form-control" />
+                        <span asp-validation-for="SelectedPageCategory.CategoryName" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                    </div>
+
+                    <!-- Checkboxes to select pages -->
+                    <div class="mb-3">
+                        <label class="form-label" style="font-size:1.2rem;">Select Pages</label>
+                        <div id="pageCheckboxContainer" class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
+                            <!-- Checkboxes will be dynamically rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons for form submission -->
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-3 me-4">
+                        <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Create</button>
+                    </div>
+                    <div class="col-4 ms-3">
+                        <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/createCategory.js"></script>
+    <script>
+        // Serialize the pages and categories models into JSON objects
+        var availablePagesLst = @Html.Raw(Json.Serialize(Model.AllPageSites));
+        var selectedPagesLst = [];
+    </script>
+}

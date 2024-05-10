@@ -81,12 +81,12 @@ $(document).ready(function () {
     }
 
     // Ajax call to fetch selected pages for the chosen profile
-    $('#ProfileId').change(function () {
+    $('#CategoryIdDiv').change(function () {
         var selectedProfileId = $(this).val();
-
+        
         $.ajax({
-            url: '/api/Navigation/GetProfilePageData/',
-            data: { profileId: selectedProfileId },
+            url: '/api/Navigation/GetCategoryToPages/',
+            data: { categoryId: selectedProfileId },
             method: 'GET',
             success: function (response) {
                 renderPageCheckboxes(response);
@@ -106,10 +106,10 @@ $(document).ready(function () {
         selectedPagesLst = [];
 
         // Get the selected profile ID
-        var selectedProfileId = $('#ProfileId').val();
+        var selectedProfileId = $('#CategoryIdDiv').val();
 
         // Get the selected profile name based on the selected option
-        var selectedProfileName = $('#ProfileId option:selected').text();
+        var selectedProfileName = $('#CategoryIdDiv option:selected').text();
 
         // Set the hidden fields with ProfileId and ProfileName
         $('#SelectedProfileId').val(selectedProfileId);

@@ -8,6 +8,7 @@ using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
 using System.Collections.Generic;
 using System.Data;
+using static Spider_EMT.Utility.Constants;
 
 namespace Spider_EMT.Repository.Domain
 {
@@ -154,7 +155,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting All the Pages.", ex);
             }
         }
-        public List<PageCategory> GetAllPageCategories()
+        public List<PageCategory> GetAllCategories()
         {
             try
             {
@@ -676,6 +677,228 @@ namespace Spider_EMT.Repository.Domain
                         return false;
                     }
                 }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user profile.", ex);
+            }
+            return true;
+        }
+        public List<PageSite> GetCategoryToPages(int categoryId)
+        {
+            try
+            {
+                List<PageSite> pages = new List<PageSite>();
+
+                string commandText = "SELECT tbp.* from tblPage tbp INNER JOIN tblPageCatagory tbc on tbp.PageCatId = tbc.PageCatId WHERE tbc.PageCatId = @CategoryId";
+                SqlParameter[] sqlParameter =
+                {
+                        new SqlParameter("@CategoryId", SqlDbType.Int){Value = categoryId}
+                    };
+                DataTable dataTable = SqlDBHelper.ExecuteParameterizedSelectCommand(commandText, CommandType.Text, sqlParameter);
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        PageSite pageSite = new PageSite
+                        {
+                            PageCatId = (int)row["PageCatId"],
+                            PageId = (int)row["PageId"],
+                            PageUrl = row["PageUrl"].ToString(),
+                            PageDescription = row["PageDescription"].ToString(),
+                            MenuImgPath = row["MenuImgPath"].ToString(),
+
+                        };
+                        pages.Add(pageSite);
+                    }
+                }
+                return pages;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Page to Categories.", ex);
+            }
+        }
+        public async Task<bool> CreateNewCategory(CategoryPagesAccessDTO categoryPagesAccessDTO)
+        {
+            try
+            {
+                int UserIdentity = 0;
+                bool isFailure = false;
+
+                SqlParameter[] sqlParameters;
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@NewCategoryName", SqlDbType.VarChar,50){Value = categoryPagesAccessDTO.PageCategoryData.CategoryName}
+                };
+
+                // Creation of New Category
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewCategory, CommandType.StoredProcedure, sqlParameters);
+                if (tables.Count > 0)
+                {
+                    DataTable dataTable = tables[0];
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        DataRow dataRow = dataTable.Rows[0];
+                        UserIdentity = (int)dataRow["UserIdentity"];
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                // Deletion
+                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@State", SqlDbType.VarChar, 2){Value = DeletePageCategoryMap.PageIdOnly},
+                        new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId},
+                    };
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
+
+                // Insertion
+                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                    };
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user profile.", ex);
+            }
+            return true;
+        }
+
+        public async Task<bool> UpdateCategory(CategoryPagesAccessDTO categoryPagesAccessDTO)
+        {
+            try
+            {
+                int UserIdentity = 0;
+                bool isFailure = false;
+
+                SqlParameter[] sqlParameters;
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@NewCategoryName", SqlDbType.VarChar,50){Value = categoryPagesAccessDTO.PageCategoryData.CategoryName}
+                };
+
+                // Creation of New Category
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewCategory, CommandType.StoredProcedure, sqlParameters);
+                if (tables.Count > 0)
+                {
+                    DataTable dataTable = tables[0];
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        DataRow dataRow = dataTable.Rows[0];
+                        UserIdentity = (int)dataRow["UserIdentity"];
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                // Deletion
+                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@State", SqlDbType.VarChar, 2){Value = DeletePageCategoryMap.PageIdOnly},
+                        new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId},
+                    };
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
+
+                // Insertion
+                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                    };
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user profile.", ex);
+            }
+            return true;
+        }
+        public async Task<bool> AssignProfileCategories(ProfileCategoryAccessDTO profileCategoryAccessDTO)
+        {
+            try
+            {
+                /*SqlParameter[] sqlParameters;
+                // Deletion of existing access for profiles for a user
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId}
+                };
+
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
+                {
+                    return false;
+                }
+                // User Profile Access Allotment
+                foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
+                {
+                    sqlParameters = new SqlParameter[]
+                    {
+                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageSite.PageCatId},
+                    };
+                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                }*/
             }
             catch (SqlException sqlEx)
             {

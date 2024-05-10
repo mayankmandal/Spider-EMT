@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
+using System.Diagnostics;
 
 namespace Spider_EMT.Controller
 {
@@ -71,12 +72,12 @@ namespace Spider_EMT.Controller
             }
         }
         // Not in Use
-        [HttpGet("GetAllPageCategories")]
-        public IActionResult GetAllPageCategories() 
+        [HttpGet("GetAllCategories")]
+        public IActionResult GetAllCategories() 
         {
             try
             {
-                IEnumerable<PageCategory> allPageCategoryData = _navigationRepository.GetAllPageCategories();
+                IEnumerable<PageCategory> allPageCategoryData = _navigationRepository.GetAllCategories();
                 return Ok(allPageCategoryData);
             }
             catch (Exception ex)
@@ -241,6 +242,75 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
                 await _navigationRepository.CreateUserProfile(profileUsersData);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetCategoryToPages")]
+        public async Task<IActionResult> GetCategoryToPages(int categoryId)
+        {
+            try
+            {
+                if (categoryId == null)
+                {
+                    return BadRequest();
+                }
+                List<PageSite> pages = new List<PageSite>();
+                pages = _navigationRepository.GetCategoryToPages(categoryId);
+                return Ok(pages);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpPost("CreateNewCategory")]
+        public async Task<IActionResult> CreateNewCategory([FromBody] CategoryPagesAccessDTO categoryPagesAccessDTO)
+        {
+            try
+            {
+                if (categoryPagesAccessDTO == null)
+                {
+                    return BadRequest();
+                }
+                await _navigationRepository.CreateNewCategory(categoryPagesAccessDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpPost("UpdateCategory")]
+        public async Task<IActionResult> UpdateCategory([FromBody] CategoryPagesAccessDTO categoryPagesAccessDTO)
+        {
+            try
+            {
+                if (categoryPagesAccessDTO == null)
+                {
+                    return BadRequest();
+                }
+                await _navigationRepository.UpdateCategory(categoryPagesAccessDTO);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpPost("AssignProfileCategories")]
+        public async Task<IActionResult> AssignProfileCategories([FromBody] ProfileCategoryAccessDTO profileCategoryAccessDTO)
+        {
+            try
+            {
+                if (profileCategoryAccessDTO == null)
+                {
+                    return BadRequest();
+                }
+                await _navigationRepository.AssignProfileCategories(profileCategoryAccessDTO);
                 return Ok();
             }
             catch (Exception ex)
