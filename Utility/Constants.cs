@@ -20,11 +20,17 @@
             public static string IsActiveDirectoryUser = "AD";
             public static string ChangePassword = "CH";
         };
-        public static class DeletePageCategoryMap
+        public static class PageCategoryMapStates
         {
             public static string PageIdOnly = "PI";
             public static string PageCategoryIdOnly = "PC";
             public static string BothPageIdAndPageCategoryId = "BP";
+        };
+        public static class UserPermissionStates
+        {
+            public static int PageIdOnly = 1;
+            public static int PageCategoryIdOnly = 2;
+            public static int BothPageIdAndPageCategoryId = 3;
         };
     }
 }

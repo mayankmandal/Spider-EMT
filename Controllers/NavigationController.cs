@@ -163,23 +163,6 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-        [HttpPut("UpdateUserProfile")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] UserProfileDTO userProfileDTO)
-        {
-            try
-            {
-                if (userProfileDTO.Profile.ProfileId != 0 || userProfileDTO.Profile.ProfileName.IsNullOrEmpty())
-                {
-                    await _navigationRepository.UpdateUserProfile(userProfileDTO.Profile, userProfileDTO.Pages, userProfileDTO.PageCategories);
-                    return Ok();
-                }
-                return BadRequest("Invalid Request Payload");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
         [HttpPost("GetPageToCategories")]
         public async Task<IActionResult> GetPageToCategories([FromBody] List<int> pageList)
         {

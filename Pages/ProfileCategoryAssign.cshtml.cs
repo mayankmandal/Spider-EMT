@@ -79,7 +79,7 @@ namespace Spider_EMT.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["success"] = "Relation between Profile and Categories Created Successfully";
-                    return RedirectToPage("/Index");
+                    return RedirectToPage("/ProfileCategoryAssign");
                 }
                 else
                 {

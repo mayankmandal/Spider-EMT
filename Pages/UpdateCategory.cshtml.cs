@@ -80,7 +80,7 @@ namespace Spider_EMT.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["success"] = "User Access Control Updated Successfully";
-                    return RedirectToPage("/Index");
+                    return RedirectToPage("/UpdateCategory");
                 }
                 else
                 {

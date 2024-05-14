@@ -24,7 +24,5 @@ namespace Spider_EMT.Repository.Skeleton
         Task<bool> UpdateCategory(CategoryPagesAccessDTO categoryPagesAccessDTO);
         Task<bool> UpdateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> AssignProfileCategories(ProfileCategoryAccessDTO profileCategoryAccessDTO);
-        Task<bool> UpdateUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories);
-        
     }
 }

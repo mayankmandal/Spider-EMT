@@ -9,81 +9,50 @@ $(document).ready(function () {
         // Clear the container before rendering new content
         container.empty();
 
-        if (Array.isArray(selectedPages) && selectedPages.length > 0) {
-            // If selectedPages is not empty, render checkboxes with selections
-            availablePagesLst.forEach(function (pageSite) {
-                // Create a div for each checkbox
-                var checkboxDiv = $('<div>', { style: 'flex: 0 0 32%; display:flex; align-items:center;justify-content:flex-start;padding:5px; box-sizing:border-box; font-size:1rem;' });
+        // If selectedPages is not empty, render checkboxes with selections
+        availablePagesLst.forEach(function (pageSite) {
+            // Create a div for each checkbox
+            var checkboxDiv = $('<div>', { style: 'flex: 0 0 32%; display:flex; align-items:center;justify-content:flex-start;padding:5px; box-sizing:border-box; font-size:1rem;' });
 
-                // Check if the page should be selected
-                var isChecked = selectedPages.some(function (page) {
-                    return page.pageId === pageSite.pageId; // Check if any object in the array has a matching pageId
-                });
-
-                // Create the checkbox inputl
-                var checkbox = $('<input>', {
-                    type: 'checkbox',
-                    class: 'form-check-input',
-                    id: pageSite.pageId,
-                    name: 'SelectedPages',
-                    value: pageSite.pageId,
-                    checked: isChecked, // Check if the page should be selected
-                });
-
-                // Create the label for the checkbox
-                var label = $('<label>', {
-                    class: 'form-check-label',
-                    for: pageSite.pageId,
-                    text: pageSite.pageDescription,
-                    style: 'margin-left: 5px;',
-                });
-
-                // Append the checkbox and label to the div
-                checkboxDiv.append(checkbox);
-                checkboxDiv.append(label);
-
-                // Append the div to the container
-                container.append(checkboxDiv);
+            // Check if the page should be selected
+            var isChecked = selectedPages.some(function (page) {
+                return page.pageId === pageSite.pageId; // Check if any object in the array has a matching pageId
             });
 
-            // Enable the Update button
-            updateBtn.prop('disabled', false);
-        } else {
-            // If selectedPages is empty, render checkboxes disabled
-            availablePagesLst.forEach(function (pageSite) {
-                var checkboxDiv = $('<div>', { style: 'flex: 0 0 32%; display:flex; align-items:center; justify-content:flex-start; padding:5px; box-sizing:border-box; font-size:1rem;' });
-
-                var checkbox = $('<input>', {
-                    type: 'checkbox',
-                    class: 'form-check-input',
-                    id: pageSite.pageId,
-                    name: 'SelectedPages',
-                    value: pageSite.pageId,
-                    disabled: true, // Disable the checkbox
-                });
-
-                var label = $('<label>', {
-                    class: 'form-check-label',
-                    for: pageSite.pageId,
-                    text: pageSite.pageDescription,
-                    style: 'margin-left: 5px;',
-                });
-
-                checkboxDiv.append(checkbox);
-                checkboxDiv.append(label);
-
-                container.append(checkboxDiv);
+            // Create the checkbox inputl
+            var checkbox = $('<input>', {
+                type: 'checkbox',
+                class: 'form-check-input',
+                id: pageSite.pageId,
+                name: 'SelectedPages',
+                value: pageSite.pageId,
+                checked: isChecked, // Check if the page should be selected
             });
 
-            // Disable the Update button
-            updateBtn.prop('disabled', true);
-        }
+            // Create the label for the checkbox
+            var label = $('<label>', {
+                class: 'form-check-label',
+                for: pageSite.pageId,
+                text: pageSite.pageDescription,
+                style: 'margin-left: 5px;',
+            });
+
+            // Append the checkbox and label to the div
+            checkboxDiv.append(checkbox);
+            checkboxDiv.append(label);
+
+            // Append the div to the container
+            container.append(checkboxDiv);
+        });
+
+        // Enable the Update button
+        updateBtn.prop('disabled', false);
     }
 
     // Ajax call to fetch selected pages for the chosen profile
     $('#CategoryIdDiv').change(function () {
         var selectedProfileId = $(this).val();
-        
+
         $.ajax({
             url: '/api/Navigation/GetCategoryToPages/',
             data: { categoryId: selectedProfileId },

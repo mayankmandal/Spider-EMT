@@ -239,7 +239,6 @@ namespace Spider_EMT.Repository.Domain
                         {
                             PageId = (int)row["PageId"],
                             MenuImgPath = row["MenuImgPath"].ToString(),
-                            PageCatId = (int)row["PageCatId"],
                             PageDescription = row["PageDescription"].ToString(),
                             PageUrl = row["PageUrl"].ToString(),
                         };
@@ -277,7 +276,6 @@ namespace Spider_EMT.Repository.Domain
                         {
                             PageId = (int)row["PageId"],
                             MenuImgPath = row["MenuImgPath"].ToString(),
-                            PageCatId = (int)row["PageCatId"],
                             PageDescription = row["PageDescription"].ToString(),
                             PageUrl = row["PageUrl"].ToString(),
                         };
@@ -349,7 +347,6 @@ namespace Spider_EMT.Repository.Domain
                         {
                             PageId = (int)row["PageId"],
                             MenuImgPath = row["MenuImgPath"].ToString(),
-                            PageCatId = (int)row["PageCatId"],
                             PageDescription = row["PageDescription"].ToString(),
                             PageUrl = row["PageUrl"].ToString(),
                         };
@@ -528,82 +525,6 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> UpdateUserProfile(ProfileSite profile, List<PageSite> pages, List<PageCategory> pageCategories)
-        {
-            try
-            {
-                // User Profile Creation
-                SqlParameter[] sqlParameters = new SqlParameter[]
-                {
-                    new SqlParameter("@ProfileId", SqlDbType.Int) { Value = profile.ProfileId },
-                    new SqlParameter("@NewProfileName", SqlDbType.VarChar, 50) { Value = profile.ProfileName }
-                };
-
-                // Execute the command
-                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_UpdateUserProfile, CommandType.StoredProcedure, sqlParameters);
-                if (isFailure)
-                {
-                    return false;
-                }
-
-                sqlParameters = new SqlParameter[]
-                {
-                    new SqlParameter("@ProfileId", SqlDbType.Int) { Value = profile.ProfileId }
-                };
-                isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
-                if (isFailure)
-                {
-                    return false;
-                }
-
-                // User Permission Allotment based on categories list provided already having associated pages linked
-                foreach (PageCategory pageCategory in pageCategories)
-                {
-                    sqlParameters = new SqlParameter[]
-                    {
-                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profile.ProfileId},
-                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageCategory.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId}
-                    };
-
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
-                    if (isFailure)
-                    {
-                        return false;
-                    }
-
-                }
-
-                // Filter out pages with matching PageCatId
-                var filteredPages = pages.Where(p => !pageCategories.Any(pc => pc.PageCatId == p.PageCatId)).ToList();
-
-                // User Permission Allotment based on pages list provided, removed already inserted categories asscoaited pages
-                foreach (PageSite pagesite in filteredPages)
-                {
-                    sqlParameters = new SqlParameter[]
-                    {
-                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profile.ProfileId},
-                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pagesite.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pagesite.PageCatId}
-                    };
-
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
-                    if (isFailure)
-                    {
-                        return false;
-                    }
-                }
-            }
-            catch (SqlException sqlEx)
-            {
-                throw new Exception("Error while updating User Profile - SQL Exception.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error while updating User Profile.", ex);
-            }
-            return true;
-        }
         public async Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
@@ -612,7 +533,8 @@ namespace Spider_EMT.Repository.Domain
                 // Deletion of existing access for profiles for a user
                 sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId}
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
+                    new SqlParameter("@State", SqlDbType.Int){Value = UserPermissionStates.PageIdOnly},
                 };
 
                 bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
@@ -627,7 +549,7 @@ namespace Spider_EMT.Repository.Domain
                     {
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageSite.PageCatId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -654,7 +576,8 @@ namespace Spider_EMT.Repository.Domain
                 // Deletion of existing access for profiles for a user
                 sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId}
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
+                    new SqlParameter("@State", SqlDbType.Int){Value = UserPermissionStates.PageIdOnly},
                 };
 
                 bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
@@ -669,7 +592,7 @@ namespace Spider_EMT.Repository.Domain
                     {
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageSite.PageCatId},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -694,7 +617,7 @@ namespace Spider_EMT.Repository.Domain
             {
                 List<PageSite> pages = new List<PageSite>();
 
-                string commandText = "SELECT tbp.* from tblPage tbp INNER JOIN tblPageCatagory tbc on tbp.PageCatId = tbc.PageCatId WHERE tbc.PageCatId = @CategoryId";
+                string commandText = "SELECT tbp.* from tblPage tbp INNER JOIN tblPageCategoryMap tbm on tbp.PageId = tbm.PageId INNER JOIN tblPageCatagory tbc on tbm.PageCatId = tbc.PageCatId WHERE tbc.PageCatId = @CategoryId";
                 SqlParameter[] sqlParameter =
                 {
                         new SqlParameter("@CategoryId", SqlDbType.Int){Value = categoryId}
@@ -706,7 +629,6 @@ namespace Spider_EMT.Repository.Domain
                     {
                         PageSite pageSite = new PageSite
                         {
-                            PageCatId = (int)row["PageCatId"],
                             PageId = (int)row["PageId"],
                             PageUrl = row["PageUrl"].ToString(),
                             PageDescription = row["PageDescription"].ToString(),
@@ -763,7 +685,7 @@ namespace Spider_EMT.Repository.Domain
                 {
                     sqlParameters = new SqlParameter[]
                     {
-                        new SqlParameter("@State", SqlDbType.VarChar, 2){Value = DeletePageCategoryMap.PageIdOnly},
+                        new SqlParameter("@State", SqlDbType.VarChar, 2){Value = PageCategoryMapStates.PageIdOnly},
                         new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId},
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
@@ -790,11 +712,11 @@ namespace Spider_EMT.Repository.Domain
             }
             catch (SqlException sqlEx)
             {
-                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+                throw new Exception("Error adding relationship between new user profile and pages - SQL Exception.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error adding relationship between new user profile.", ex);
+                throw new Exception("Error adding relationship between new user profile and pages.", ex);
             }
             return true;
         }
@@ -803,44 +725,20 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                int UserIdentity = 0;
+                int UserIdentity = categoryPagesAccessDTO.PageCategoryData.PageCatId;
                 bool isFailure = false;
 
                 SqlParameter[] sqlParameters;
+
                 sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@NewCategoryName", SqlDbType.VarChar,50){Value = categoryPagesAccessDTO.PageCategoryData.CategoryName}
+                    new SqlParameter("@State", SqlDbType.VarChar, 2){Value = PageCategoryMapStates.PageCategoryIdOnly},
+                    new SqlParameter("@PageCatId", SqlDbType.Int){Value = UserIdentity},
                 };
-
-                // Creation of New Category
-                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewCategory, CommandType.StoredProcedure, sqlParameters);
-                if (tables.Count > 0)
+                isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
                 {
-                    DataTable dataTable = tables[0];
-                    if (dataTable.Rows.Count > 0)
-                    {
-                        DataRow dataRow = dataTable.Rows[0];
-                        UserIdentity = (int)dataRow["UserIdentity"];
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-                // Deletion
-                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
-                {
-                    sqlParameters = new SqlParameter[]
-                    {
-                        new SqlParameter("@State", SqlDbType.VarChar, 2){Value = DeletePageCategoryMap.PageIdOnly},
-                        new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId},
-                    };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
-                    if (isFailure)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
 
                 // Insertion
@@ -860,11 +758,11 @@ namespace Spider_EMT.Repository.Domain
             }
             catch (SqlException sqlEx)
             {
-                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+                throw new Exception("Error Updating relationship between existing profile and pages - SQL Exception.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error adding relationship between new user profile.", ex);
+                throw new Exception("Error Updating relationship between existing profile and pages.", ex);
             }
             return true;
         }
@@ -872,11 +770,12 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                /*SqlParameter[] sqlParameters;
+                SqlParameter[] sqlParameters;
                 // Deletion of existing access for profiles for a user
                 sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId}
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = profileCategoryAccessDTO.ProfileSiteData.ProfileId},
+                    new SqlParameter("@State", SqlDbType.Int){Value = UserPermissionStates.PageCategoryIdOnly},
                 };
 
                 bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
@@ -885,20 +784,20 @@ namespace Spider_EMT.Repository.Domain
                     return false;
                 }
                 // User Profile Access Allotment
-                foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
+                foreach (PageCategory pageCategory in profileCategoryAccessDTO.PageCategories)
                 {
                     sqlParameters = new SqlParameter[]
                     {
-                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
-                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageSite.PageCatId},
+                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profileCategoryAccessDTO.ProfileSiteData.ProfileId},
+                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = DBNull.Value},
+                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId},
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
                     }
-                }*/
+                }
             }
             catch (SqlException sqlEx)
             {

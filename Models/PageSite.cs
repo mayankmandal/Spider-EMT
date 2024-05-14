@@ -5,7 +5,6 @@
         public int PageId {  get; set; }
         public string PageUrl { get; set; }
         public string PageDescription { get; set; }
-        public int PageCatId { get; set; }
         public string MenuImgPath { get; set; }
         public bool isSelected { get; set; }
     }

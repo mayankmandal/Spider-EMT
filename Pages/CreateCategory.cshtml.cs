@@ -68,7 +68,7 @@ namespace Spider_EMT.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["success"] = "New Category Created Successfully";
-                    return RedirectToPage("/Index");
+                    return RedirectToPage("/CreateCategory");
                 }
                 else
                 {
