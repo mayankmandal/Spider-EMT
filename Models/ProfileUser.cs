@@ -33,8 +33,7 @@ namespace Spider_EMT.Models
         [Required(ErrorMessage = "Profile Data is required")]
         public ProfileSite ProfileSiteData { get; set; }
 
-        [Required(ErrorMessage = "User Status is required")]
         [DisplayName("User Status")]
-        public string Status { get; set; }
+        public string UserStatus { get; set; }
     }
 }

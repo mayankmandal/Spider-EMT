@@ -19,6 +19,7 @@ namespace Spider_EMT.Pages
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
+        public ProfileSite profileSite { get; set; }
         public List<ProfileSite> AllProfilesData { get; set; }
         public List<PageCategory> AllCategoriesData { get; set; }
         [BindProperty]

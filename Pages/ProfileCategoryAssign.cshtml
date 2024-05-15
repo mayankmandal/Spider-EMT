@@ -52,14 +52,15 @@
                     </div>
                     <!-- Profile Dropdown -->
                     <div class="mb-3">
-                        <label for="ProfileId" class="form-label" style="font-size:1.2rem;">Select Profile</label>
-                        <select id="ProfileId" class="form-control" name="ProfileId" style="font-size:1.2rem;" required>
+                        <label class="form-label" style="font-size:1.2rem;">Select a Profile</label>
+                        <select asp-for="profileSite.ProfileName" id="ProfileId" class="form-control" style="font-size:1.2rem;" id="profileSelect">
                             <option value="" disabled selected>Select a Profile</option>
                             @foreach (var profile in Model.AllProfilesData)
                             {
-                                <option value="@profile.ProfileId">@profile.ProfileName</option>
+                                <option value="@profile.ProfileId" data-profilename="@profile.ProfileName">@profile.ProfileName</option>
                             }
                         </select>
+                        <span asp-validation-for="profileSite.ProfileName" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
                     </div>
 
                     <!-- Multi-Select for Categories -->

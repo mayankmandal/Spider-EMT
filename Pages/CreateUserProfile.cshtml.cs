@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
 using System.Text;
 
 namespace Spider_EMT.Pages
@@ -20,9 +21,30 @@ namespace Spider_EMT.Pages
         }
         [BindProperty]
         public ProfileUser ProfileUsersData { get; set; }
-        [BindProperty]
         public List<ProfileSite> ProfilesData { get; set; }
-
+        [BindProperty]
+        public List<string> UserStatusLst { get; set; }
+        public List<CheckBoxOption> Checkboxes = new List<CheckBoxOption>
+        {
+            new CheckBoxOption()
+            {
+                IsChecked = false,
+                Text = Constants.UserStatusDescription.IsActive.Text,
+                Value = Constants.UserStatusDescription.IsActive.Value
+            },
+            new CheckBoxOption()
+            {
+                IsChecked = false,
+                Text = Constants.UserStatusDescription.IsActiveDirectoryUser.Text,
+                Value = Constants.UserStatusDescription.IsActiveDirectoryUser.Value
+            },
+            new CheckBoxOption()
+            {
+                IsChecked = false,
+                Text = Constants.UserStatusDescription.ChangePassword.Text,
+                Value = Constants.UserStatusDescription.ChangePassword.Value
+            }
+        };
         public async Task<IActionResult> OnGet()
         {
             await LoadAllProfilesData();
@@ -34,7 +56,7 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
             ProfilesData = JsonConvert.DeserializeObject<List<ProfileSite>>(response);
         }
-        public async Task<IActionResult> OnPost() 
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {

@@ -77,44 +77,41 @@
                 <!-- Dropdown to Select Profile Name -->
                 <!-- Profile Name Dropdown -->
                 <div class="mb-3">
-                    <label asp-for="ProfileUsersData.ProfileSiteData.ProfileId" class="form-label" style="font-size:1.2rem;">Profile Name</label>
-                    <select asp-for="ProfileUsersData.ProfileSiteData.ProfileId" class="form-control" style="font-size:1.2rem;" id="profileSelect">
+                    <label class="form-label" style="font-size:1.2rem;">Profile Name</label>
+                    <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-control" style="font-size:1.2rem;" id="profileSelect">
                         <option value="" disabled selected>Select a Profile</option>
                         @foreach (var profile in Model.ProfilesData)
                         {
-                            <option value="@profile.ProfileId" data-profilename="@profile.ProfileName">@profile.ProfileName</option>
+                            <option value="@profile.ProfileName" data-profileid="@profile.ProfileId">@profile.ProfileName</option>
                         }
                     </select>
-                    <span asp-validation-for="ProfileUsersData.ProfileSiteData.ProfileId" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                    <span asp-validation-for="ProfileUsersData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
                 </div>
 
-                <!-- Hidden field to store ProfileName -->
-                <input type="hidden" asp-for="ProfileUsersData.ProfileSiteData.ProfileName" id="profileNameHidden" />
+                <!-- Hidden fields Profile Id -->
+                <input type="hidden" asp-for="ProfileUsersData.ProfileSiteData.ProfileId" id="profileIdHidden" />
+
+                <!-- Hidden field for UserStatus -->
+                <input type="hidden" asp-for="ProfileUsersData.UserStatus" id="ProfileUsersData_UserStatus" />
 
                 <!-- Status with radio buttons on one line -->
                 <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center; font-size:1.2rem; column-gap:2rem">
-                    <label asp-for="ProfileUsersData.Status" class="form-label" style="margin-right: 10px;">Status</label>
-                    <div>
-                        <input type="radio" asp-for="ProfileUsersData.Status" class="form-input" id="IsActiveBtn" value="AC" />
-                        <label for="IsActiveBtn" class="form-label">IsActive</label>
-                    </div>
-                    <div style="margin-left: 10px;">
-                        <input type="radio" asp-for="ProfileUsersData.Status" class="form-input" id="IsActiveDirectoryUserBtn" value="AD" />
-                        <label for="IsActiveDirectoryUserBtn" class="form-label">IsActiveDirectoryUser</label>
-                    </div>
-                    <div style="margin-left: 10px;">
-                        <input type="radio" asp-for="ProfileUsersData.Status" class="form-input" id="ChangePasswordBtn" value="CH" />
-                        <label for="ChangePasswordBtn" class="form-label">ChangePassword</label>
-                    </div>
+                    <label asp-for="ProfileUsersData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
+                    @foreach (var checkbox in Model.Checkboxes)
+                    {
+                        <div>
+                            <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
+                            <label for="checkbox_@checkbox.Value" class="fw-normal" style="font-size:1.1rem">@checkbox.Text</label>
+                        </div>
+                    }
                 </div>
-
             </div>
 
             <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="col-3 me-4">
-                        <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Create</button>
+                        <button type="submit" onclick="prepareFormSubmission()" class="btn" style="width:140px; background-color:#17a2b8;color:white">Create</button>
                     </div>
                     <div class="col-4 ms-3">
                         <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>

@@ -1,67 +1,16 @@
-﻿
-// Function to handle form submission
-function prepareRawData() {
-    var selectedProfileUsers = [];
-    var selectedProfiles = [];
+﻿function prepareFormSubmission() {
+    // Get the selected profile ID
+    var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
 
-    // Get the list of selected profile users and profiles
-    var selectedProfileUsersValues = $('#profileUsers .selected').map(function () {
-        return parseInt($(this).val(), 10); // Convert to integer
-    }).get();
+    // Set the hidden fields with ProfileId and ProfileName
+    $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
 
-    var selectedProfilesValues = $('#profiles .selected').map(function () {
-        return parseInt($(this).val(), 10); // Convert to integer
-    }).get();
-
-    // Filter the allProfileUsersLst to get the objects corresponding to the selected values
-    allProfileUsersLst.forEach(function (user) {
-        if (selectedProfileUsersValues.includes(user.userId)) {
-            selectedProfileUsers.push(user);
-        }
+    // Get the selected user statuses
+    var selectedUserStatusLst = [];
+    $('input[name="UserStatusLst"]:checked').each(function () {
+        selectedUserStatusLst.push($(this).val());
     });
 
-    // Filter the allProfilesLst to get the objects corresponding to the selected values
-    allProfilesLst.forEach(function (profile) {
-        if (selectedProfilesValues.includes(profile.profileId)) {
-            selectedProfiles.push(profile);
-        }
-    });
-
-    // Set the hidden inputs with the JSON of the filtered objects
-    $('#SelectedProfileUsersJson').val(JSON.stringify(selectedProfileUsers));
-    $('#SelectedProfilesJson').val(JSON.stringify(selectedProfiles));
+    // Set the hidden field with selected user statuses
+    $('#ProfileUsersData_UserStatus').val(selectedUserStatusLst); // Assuming a comma-separated string for UserStatus
 }
-
-$('form').on('submit', function () {
-    prepareRawData();
-});
-
-$(document).ready(function () {
-    // Function to toggle selection on click
-    $('#profileUsers').on('click', 'option', function () {
-        $(this).toggleClass('selected');
-        if ($(this).hasClass('selected')) {
-            $(this).css('background-color', '#17a2b8'); // Highlight color
-        } else {
-            $(this).css('background-color', ''); // Remove highlight
-        }
-    });
-
-
-    $('#profiles').on('click', 'option', function () {
-        $(this).toggleClass('selected');
-        if ($(this).hasClass('selected')) {
-            $(this).css('background-color', '#17a2b8'); // Highlight color
-        } else {
-            $(this).css('background-color', ''); // Remove highlight
-        }
-    });
-
-    $('#profileSelect').change(function () {
-        var selectedOption = $(this).find('option:selected'); // Get the selected option
-        var profileName = selectedOption.data('profilename'); // Retrieve the data attribute
-
-        // Set the hidden field with the profile name
-        $('#profileNameHidden').val(profileName);
-    });
-});

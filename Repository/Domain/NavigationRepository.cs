@@ -496,7 +496,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
                     new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
                     new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
-                    new SqlParameter("@NewUserStatus", SqlDbType.VarChar, 5) { Value = userProfileData.Status },
+                    new SqlParameter("@NewUserStatus", SqlDbType.VarChar, 20) { Value = userProfileData.UserStatus },
                 };
 
                 // Execute the command

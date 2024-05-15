@@ -5,6 +5,8 @@ namespace Spider_EMT.Models
 {
     public class ProfileSite
     {
+        [Required(ErrorMessage = "Profile Id is required")]
+        [DisplayName("Profile Id")]
         public int ProfileId { get; set; }
         [Required(ErrorMessage = "Profile Name is required")]
         [DisplayName("Profile Name")]
