@@ -6,7 +6,6 @@ namespace Spider_EMT.Models
 {
     public class ProfileUser
     {
-        [Required(ErrorMessage = "User ID is required")]
         [DisplayName("User ID")]
         public int UserId { get; set; }
 

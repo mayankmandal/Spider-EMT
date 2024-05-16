@@ -129,8 +129,8 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                List<PageCategory> pageCategories = _navigationRepository.GetCurrentUserCategories();
-                return Ok(pageCategories);
+                List<CategoriesSetDTO> categoriesSet = _navigationRepository.GetCurrentUserCategories();
+                return Ok(categoriesSet);
             }
             catch (Exception ex)
             {

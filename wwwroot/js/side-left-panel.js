@@ -29,7 +29,7 @@
         link.className = 'nav-link';
 
         const icon = document.createElement('i');
-        icon.className = 'far fa-circle nav-icon';
+        icon.className = 'far ion-android-contact nav-icon';
 
         const paragraph = document.createElement('p');
 
@@ -67,7 +67,7 @@
             link.className = 'nav-link';
 
             const icon = document.createElement('i');
-            icon.className = 'far fa-circle nav-icon';
+            icon.className = 'far ion-android-open nav-icon';
 
             const paragraph = document.createElement('p');
 
@@ -88,7 +88,27 @@
                 throw new Error(`Http Error! Status : ${response.status}`);
             }
             const categories = await response.json();
-            populateSidebarforCategories(categories);
+
+            const structureData = categories.reduce((acc, item) => {
+                const existingCategory = acc.find(cat => cat.catagoryName == item.catagoryName);
+                if (existingCategory) {
+                    existingCategory.pages.push({
+                        pageDescription: item.pageDescription,
+                        pageUrl: item.pageUrl
+                    });
+                } else {
+                    acc.push({
+                        catagoryName: item.catagoryName,
+                        pages: [{
+                            pageDescription: item.pageDescription,
+                            pageUrl: item.pageUrl
+                        }]
+                    })
+                }
+                return acc;
+            },[]);
+
+            populateSidebarforCategories(structureData);
         }
         catch (error) {
             console.error('Fetch error: ', error);
@@ -102,20 +122,35 @@
             listItem.className = 'nav-item';
 
             const link = document.createElement('a');
-            link.href = category.pageUrl;
+            link.href = '#'; // Link to a placeholder since it's a submenu
             link.className = 'nav-link';
+            link.innerHTML = `
+                <i class="far ion-merge nav-icon"></i>
+                <p>${category.catagoryName}<i class="fas fa-angle-left right"></i></p>
+            `;
 
-            const icon = document.createElement('i');
-            icon.className = 'far fa-circle nav-icon';
+            const submenu = document.createElement('ul');
+            submenu.className = 'nav nav-treeview ml-3';
 
-            const paragraph = document.createElement('p');
+            // Populate pages under this category
+            category.pages.forEach(page => {
+                const pageItem = document.createElement('li');
+                pageItem.className = 'nav-item';
 
-            const text = document.createTextNode(category.categoryName);
+                const pageLink = document.createElement('a');
+                pageLink.href = page.pageUrl;
+                pageLink.className = 'nav-link';
+                pageLink.innerHTML = `
+                    <i class="far ion-android-open nav-icon"></i>
+                    <p>${page.pageDescription}</p>
+                `;
 
-            paragraph.appendChild(text);
-            link.appendChild(icon);
-            link.appendChild(paragraph);
+                pageItem.appendChild(pageLink);
+                submenu.appendChild(pageItem);
+            });
+
             listItem.appendChild(link);
+            listItem.appendChild(submenu);
             list.appendChild(listItem);
         });
     }

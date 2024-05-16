@@ -14,7 +14,7 @@ namespace Spider_EMT.Repository.Skeleton
         List<PageSite> GetCurrentUserPages();
         List<PageSite> GetProfilePageData(string profileId);
         List<PageSite> GetNewUserPages();
-        List<PageCategory> GetCurrentUserCategories();
+        List<CategoriesSetDTO> GetCurrentUserCategories();
         List<PageCategory> GetNewUserCategories();
         List<PageCategory> GetPageToCategories(List<int> pageList);
         List<PageSite> GetCategoryToPages(int categoryId);

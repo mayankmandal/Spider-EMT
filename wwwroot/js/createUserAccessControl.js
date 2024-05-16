@@ -1,4 +1,15 @@
 ﻿$(document).ready(function () {
+    // Function to render profile input section
+    function renderProfileInput() {
+        $('#profileInputDiv').show(); // Show the profile input section
+        $('#profileDropdownDiv').hide(); // Hide the profile dropdown section
+    }
+
+    // Function to render profile dropdown section
+    function renderProfileDropdown() {
+        $('#profileInputDiv').hide(); // Hide the profile input section
+        $('#profileDropdownDiv').show(); // Show the profile dropdown section
+    }
     function renderPageCheckboxes() {
         var container = $('#pageCheckboxContainer'); // container to append checkboxes
 
@@ -36,11 +47,18 @@
         // Initialize the list of selected pages
         selectedPagesLst = [];
 
-        // Get the selected profile ID
-        var selectedProfileId = $('#ProfileId').val();
+        // Get the selected profile ID and profile name
+        var selectedProfileId, selectedProfileName;
 
-        // Get the selected profile name based on the selected option
-        var selectedProfileName = $('#ProfileId option:selected').text();
+        if ($('input[name="profileType"]:checked').val() === 'oldProfile') {
+            // For existing profile (dropdown)
+            selectedProfileId = $('#ProfileId').val();
+            selectedProfileName = $('#ProfileId option:selected').text();
+        } else {
+            // For new profile (input)
+            selectedProfileId = '0'; // Assuming '0' represents a new profile
+            selectedProfileName = $('#ProfileName').val(); // Get the value from the input field
+        }
 
         // Set the hidden fields with ProfileId and ProfileName
         $('#SelectedProfileId').val(selectedProfileId);
@@ -69,6 +87,25 @@
 
         // Store the selected pages as JSON in a hidden field
         $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
+    }
+
+    // Event Listener for profile type radio buttons
+    $('input[name="profileType"]').change(function () {
+        var selectedProfileType = $(this).val();
+
+        if (selectedProfileType === 'newProfile') {
+            renderProfileInput(); // Render profile input section for new profile
+        }
+        else {
+            renderProfileDropdown(); // Render profile dropdown section for existing profile
+        }
+    });
+
+    // Initial rendering based on the default selected radio button
+    if ($('input[name="profileType"]:checked').val() === 'newProfile') {
+        renderProfileInput(); // Render profile input section for new profile
+    } else {
+        renderProfileDropdown(); // Render profile dropdown section for existing profile
     }
 
     // Initial render of the checkboxes without selections
