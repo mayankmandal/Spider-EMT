@@ -49,6 +49,7 @@
                 throw new Error(`Http Error! Status : ${response.status}`);
             }
             const pages = await response.json();
+            pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
             populateSidebarforPages(pages);
         }
         catch(error) {
@@ -108,6 +109,14 @@
                 return acc;
             },[]);
 
+            // Sort the pages within each category
+            structureData.forEach(category => {
+                category.pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
+            });
+
+            // Sort the categories
+            structureData.sort((a, b) => a.catagoryName.localeCompare(b.catagoryName));
+
             populateSidebarforCategories(structureData);
         }
         catch (error) {
@@ -131,6 +140,7 @@
 
             const submenu = document.createElement('ul');
             submenu.className = 'nav nav-treeview ml-3';
+            submenu.style.borderLeft = '3px solid #D3D3D3';
 
             // Populate pages under this category
             category.pages.forEach(page => {

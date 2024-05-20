@@ -1,0 +1,159 @@
+﻿@page
+@model Spider_EMT.Pages.ReadUserProfileModel
+@{
+    ViewData["Title"] = "View User Profile";
+}
+
+@if (TempData["success"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.success('@TempData["success"]');
+    </script>
+}
+@if (TempData["error"] != null)
+{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/toastr.min.js"></script>
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-bottom-right", // Set the position to right bottom
+        };
+        toastr.error('@TempData["error"]');
+    </script>
+}
+
+
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <form method="post">
+        <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%;font-size:2rem;">
+
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
+                <div class="row pb-1 pt-2">
+                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">User Profile</h2>
+                    <div>
+                        <hr />
+                    </div>
+                </div>
+
+                <!-- User ID and ID Number on one line -->
+                <div class="mb-3" style="display: flex; justify-content: space-between;">
+                    <div style="flex: 1; margin-right: 10px;">
+                        <label asp-for="CurrentUserDetailsData.UserId" class="form-label" style="font-size:1.2rem;"></label>
+                        <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" disabled />
+                    </div>
+                    <div style="flex: 1;">
+                        <label asp-for="CurrentUserDetailsData.IdNumber" class="form-label" style="font-size:1.2rem;"></label>
+                        <input asp-for="CurrentUserDetailsData.IdNumber" placeholder="National/Iqama Number" class="form-control" disabled />
+                        <span asp-validation-for="CurrentUserDetailsData.IdNumber" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                    </div>
+                </div>
+
+                <!-- Full Name Field -->
+                <div class="mb-3">
+                    <label asp-for="CurrentUserDetailsData.FullName" class="form-label" style="font-size:1.2rem;"></label>
+                    <input asp-for="CurrentUserDetailsData.FullName" placeholder="Full Name" class="form-control" style="font-size:1.2rem;" disabled />
+                    <span asp-validation-for="CurrentUserDetailsData.FullName" class="mt-auto text-danger fw-bold" style="font-size:1.2rem;"></span>
+                </div>
+
+                <!-- Email and Mobile Number on one line -->
+                <div class="mb-3" style="display: flex; justify-content: space-between;">
+                    <div style="flex: 1; margin-right: 10px;">
+                        <label asp-for="CurrentUserDetailsData.Email" class="form-label" style="font-size:1.2rem;"></label>
+                        <input asp-for="CurrentUserDetailsData.Email" placeholder="Email Address" class="form-control" disabled />
+                        <span asp-validation-for="CurrentUserDetailsData.Email" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                    </div>
+                    <div style="flex: 1;">
+                        <label asp-for="CurrentUserDetailsData.MobileNo" class="form-label" style="font-size:1.2rem;"></label>
+                        <input asp-for="CurrentUserDetailsData.MobileNo" placeholder="Mobile Number" class="form-control" disabled />
+                        <span asp-validation-for="CurrentUserDetailsData.MobileNo" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                    </div>
+                </div>
+
+                <!-- Dropdown to Select Profile Name -->
+                <!-- Profile Name Dropdown -->
+                <div class="mb-3">
+                    <label asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-label" style="font-size:1.2rem;"></label>
+                    <input asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-control" style="font-size:1.2rem;" disabled />
+                    <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                </div>
+
+                <!-- Status with radio buttons on one line -->
+                <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center; font-size:1.2rem; column-gap:2rem">
+                    <label asp-for="CurrentUserDetailsData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
+                    @foreach (var checkbox in Model.StatusCheckboxes)
+                    {
+                        <div>
+                            <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox" value="@checkbox" checked="true" disabled />
+                            <label for="checkbox_@checkbox" class="fw-normal" style="font-size:1.1rem">@checkbox</label>
+                        </div>
+                    }
+                </div>
+
+                <hr />
+
+                <div class="card">
+                    <div class="card-header fw-bolder" style="font-size:1.2rem;">Categories View</div>
+                    <div class="card-body" style="font-size:1rem;">
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="dynamicCategoriesList">
+                            <!-- Populate categories here -->
+                            @foreach (var categoryData in Model.StructureData)
+                            {
+                                <li class="nav-item" id="categoryViewDiv">
+                                    <a href="#" class="nav-link">
+                                        <i class="far ion-ios-briefcase-outline nav-icon"></i>
+                                        <p>
+                                            @categoryData.CategoryName
+                                            <i class="right fas fa-angle-left"></i>
+                                        </p>
+                                    </a>
+                                    <ul class="nav nav-treeview">
+                                        @foreach (var pageSite in categoryData.Pages)
+                                        {
+                                            <li class="nav-item">
+                                                <a href="@pageSite.PageUrl" class="nav-link">
+                                                    <i class="far ion-paper-airplane nav-icon"></i>
+                                                    <p>@pageSite.PageDescription</p>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="card">
+                    <div class="card-header fw-bolder" style="font-size:1.2rem;">Pages View</div>
+                    <div class="card-body" style="font-size:1rem;">
+                        <ul class="nav nav-pills nav-sidebar" data-widget="treeview" role="menu" data-accordion="false" id="dynamicPagesList">
+                            <!-- Populate pages here -->
+                            @foreach (var pageSite in Model.CurrentPageSites)
+                            {
+                                <li class="nav-item" id="pageViewDiv">
+                                    <a href="@pageSite.PageUrl" class="nav-link">
+                                        <i class="far ion-paper-airplane nav-icon"></i>
+                                        <p>@pageSite.PageDescription</p>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/readUserProfile.js" asp-append-version="true"></script>
+}

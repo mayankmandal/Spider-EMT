@@ -10,6 +10,7 @@ namespace Spider_EMT.Repository.Skeleton
         List<ProfileSite> GetAllProfiles();
         List<PageSite> GetAllPages();
         List<PageCategory> GetAllCategories();
+        ProfileUser GetCurrentUserDetails();
         ProfileSite GetCurrentUserProfile();
         List<PageSite> GetCurrentUserPages();
         List<PageSite> GetProfilePageData(string profileId);

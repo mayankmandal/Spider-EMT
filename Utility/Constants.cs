@@ -31,9 +31,21 @@
                     Value = value;
                 }
             }
-            public static StatusOption IsActive = new StatusOption("IsActive","AC");
-            public static StatusOption IsActiveDirectoryUser = new StatusOption("IsActiveDirectoryUser", "AD");
-            public static StatusOption ChangePassword = new StatusOption("ChangePassword", "CH");
+
+            public static readonly StatusOption[] StatusOptions = new StatusOption[]
+            {
+                new StatusOption("IsActive", "AC"),
+                new StatusOption("IsActiveDirectoryUser", "AD"),
+                new StatusOption("ChangePassword", "CH")
+            };
+
+            public static List<string> GetStatusTextsFromCsv(string csv)
+            {
+                var values = csv.Split(',');
+                return values.Select(value => StatusOptions.FirstOrDefault(option => option.Value == value)?.Text)
+                        .Where(text => text != null)
+                        .ToList();
+            }
         }
         
         public static class PageCategoryMapStates

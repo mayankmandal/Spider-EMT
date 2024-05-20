@@ -10,4 +10,17 @@
         public string MenuImgPath { get; set; }
 
     }
+
+    public class CategoryDisplayViewModel
+    {
+        public string CategoryName { get; set; }
+        public List<PageDisplayViewModel> Pages { get; set; }
+    }
+
+    public class PageDisplayViewModel
+    {
+        public string PageDescription { get; set; }
+        public string PageUrl { get; set; }
+    }
+
 }

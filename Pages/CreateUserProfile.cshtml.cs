@@ -5,6 +5,7 @@ using Spider_EMT.Models;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
 using System.Text;
+using static Spider_EMT.Utility.Constants;
 
 namespace Spider_EMT.Pages
 {
@@ -24,27 +25,12 @@ namespace Spider_EMT.Pages
         public List<ProfileSite> ProfilesData { get; set; }
         [BindProperty]
         public List<string> UserStatusLst { get; set; }
-        public List<CheckBoxOption> Checkboxes = new List<CheckBoxOption>
+        public List<CheckBoxOption> Checkboxes = UserStatusDescription.StatusOptions.Select(option => new CheckBoxOption
         {
-            new CheckBoxOption()
-            {
-                IsChecked = false,
-                Text = Constants.UserStatusDescription.IsActive.Text,
-                Value = Constants.UserStatusDescription.IsActive.Value
-            },
-            new CheckBoxOption()
-            {
-                IsChecked = false,
-                Text = Constants.UserStatusDescription.IsActiveDirectoryUser.Text,
-                Value = Constants.UserStatusDescription.IsActiveDirectoryUser.Value
-            },
-            new CheckBoxOption()
-            {
-                IsChecked = false,
-                Text = Constants.UserStatusDescription.ChangePassword.Text,
-                Value = Constants.UserStatusDescription.ChangePassword.Value
-            }
-        };
+            IsChecked = false,
+            Text = option.Text,
+            Value = option.Value
+        }).ToList();
         public async Task<IActionResult> OnGet()
         {
             await LoadAllProfilesData();

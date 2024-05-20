@@ -191,6 +191,46 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Get All the Page Categories.", ex);
             }
         }
+        public ProfileUser GetCurrentUserDetails()
+        {
+            try
+            {
+                string commandText = "select u.*, tp.ProfileId,tp.ProfileName from tblUsers u INNER JOIN tblCurrentUser cu on u.UserId = cu.UserId INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                ProfileUser profileUser = new ProfileUser();
+                if (dataTable.Rows.Count > 0)
+                {
+                    DataRow dataRow = dataTable.Rows[0];
+                    profileUser = new ProfileUser
+                    {
+                        UserId = (int)dataRow["UserId"],
+                        IdNumber = dataRow["IdNumber"].ToString(),
+                        FullName = dataRow["FullName"].ToString(),
+                        Email = dataRow["Email"].ToString(),
+                        MobileNo = dataRow["MobileNo"].ToString(),
+                        ProfileSiteData = new ProfileSite
+                        {
+                            ProfileId = (int)dataRow["ProfileId"],
+                            ProfileName = dataRow["ProfileName"].ToString()
+                        },
+                        UserStatus = dataRow["Status"].ToString(),
+                    };
+                }
+                return profileUser;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting All Users Data.", ex);
+            }
+        }
         public ProfileSite GetCurrentUserProfile()
         {
             try

@@ -16,22 +16,7 @@ namespace Spider_EMT.Controller
         {
             _navigationRepository = navigationRepository;
         }
-        [HttpGet]
-        [Route("GetCurrentUser")]
-        public IActionResult GetCurrentUser()
-        {
-            try
-            {
-                CurrentUser currentUserData = _navigationRepository.GetCurrentUser();
-                return Ok(currentUserData);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-        [HttpGet]
-        [Route("GetAllProfileUsers")]
+        [HttpGet("GetAllProfileUsers")]
         public IActionResult GetAllProfileUsers()
         {
             try
@@ -44,8 +29,7 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-        [HttpGet]
-        [Route("GetAllProfiles")]
+        [HttpGet("GetAllProfiles")]
         public IActionResult GetAllProfiles()
         {
             try
@@ -71,7 +55,6 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-        // Not in Use
         [HttpGet("GetAllCategories")]
         public IActionResult GetAllCategories() 
         {
@@ -79,6 +62,33 @@ namespace Spider_EMT.Controller
             {
                 IEnumerable<PageCategory> allPageCategoryData = _navigationRepository.GetAllCategories();
                 return Ok(allPageCategoryData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetCurrentUser")]
+        public IActionResult GetCurrentUser()
+        {
+            try
+            {
+                CurrentUser currentUserData = _navigationRepository.GetCurrentUser();
+                return Ok(currentUserData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpGet("GetCurrentUserDetails")]
+        public IActionResult GetCurrentUserDetails()
+        {
+            try
+            {
+                ProfileUser currentUserDetails = _navigationRepository.GetCurrentUserDetails();
+                return Ok(currentUserDetails);
             }
             catch (Exception ex)
             {
