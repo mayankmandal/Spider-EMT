@@ -7,19 +7,19 @@ const year = new Date().getFullYear()
 const banner = `/*!
  * SpiderWeb v${pkg.version} (${pkg.homepage})
  * Copyright 2014-${year} ${pkg.author}
- * Licensed under MIT (https://github.com/ColorlibHQ/AdminLTE/blob/master/LICENSE)
+ * Licensed under MIT (https://github.com/ColorlibHQ/SpiderEMT/blob/master/LICENSE)
  */`
 
 module.exports = {
-  input: 'build/js/AdminLTE.js',
+  input: 'build/js/SpiderEMT.js',
   output: {
     banner,
-    file: 'dist/js/adminlte.js',
+    file: 'dist/js/spideremt.js',
     format: 'umd',
     globals: {
       jquery: 'jQuery'
     },
-    name: 'adminlte'
+    name: 'spideremt'
   },
   external: ['jquery'],
   plugins: [

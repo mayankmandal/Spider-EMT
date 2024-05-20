@@ -1,7 +1,7 @@
 'use strict'
 
 const Plugins = [
-  // AdminLTE Dist
+  // SpiderEMT Dist
   {
     from: 'dist/css/',
     to: 'docs/assets/css/'

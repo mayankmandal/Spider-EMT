@@ -1,12 +1,12 @@
 /*!
  * SpiderWeb v3.2.0 
  * Copyright 2014-2022 Colorlib <https://colorlib.com>
- * Licensed under MIT (https://github.com/ColorlibHQ/AdminLTE/blob/master/LICENSE)
+ * Licensed under MIT (https://github.com/ColorlibHQ/SpiderEMT/blob/master/LICENSE)
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('jquery')) :
   typeof define === 'function' && define.amd ? define(['exports', 'jquery'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.adminlte = {}, global.jQuery));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.spideremt = {}, global.jQuery));
 })(this, (function (exports, $) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -1640,7 +1640,7 @@
 
         var _options = $__default["default"].extend({}, Default$7, typeof config === 'object' ? config : data);
 
-        localStorage.setItem('AdminLTE:IFrame:Options', JSON.stringify(_options));
+        localStorage.setItem('SpiderEMT:IFrame:Options', JSON.stringify(_options));
         var plugin = new IFrame($__default["default"](this), _options);
         $__default["default"](this).data(DATA_KEY$7, typeof config === 'object' ? config : data);
 
@@ -1648,7 +1648,7 @@
           plugin[config]();
         }
       } else {
-        new IFrame($__default["default"](this), JSON.parse(localStorage.getItem('AdminLTE:IFrame:Options')))._initFrameElement();
+        new IFrame($__default["default"](this), JSON.parse(localStorage.getItem('SpiderEMT:IFrame:Options')))._initFrameElement();
       }
     };
 
@@ -3066,4 +3066,4 @@
   Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-//# sourceMappingURL=adminlte.js.map
+//# sourceMappingURL=spideremt.js.map

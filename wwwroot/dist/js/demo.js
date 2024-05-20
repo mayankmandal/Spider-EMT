@@ -11,10 +11,10 @@
   'use strict'
 
   setTimeout(function () {
-    if (window.___browserSync___ === undefined && Number(localStorage.getItem('AdminLTE:Demo:MessageShowed')) < Date.now()) {
-      localStorage.setItem('AdminLTE:Demo:MessageShowed', (Date.now()) + (15 * 60 * 1000))
+    if (window.___browserSync___ === undefined && Number(localStorage.getItem('SpiderEMT:Demo:MessageShowed')) < Date.now()) {
+      localStorage.setItem('SpiderEMT:Demo:MessageShowed', (Date.now()) + (15 * 60 * 1000))
       // eslint-disable-next-line no-alert
-      alert('You load AdminLTE\'s "demo.js", \nthis file is only created for testing purposes!')
+      alert('You load SpiderEMT\'s "demo.js", \nthis file is only created for testing purposes!')
     }
   }, 1000)
 
@@ -60,7 +60,7 @@
   // Checkboxes
 
   $container.append(
-    '<h5>Customize AdminLTE</h5><hr class="mb-2"/>'
+    '<h5>Customize SpiderEMT</h5><hr class="mb-2"/>'
   )
 
   var $dark_mode_checkbox = $('<input />', {
