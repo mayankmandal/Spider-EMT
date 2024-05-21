@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
+builder.Services.AddMemoryCache();
+builder.Services.AddLazyCache();
 
 SqlDBHelper.CONNECTION_STRING = builder.Configuration.GetConnectionString("DefaultConnection");
 

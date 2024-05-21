@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LazyCache;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
+using System.Drawing.Printing;
 
 namespace Spider_EMT.Controller
 {
@@ -12,12 +16,14 @@ namespace Spider_EMT.Controller
     {
         #region Fields
         private readonly INavigationRepository _navigationRepository;
+        private ICacheProvider _cacheProvider;
         #endregion
 
         #region Constructor
-        public NavigationController(INavigationRepository navigationRepository)
+        public NavigationController(INavigationRepository navigationRepository, ICacheProvider cacheProvider)
         {
             _navigationRepository = navigationRepository;
+            _cacheProvider = cacheProvider;
         }
         #endregion
 
@@ -78,7 +84,19 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                var currentUserData = await _navigationRepository.GetCurrentUserAsync();
+                if(!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
+                {
+                    currentUserData = await _navigationRepository.GetCurrentUserAsync();
+
+                    var cacheEntryOption = new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
+                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        Size = 1024
+                    };
+
+                    _cacheProvider.Set(CacheKeys.CurrentUserKey, currentUserData, cacheEntryOption);
+                }
                 return Ok(currentUserData);
             }
             catch (Exception ex)
@@ -110,7 +128,19 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                var currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync();
+                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserProfileKey, out ProfileSite currentUserProfile))
+                {
+                    currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync();
+
+                    var cacheEntryOption = new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
+                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        Size = 1024
+                    };
+
+                    _cacheProvider.Set(CacheKeys.CurrentUserProfileKey, currentUserProfile, cacheEntryOption);
+                }
                 return Ok(currentUserProfile);
             }
             catch (Exception ex)
@@ -126,7 +156,20 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                var pageSites = await _navigationRepository.GetCurrentUserPagesAsync();
+                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out List<PageSite> pageSites))
+                {
+                    pageSites = await _navigationRepository.GetCurrentUserPagesAsync();
+
+
+                    var cacheEntryOption = new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
+                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        Size = 1024
+                    };
+
+                    _cacheProvider.Set(CacheKeys.CurrentUserPagesKey, pageSites, cacheEntryOption);
+                }
                 return Ok(pageSites);
             }
             catch (Exception ex)
@@ -158,7 +201,19 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                var categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync();
+                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserCategoriesKey, out List<CategoriesSetDTO> categoriesSet))
+                {
+                    categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync();
+
+                    var cacheEntryOption = new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
+                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        Size = 1024
+                    };
+
+                    _cacheProvider.Set(CacheKeys.CurrentUserCategoriesKey, categoriesSet, cacheEntryOption);
+                }
                 return Ok(categoriesSet);
             }
             catch (Exception ex)
