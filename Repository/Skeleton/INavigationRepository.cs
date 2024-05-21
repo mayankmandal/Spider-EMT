@@ -5,24 +5,24 @@ namespace Spider_EMT.Repository.Skeleton
 {
     public interface INavigationRepository
     {
-        CurrentUser GetCurrentUser();
-        List<ProfileSite> GetAllProfiles();
-        List<PageSite> GetAllPages();
-        List<PageCategory> GetAllCategories();
-        ProfileUser GetCurrentUserDetails();
-        ProfileSite GetCurrentUserProfile();
-        List<PageSite> GetCurrentUserPages();
-        List<PageSite> GetProfilePageData(string profileId);
-        List<CategoriesSetDTO> GetCurrentUserCategories();
-        List<PageCategory> GetPageToCategories(List<int> pageList);
-        List<PageSite> GetCategoryToPages(int categoryId);
-        Task<bool> CreateUserProfile(ProfileUser profileUsersData);
-        Task<bool> UpdateUserProfile(ProfileUser profileUsersData);
-        Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
-        Task<bool> CreateNewCategory(CategoryPagesAccessDTO categoryPagesAccessDTO);
-        Task<bool> UpdateCategory(CategoryPagesAccessDTO categoryPagesAccessDTO);
-        Task<bool> UpdateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
-        Task<bool> AssignProfileCategories(ProfileCategoryAccessDTO profileCategoryAccessDTO);
-        Task<List<ProfileUser>> SearchUserDetailsByCriteria(string criteriaText, string InputText);
+        Task<CurrentUser> GetCurrentUserAsync();
+        Task<List<ProfileSite>> GetAllProfilesAsync();
+        Task<List<PageSite>> GetAllPagesAsync();
+        Task<List<PageCategory>> GetAllCategoriesAsync();
+        Task<ProfileUser> GetCurrentUserDetailsAsync();
+        Task<ProfileSite> GetCurrentUserProfileAsync();
+        Task<List<PageSite>> GetCurrentUserPagesAsync();
+        Task<List<PageSite>> GetProfilePageDataAsync(string profileId);
+        Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync();
+        Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList);
+        Task<List<PageSite>> GetCategoryToPagesAsync(int categoryId);
+        Task<bool> CreateUserProfileAsync(ProfileUser profileUsersData);
+        Task<bool> UpdateUserProfileAsync(ProfileUser profileUsersData);
+        Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO);
+        Task<bool> CreateNewCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
+        Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
+        Task<bool> UpdateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO);
+        Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO);
+        Task<List<ProfileUser>> SearchUserDetailsByCriteriaAsync(string criteriaText, string inputText);
     }
 }

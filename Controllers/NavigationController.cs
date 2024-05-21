@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
-using System.Diagnostics;
 
 namespace Spider_EMT.Controller
 {
@@ -11,18 +10,27 @@ namespace Spider_EMT.Controller
     [ApiController]
     public class NavigationController : ControllerBase
     {
+        #region Fields
         private readonly INavigationRepository _navigationRepository;
+        #endregion
+
+        #region Constructor
         public NavigationController(INavigationRepository navigationRepository)
         {
             _navigationRepository = navigationRepository;
         }
-        
+        #endregion
+
+        #region Actions
+
         [HttpGet("GetAllProfiles")]
-        public IActionResult GetAllProfiles()
+        [ProducesResponseType(typeof(IEnumerable<ProfileSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllProfiles()
         {
             try
             {
-                IEnumerable<ProfileSite> allProfilesData = _navigationRepository.GetAllProfiles();
+                var allProfilesData = await _navigationRepository.GetAllProfilesAsync();
                 return Ok(allProfilesData);
             }
             catch (Exception ex)
@@ -30,12 +38,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetAllPages")]
-        public IActionResult GetAllPages()
+        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllPages()
         {
             try
             {
-                IEnumerable<PageSite> allPagesData = _navigationRepository.GetAllPages();
+                var allPagesData = await _navigationRepository.GetAllPagesAsync();
                 return Ok(allPagesData);
             }
             catch (Exception ex)
@@ -43,12 +54,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetAllCategories")]
-        public IActionResult GetAllCategories() 
+        [ProducesResponseType(typeof(IEnumerable<PageCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllCategories()
         {
             try
             {
-                IEnumerable<PageCategory> allPageCategoryData = _navigationRepository.GetAllCategories();
+                var allPageCategoryData = await _navigationRepository.GetAllCategoriesAsync();
                 return Ok(allPageCategoryData);
             }
             catch (Exception ex)
@@ -58,11 +72,13 @@ namespace Spider_EMT.Controller
         }
 
         [HttpGet("GetCurrentUser")]
-        public IActionResult GetCurrentUser()
+        [ProducesResponseType(typeof(CurrentUser), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCurrentUser()
         {
             try
             {
-                CurrentUser currentUserData = _navigationRepository.GetCurrentUser();
+                var currentUserData = await _navigationRepository.GetCurrentUserAsync();
                 return Ok(currentUserData);
             }
             catch (Exception ex)
@@ -70,12 +86,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetCurrentUserDetails")]
-        public IActionResult GetCurrentUserDetails()
+        [ProducesResponseType(typeof(ProfileUser), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCurrentUserDetails()
         {
             try
             {
-                ProfileUser currentUserDetails = _navigationRepository.GetCurrentUserDetails();
+                var currentUserDetails = await _navigationRepository.GetCurrentUserDetailsAsync();
                 return Ok(currentUserDetails);
             }
             catch (Exception ex)
@@ -83,12 +102,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetCurrentUserProfile")]
-        public IActionResult GetCurrentUserProfile()
+        [ProducesResponseType(typeof(ProfileSite), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCurrentUserProfile()
         {
             try
             {
-                ProfileSite currentUserProfile = _navigationRepository.GetCurrentUserProfile();
+                var currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync();
                 return Ok(currentUserProfile);
             }
             catch (Exception ex)
@@ -96,12 +118,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetCurrentUserPages")]
-        public IActionResult GetCurrentUserPages()
+        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCurrentUserPages()
         {
             try
             {
-                List<PageSite> pageSites = _navigationRepository.GetCurrentUserPages();
+                var pageSites = await _navigationRepository.GetCurrentUserPagesAsync();
                 return Ok(pageSites);
             }
             catch (Exception ex)
@@ -109,12 +134,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetProfilePageData")]
-        public IActionResult GetProfilePageData(string profileId)
+        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetProfilePageData(string profileId)
         {
             try
             {
-                List<PageSite> pageSites = _navigationRepository.GetProfilePageData(profileId);
+                var pageSites = await _navigationRepository.GetProfilePageDataAsync(profileId);
                 return Ok(pageSites);
             }
             catch (Exception ex)
@@ -122,12 +150,15 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetCurrentUserCategories")]
-        public IActionResult GetCurrentUserCategories()
+        [ProducesResponseType(typeof(IEnumerable<CategoriesSetDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetCurrentUserCategories()
         {
             try
             {
-                List<CategoriesSetDTO> categoriesSet = _navigationRepository.GetCurrentUserCategories();
+                var categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync();
                 return Ok(categoriesSet);
             }
             catch (Exception ex)
@@ -135,17 +166,21 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("GetPageToCategories")]
+        [ProducesResponseType(typeof(IEnumerable<PageCategory>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetPageToCategories([FromBody] List<int> pageList)
         {
             try
             {
-                if(pageList == null)
+                if (pageList == null)
                 {
                     return BadRequest();
                 }
-                List<PageCategory> pageCategories = new List<PageCategory>();
-                pageCategories = _navigationRepository.GetPageToCategories(pageList);
+
+                var pageCategories = await _navigationRepository.GetPageToCategoriesAsync(pageList);
                 return Ok(pageCategories);
             }
             catch (Exception ex)
@@ -153,7 +188,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("CreateUserAccess")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUserAccess([FromBody] ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
@@ -162,7 +201,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.CreateUserAccess(profilePagesAccessDTO);
+
+                await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO);
                 return Ok();
             }
             catch (Exception ex)
@@ -170,7 +210,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("UpdateUserAccess")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserAccess([FromBody] ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
@@ -179,7 +223,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.UpdateUserAccess(profilePagesAccessDTO);
+
+                await _navigationRepository.UpdateUserAccessAsync(profilePagesAccessDTO);
                 return Ok();
             }
             catch (Exception ex)
@@ -187,7 +232,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("CreateUserProfile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUserProfile([FromBody] ProfileUser profileUsersData)
         {
             try
@@ -196,7 +245,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.CreateUserProfile(profileUsersData);
+
+                await _navigationRepository.CreateUserProfileAsync(profileUsersData);
                 return Ok();
             }
             catch (Exception ex)
@@ -204,7 +254,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("UpdateUserProfile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserProfile([FromBody] ProfileUser profileUsersData)
         {
             try
@@ -213,7 +267,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.UpdateUserProfile(profileUsersData);
+
+                await _navigationRepository.UpdateUserProfileAsync(profileUsersData);
                 return Ok();
             }
             catch (Exception ex)
@@ -221,17 +276,16 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("GetCategoryToPages")]
+        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCategoryToPages(int categoryId)
         {
             try
             {
-                if (categoryId == null)
-                {
-                    return BadRequest();
-                }
-                List<PageSite> pages = new List<PageSite>();
-                pages = _navigationRepository.GetCategoryToPages(categoryId);
+                var pages = await _navigationRepository.GetCategoryToPagesAsync(categoryId);
                 return Ok(pages);
             }
             catch (Exception ex)
@@ -239,7 +293,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("CreateNewCategory")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateNewCategory([FromBody] CategoryPagesAccessDTO categoryPagesAccessDTO)
         {
             try
@@ -248,7 +306,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.CreateNewCategory(categoryPagesAccessDTO);
+
+                await _navigationRepository.CreateNewCategoryAsync(categoryPagesAccessDTO);
                 return Ok();
             }
             catch (Exception ex)
@@ -256,7 +315,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("UpdateCategory")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryPagesAccessDTO categoryPagesAccessDTO)
         {
             try
@@ -265,7 +328,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.UpdateCategory(categoryPagesAccessDTO);
+
+                await _navigationRepository.UpdateCategoryAsync(categoryPagesAccessDTO);
                 return Ok();
             }
             catch (Exception ex)
@@ -273,7 +337,11 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpPost("AssignProfileCategories")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AssignProfileCategories([FromBody] ProfileCategoryAccessDTO profileCategoryAccessDTO)
         {
             try
@@ -282,7 +350,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-                await _navigationRepository.AssignProfileCategories(profileCategoryAccessDTO);
+
+                await _navigationRepository.AssignProfileCategoriesAsync(profileCategoryAccessDTO);
                 return Ok();
             }
             catch (Exception ex)
@@ -290,16 +359,21 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("SearchUserDetails")]
+        [ProducesResponseType(typeof(IEnumerable<ProfileUser>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SearchUserDetails(string criteria, string input)
         {
             try
             {
-                if (criteria.IsNullOrEmpty() || input.IsNullOrEmpty())
+                if (string.IsNullOrEmpty(criteria) || string.IsNullOrEmpty(input))
                 {
                     return BadRequest();
                 }
-                List<ProfileUser> profileUsers = await _navigationRepository.SearchUserDetailsByCriteria(criteria,input);
+
+                var profileUsers = await _navigationRepository.SearchUserDetailsByCriteriaAsync(criteria, input);
                 return Ok(profileUsers);
             }
             catch (Exception ex)
@@ -307,5 +381,7 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+        #endregion
     }
 }

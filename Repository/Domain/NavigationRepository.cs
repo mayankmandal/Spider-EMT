@@ -1,13 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Spider_EMT.DAL;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
-using Spider_EMT.Utility;
-using System.Collections.Generic;
 using System.Data;
 using static Spider_EMT.Utility.Constants;
 
@@ -19,7 +14,7 @@ namespace Spider_EMT.Repository.Domain
         {
 
         }
-        public CurrentUser GetCurrentUser()
+        public async Task<CurrentUser> GetCurrentUserAsync()
         {
             try
             {
@@ -54,7 +49,7 @@ namespace Spider_EMT.Repository.Domain
             }
         }
         
-        public List<ProfileSite> GetAllProfiles()
+        public async Task<List<ProfileSite>> GetAllProfilesAsync()
         {
             try
             {
@@ -88,7 +83,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting All Profiles.", ex);
             }
         }
-        public List<PageSite> GetAllPages()
+        public async Task<List<PageSite>> GetAllPagesAsync()
         {
             try
             {
@@ -124,7 +119,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting All the Pages.", ex);
             }
         }
-        public List<PageCategory> GetAllCategories()
+        public async Task<List<PageCategory>> GetAllCategoriesAsync()
         {
             try
             {
@@ -159,7 +154,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Get All the Page Categories.", ex);
             }
         }
-        public ProfileUser GetCurrentUserDetails()
+        public async Task<ProfileUser> GetCurrentUserDetailsAsync()
         {
             try
             {
@@ -199,7 +194,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting All Users Data.", ex);
             }
         }
-        public ProfileSite GetCurrentUserProfile()
+        public async Task<ProfileSite> GetCurrentUserProfileAsync()
         {
             try
             {
@@ -231,7 +226,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
-        public List<PageSite> GetCurrentUserPages()
+        public async Task<List<PageSite>> GetCurrentUserPagesAsync()
         {
             try
             {
@@ -268,7 +263,7 @@ namespace Spider_EMT.Repository.Domain
             }
         }
 
-        public List<PageSite> GetProfilePageData(string profileId)
+        public async Task<List<PageSite>> GetProfilePageDataAsync(string profileId)
         {
             try
             {
@@ -304,7 +299,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting associated pages for profile.\n", ex);
             }
         }
-        public List<CategoriesSetDTO> GetCurrentUserCategories()
+        public async Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync()
         {
             try
             {
@@ -343,7 +338,7 @@ namespace Spider_EMT.Repository.Domain
             }
         }
         
-        public List<PageCategory> GetPageToCategories(List<int> pageList)
+        public async Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList)
         {
             try
             {
@@ -388,7 +383,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Page to Categories.", ex);
             }
         }
-        public List<CurrentUserProfileViewModel> GetCurrentProfiles()
+        public async Task<List<CurrentUserProfileViewModel>> GetCurrentProfilesAsync()
         {
             try
             {
@@ -422,7 +417,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current Profiles.", ex);
             }
         }
-        public async Task<bool> CreateUserProfile(ProfileUser userProfileData)
+        public async Task<bool> CreateUserProfileAsync(ProfileUser userProfileData)
         {
             try
             {
@@ -440,7 +435,7 @@ namespace Spider_EMT.Repository.Domain
                 };
 
                 // Execute the command
-                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewUser, CommandType.StoredProcedure, sqlParameters);
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_AddNewUser, CommandType.StoredProcedure, sqlParameters);
                 if (tables.Count > 0)
                 {
                     DataTable dataTable = tables[0];
@@ -459,7 +454,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@ProfileId", SqlDbType.Int){Value = userProfileData.ProfileSiteData.ProfileId},
                     new SqlParameter("@UserId", SqlDbType.Int){Value = UserId},
                 };
-                isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddNewUserProfile, CommandType.StoredProcedure, sqlParameters);
+                isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddNewUserProfile, CommandType.StoredProcedure, sqlParameters);
                 if (isFailure)
                 {
                     return false;
@@ -475,7 +470,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> UpdateUserProfile(ProfileUser userProfileData)
+        public async Task<bool> UpdateUserProfileAsync(ProfileUser userProfileData)
         {
             try
             {
@@ -493,7 +488,7 @@ namespace Spider_EMT.Repository.Domain
                 };
 
                 // Execute the command
-                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_UpdateUser, CommandType.StoredProcedure, sqlParameters);
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_UpdateUser, CommandType.StoredProcedure, sqlParameters);
                 if (tables.Count > 0)
                 {
                     DataTable dataTable = tables[0];
@@ -522,7 +517,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO)
+        public async Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {
@@ -538,7 +533,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@ProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@State", SqlDbType.Int){Value = UserPermissionStates.PageIdOnly},
                     };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
@@ -552,7 +547,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
                         };
-                        isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                        isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                         if (isFailure)
                         {
                             return false;
@@ -566,7 +561,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewProfileName", SqlDbType.VarChar,50){Value = profilePagesAccessDTO.ProfileData.ProfileName},
                     };
                     // Execute the command
-                    List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewProfile, CommandType.StoredProcedure, sqlParameters);
+                    List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_AddNewProfile, CommandType.StoredProcedure, sqlParameters);
                     if (tables.Count > 0)
                     {
                         DataTable dataTable = tables[0];
@@ -590,7 +585,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
                         };
-                        isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                        isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                         if (isFailure)
                         {
                             return false;
@@ -608,7 +603,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> UpdateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO)
+        public async Task<bool> UpdateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {
@@ -620,7 +615,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@State", SqlDbType.Int){Value = UserPermissionStates.PageIdOnly},
                 };
 
-                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
                 if (isFailure)
                 {
                     return false;
@@ -634,7 +629,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
                     };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
@@ -651,7 +646,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public List<PageSite> GetCategoryToPages(int categoryId)
+        public async Task<List<PageSite>> GetCategoryToPagesAsync(int categoryId)
         {
             try
             {
@@ -691,7 +686,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Page to Categories.", ex);
             }
         }
-        public async Task<bool> CreateNewCategory(CategoryPagesAccessDTO categoryPagesAccessDTO)
+        public async Task<bool> CreateNewCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO)
         {
             try
             {
@@ -705,7 +700,7 @@ namespace Spider_EMT.Repository.Domain
                 };
 
                 // Creation of New Category
-                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewCategory, CommandType.StoredProcedure, sqlParameters);
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_AddNewCategory, CommandType.StoredProcedure, sqlParameters);
                 if (tables.Count > 0)
                 {
                     DataTable dataTable = tables[0];
@@ -728,7 +723,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@State", SqlDbType.VarChar, 2){Value = PageCategoryMapStates.PageIdOnly},
                         new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId},
                     };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
@@ -743,7 +738,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                     };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
@@ -761,7 +756,7 @@ namespace Spider_EMT.Repository.Domain
             return true;
         }
 
-        public async Task<bool> UpdateCategory(CategoryPagesAccessDTO categoryPagesAccessDTO)
+        public async Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO)
         {
             try
             {
@@ -775,7 +770,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@State", SqlDbType.VarChar, 2){Value = PageCategoryMapStates.PageCategoryIdOnly},
                     new SqlParameter("@PageCatId", SqlDbType.Int){Value = UserIdentity},
                 };
-                isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                 if (isFailure)
                 {
                     return false;
@@ -789,7 +784,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                     };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
@@ -806,7 +801,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> AssignProfileCategories(ProfileCategoryAccessDTO profileCategoryAccessDTO)
+        public async Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO)
         {
             try
             {
@@ -818,7 +813,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@State", SqlDbType.Int){Value = UserPermissionStates.PageCategoryIdOnly},
                 };
 
-                bool isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeleteUserPermission, CommandType.StoredProcedure, sqlParameters);
                 if (isFailure)
                 {
                     return false;
@@ -832,7 +827,7 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = DBNull.Value},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId},
                     };
-                    isFailure = SqlDBHelper.ExecuteNonQuery(Constants.SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
                     {
                         return false;
@@ -850,13 +845,13 @@ namespace Spider_EMT.Repository.Domain
             return true;
         }
 
-        public async Task<List<ProfileUser>> SearchUserDetailsByCriteria(string criteriaText, string InputText)
+        public async Task<List<ProfileUser>> SearchUserDetailsByCriteriaAsync(string criteriaText, string InputText)
         {
             try
             {
                 SqlParameter[] sqlParameters;
                 int InputValue = 0;
-                foreach (var d in Enum.GetValues(typeof(Constants.SearchByTextStates)))
+                foreach (var d in Enum.GetValues(typeof(SearchByTextStates)))
                 {
                     if(criteriaText == d.ToString())
                     {
