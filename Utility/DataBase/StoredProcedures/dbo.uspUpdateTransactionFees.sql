@@ -1,6 +1,6 @@
 USE [SpiderETMDB]
 GO
-/****** Object:  StoredProcedure [dbo].[uspUpdateTransactionFees]    Script Date: 03-01-2024 15:45:28 ******/
+/****** Object:  StoredProcedure [dbo].[uspUpdateTransactionFees]    Script Date: 21-05-2024 15:31:24 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -10,7 +10,7 @@ GO
 -- Create date: YYYY-MM-DD
 -- Description: Update transaction fees for a specific transaction
 -- =============================================
-CREATE PROCEDURE uspUpdateTransactionFees
+ALTER PROCEDURE [dbo].[uspUpdateTransactionFees]
     -- Add the parameters for the stored procedure here
     @TransactionFeeId INT,
     @NewCWTxnFee DECIMAL(5,2),
@@ -56,4 +56,3 @@ BEGIN
     END CATCH;
 
 END
-GO

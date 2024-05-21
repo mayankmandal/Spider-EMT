@@ -5,8 +5,8 @@
         public const string MagicString = "";
 
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";
-        public const string SP_AddNewUserProfile = "dbo.uspAddNewUserProfile";
         public const string SP_AddNewProfile = "dbo.uspAddNewProfile";
+        public const string SP_AddNewUserProfile = "dbo.uspAddNewUserProfile";
         public const string SP_AddPageCategoryMap = "dbo.uspAddPageCategoryMap";
         public const string SP_AddTransactionFees = "dbo.uspAddTransactionFees";
         public const string SP_AddUserPermission = "dbo.uspAddUserPermission";
