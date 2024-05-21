@@ -543,7 +543,7 @@ namespace Spider_EMT.Repository.Domain
                 };
 
                 // Execute the command
-                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddUserProfile, CommandType.StoredProcedure, sqlParameters);
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_AddNewUser, CommandType.StoredProcedure, sqlParameters);
                 if (tables.Count > 0)
                 {
                     DataTable dataTable = tables[0];
@@ -566,6 +566,54 @@ namespace Spider_EMT.Repository.Domain
                 if (isFailure)
                 {
                     return false;
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error while adding User Profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while adding User Profile.", ex);
+            }
+            return true;
+        }
+        public async Task<bool> UpdateUserProfile(ProfileUser userProfileData)
+        {
+            try
+            {
+                int NumberOfRowsAffected = 0;
+                bool isFailure = false;
+                // User Profile Updation
+                SqlParameter[] sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = userProfileData.UserId },
+                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 20) { Value = userProfileData.IdNumber },
+                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userProfileData.FullName },
+                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
+                    new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
+                    new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
+                    new SqlParameter("@NewUserStatus", SqlDbType.VarChar, 20) { Value = userProfileData.UserStatus },
+                };
+
+                // Execute the command
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(Constants.SP_UpdateUser, CommandType.StoredProcedure, sqlParameters);
+                if (tables.Count > 0)
+                {
+                    DataTable dataTable = tables[0];
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        DataRow dataRow = dataTable.Rows[0];
+                        NumberOfRowsAffected = (int)dataRow["RowsAffected"];
+                        if (NumberOfRowsAffected < 0) 
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             catch (SqlException sqlEx)
@@ -904,6 +952,62 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error adding relationship between new user profile.", ex);
             }
             return true;
+        }
+
+        public async Task<List<ProfileUser>> SearchUserDetailsByCriteria(string criteriaText, string InputText)
+        {
+            try
+            {
+                SqlParameter[] sqlParameters;
+                int InputValue = 0;
+                foreach (var d in Enum.GetValues(typeof(Constants.SearchByTextStates)))
+                {
+                    if(criteriaText == d.ToString())
+                    {
+                        InputValue = (int)d;
+                        break;
+                    }
+                }
+                
+                sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@TextCriteria", SqlDbType.Int){Value = InputValue},
+                    new SqlParameter("@InputText", SqlDbType.VarChar, 100){Value = InputText},
+                };
+
+                DataTable dataTable = SqlDBHelper.ExecuteParameterizedSelectCommand(SP_SearchUserByTextCriteria, CommandType.StoredProcedure, sqlParameters);
+                List<ProfileUser> profileUserLst = new List<ProfileUser>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach(DataRow dataRow in dataTable.Rows)
+                    {
+                        ProfileUser profileUser = new ProfileUser
+                        {
+                            UserId = (int)dataRow["UserId"],
+                            IdNumber = dataRow["IdNumber"].ToString(),
+                            FullName = dataRow["FullName"].ToString(),
+                            Email = dataRow["Email"].ToString(),
+                            MobileNo = dataRow["MobileNo"].ToString(),
+                            ProfileSiteData = new ProfileSite
+                            {
+                                ProfileId = (int)dataRow["ProfileId"],
+                                ProfileName = dataRow["ProfileName"].ToString()
+                            },
+                            UserStatus = dataRow["Status"].ToString(),
+                        };
+                        profileUserLst.Add(profileUser);
+                    }
+                }
+                return profileUserLst;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user profile.", ex);
+            }
         }
     }
 }

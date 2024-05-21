@@ -10,14 +10,16 @@
         public const string SP_AddPageCategoryMap = "dbo.uspAddPageCategoryMap";
         public const string SP_AddTransactionFees = "dbo.uspAddTransactionFees";
         public const string SP_AddUserPermission = "dbo.uspAddUserPermission";
-        public const string SP_AddUserProfile = "dbo.uspAddUserProfile";
+        public const string SP_AddNewUser = "dbo.uspAddNewUser";
 
         public const string SP_DeletePageCategoryMap = "dbo.uspDeletePageCategoryMap";
         public const string SP_DeleteUserPermission = "dbo.uspDeleteUserPermission";
         public const string SP_DeleteUserProfile = "dbo.uspDeleteUserProfile";
 
+        public const string SP_SearchUserByTextCriteria = "dbo.uspSearchUserByTextCriteria";
+
         public const string SP_UpdateTransactionFees = "dbo.uspUpdateTransactionFees";
-        public const string SP_UpdateUserProfile = "dbo.uspUpdateUserProfile";
+        public const string SP_UpdateUser = "dbo.uspUpdateUser";
 
         public static class UserStatusDescription
         {
@@ -60,5 +62,14 @@
             public static int PageCategoryIdOnly = 2;
             public static int BothPageIdAndPageCategoryId = 3;
         };
+        public enum SearchByTextStates
+        {
+            UserId = 1,
+            IdNumber = 2,
+            FullName = 3,
+            Email = 4,
+            MobileNo = 5,
+            ProfileName = 6
+        }
     }
 }

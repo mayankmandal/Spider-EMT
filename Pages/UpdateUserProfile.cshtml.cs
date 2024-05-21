@@ -61,7 +61,7 @@ namespace Spider_EMT.Pages
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["success"] = "Profile Updated Successfully";
-                    return RedirectToPage("/CreateUserAccessControl");
+                    return RedirectToPage("/UpdateUserProfile");
                 }
                 else
                 {

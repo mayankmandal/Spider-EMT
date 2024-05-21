@@ -84,6 +84,7 @@
                         class: 'form-check-input',
                         id: 'page-${page.pageId}',
                         value: page.pageId,
+                        checked: true,
                         disabled: true // Disabled since it's for display only
                     });
 

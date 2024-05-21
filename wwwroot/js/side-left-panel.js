@@ -25,7 +25,7 @@
         listItem.className = 'nav-item';
 
         const link = document.createElement('a');
-        link.href = '/UserProfile';
+        link.href = '/ReadUserProfile';
         link.className = 'nav-link';
 
         const icon = document.createElement('i');

@@ -133,16 +133,25 @@
                 <div class="card">
                     <div class="card-header fw-bolder" style="font-size:1.2rem;">Pages View</div>
                     <div class="card-body" style="font-size:1rem;">
-                        <ul class="nav nav-pills nav-sidebar" data-widget="treeview" role="menu" data-accordion="false" id="dynamicPagesList">
+                        <ul class="nav nav-pills nav-sidebar" data-widget="treeview" role="menu" data-accordion="false" id="dynamicPagesList" style="display: flex; flex-wrap: wrap; padding: 0;">
                             <!-- Populate pages here -->
                             @foreach (var pageSite in Model.CurrentPageSites)
                             {
-                                <li class="nav-item" id="pageViewDiv">
-                                    <a href="@pageSite.PageUrl" class="nav-link">
-                                        <i class="far ion-paper-airplane nav-icon"></i>
+                                <li class="nav-item" style="flex: 1 0 30%; box-sizing: border-box; padding: 2px; list-style: none; height: auto;">
+                                    <a href="@pageSite.PageUrl" class="nav-link" style="display: flex; flex-direction: row; justify-content: start; align-items: start; height: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; text-align: start;">
+                                        <i class="far ion-paper-airplane nav-icon" style="margin-left:2px; margin-right:2px;"></i>
                                         <p>@pageSite.PageDescription</p>
                                     </a>
                                 </li>
+                            }
+                            @if (Model.CurrentPageSites.Count() % 3 == 2)
+                            {
+                                <li class="nav-item" style="flex: 1 0 30%; box-sizing: border-box; padding: 10px; list-style: none;"></li>
+                            }
+                            @if (Model.CurrentPageSites.Count() % 3 == 1)
+                            {
+                                <li class="nav-item" style="flex: 1 0 30%; box-sizing: border-box; padding: 10px; list-style: none;"></li>
+                                <li class="nav-item" style="flex: 1 0 30%; box-sizing: border-box; padding: 10px; list-style: none;"></li>
                             }
                         </ul>
                     </div>

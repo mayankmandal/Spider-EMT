@@ -242,6 +242,23 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+        [HttpPost("UpdateUserProfile")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] ProfileUser profileUsersData)
+        {
+            try
+            {
+                if (profileUsersData == null)
+                {
+                    return BadRequest();
+                }
+                await _navigationRepository.UpdateUserProfile(profileUsersData);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
         [HttpGet("GetCategoryToPages")]
         public async Task<IActionResult> GetCategoryToPages(int categoryId)
         {
@@ -305,6 +322,23 @@ namespace Spider_EMT.Controller
                 }
                 await _navigationRepository.AssignProfileCategories(profileCategoryAccessDTO);
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+        [HttpGet("SearchUserDetails")]
+        public async Task<IActionResult> SearchUserDetails(string criteria, string input)
+        {
+            try
+            {
+                if (criteria.IsNullOrEmpty() || input.IsNullOrEmpty())
+                {
+                    return BadRequest();
+                }
+                List<ProfileUser> profileUsers = await _navigationRepository.SearchUserDetailsByCriteria(criteria,input);
+                return Ok(profileUsers);
             }
             catch (Exception ex)
             {

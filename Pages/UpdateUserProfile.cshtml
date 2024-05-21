@@ -28,8 +28,48 @@
 }
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+
+    <div class="container form-control pt-4 pb-2" style="height:auto;background-color: #f4f0ec; width:60%;font-size:1.2rem;">
+        <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
+            <!-- Search Section -->
+            <div class="mb-3">
+                <label for="searchCriteria" class="form-label" style="font-size:1.2rem;">
+                    Search By
+                </label>
+                <select id="searchCriteria" class="form-control" style="font-size:1.2rem">
+                    \
+                    <option value="UserId">User ID</option>
+                    <option value="IdNumber">National/Iqama Number</option>
+                    <option value="FullName">Full Name</option>
+                    <option value="Email">Email Address</option>
+                    <option value="MobileNo">Mobile Number</option>
+                    <option value="ProfileName">Profile Name</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="searchInput" class="form-label" style="font-size:1.2rem;">
+                    Search
+                </label>
+                <input type="text" id="searchInput" class="form-control mb-2" placeholder="Enter search term" style="font-size:1.2rem;" />
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <button id="searchButton" class="btn mt-2" style="font-size:1.2rem; width:140px; background-color:#17a2b8;color:white">Search</button>
+                    <button id="clearButton" class="btn btn-secondary mt-2" style="font-size:1.2rem; width:180px;">Clear</button>
+                </div>
+                
+            </div>
+
+            <div id="resultsCount" class="mb-3" style="font-size:1.2rem; display:none;"></div>
+
+            <div id="searchResults" class="mb-3" style="font-size:0.7rem; display:none;">
+                <!-- Search results will be displayed here -->
+            </div>
+            <button id="selectButton" class="btn btn-success mt-2" style="font-size:1.2rem; display:none;">Select</button>
+        </div>
+    </div>
+
     <form method="post">
-        <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:60%;font-size:2rem;">
+        <div id="createProfileSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;font-size:2rem;display:none;">
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
                 <div class="row pb-1 pt-2">
@@ -43,7 +83,7 @@
                     <div class="mb-3" style="display: flex; justify-content: space-between;">
                         <div style="flex: 1; margin-right: 10px;">
                             <label asp-for="ProfileUsersData.UserId" class="form-label" style="font-size:1.2rem;"></label>
-                            <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" disabled />
+                            <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" value="ProfileUsersData.UserId" readonly />
                         </div>
                         <div style="flex: 1;">
                             <label asp-for="ProfileUsersData.IdNumber" class="form-label" style="font-size:1.2rem;"></label>
@@ -107,10 +147,11 @@
                 </div>
             </div>
 
-            <div class="container form-control border-2" style="justify-content:space-around;height:auto;">
+            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="col-3 me-4">
+                        <button type="submit" onclick="prepareFormSubmission()" class="btn" style="width:140px; background-color:#17a2b8;color:white">Update</button>
                     </div>
                     <div class="col-4 ms-3">
                         <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
@@ -124,5 +165,5 @@
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/createUserProfile.js" asp-append-version="true"></script>
+    <script src="~/js/updateUserProfile.js" asp-append-version="true"></script>
 }

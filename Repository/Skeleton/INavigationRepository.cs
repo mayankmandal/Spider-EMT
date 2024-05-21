@@ -20,10 +20,12 @@ namespace Spider_EMT.Repository.Skeleton
         List<PageCategory> GetPageToCategories(List<int> pageList);
         List<PageSite> GetCategoryToPages(int categoryId);
         Task<bool> CreateUserProfile(ProfileUser profileUsersData);
+        Task<bool> UpdateUserProfile(ProfileUser profileUsersData);
         Task<bool> CreateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> CreateNewCategory(CategoryPagesAccessDTO categoryPagesAccessDTO);
         Task<bool> UpdateCategory(CategoryPagesAccessDTO categoryPagesAccessDTO);
         Task<bool> UpdateUserAccess(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> AssignProfileCategories(ProfileCategoryAccessDTO profileCategoryAccessDTO);
+        Task<List<ProfileUser>> SearchUserDetailsByCriteria(string criteriaText, string InputText);
     }
 }
