@@ -11,28 +11,33 @@ namespace Spider_EMT.Pages
 {
     public class UpdateCategoryModel : PageModel
     {
-        private readonly INavigationRepository _navigationRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        public UpdateCategoryModel(INavigationRepository navigationRepository, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public UpdateCategoryModel(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _navigationRepository = navigationRepository;
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
         [BindProperty]
-        public List<PageSite> AllPageSites { get; set; }
+        public List<PageSite>? AllPageSites { get; set; }
         [BindProperty]
-        public List<PageCategory> AllCategories { get; set; }
+        public List<PageCategory>? AllCategories { get; set; }
         [BindProperty]
-        public PageCategory SelectedPageCategory { get; set; }
+        public PageCategory? SelectedPageCategory { get; set; }
         [BindProperty]
-        public string SelectedPagesJson { get; set; }
+        public string? SelectedPagesJson { get; set; }
         public async Task<IActionResult> OnGet()
         {
-            await LoadAllCategoriesData();
-            await LoadAllPagesData();
-            return Page();
+            try
+            {
+                await LoadAllCategoriesData();
+                await LoadAllPagesData();
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex, "Error occurred while loading profile data.");
+            }
         }
         private async Task LoadAllCategoriesData()
         {
@@ -84,17 +89,29 @@ namespace Spider_EMT.Pages
                 }
                 else
                 {
-                    TempData["error"] = "Error occured in response with status : " + response.StatusCode + response.RequestMessage + response.ReasonPhrase;
+                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     await LoadAllCategoriesData();
                     await LoadAllPagesData();
                     return Page();
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                return HandleError(ex, "Error occurred during HTTP request.");
+            }
+            catch (JsonException ex)
+            {
+                return HandleError(ex, "Error occurred while parsing JSON.");
+            }
             catch (Exception ex)
             {
-                TempData["error"] = "Error occured : " + ex.Message;
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return HandleError(ex, "An unexpected error occurred.");
             }
+        }
+        private IActionResult HandleError(Exception ex, string errorMessage)
+        {
+            TempData["error"] = errorMessage + " Error details: " + ex.Message;
+            return RedirectToPage("/Error");
         }
     }
 }

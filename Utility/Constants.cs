@@ -14,7 +14,6 @@
 
         public const string SP_DeletePageCategoryMap = "dbo.uspDeletePageCategoryMap";
         public const string SP_DeleteUserPermission = "dbo.uspDeleteUserPermission";
-        public const string SP_DeleteUserProfile = "dbo.uspDeleteUserProfile";
 
         public const string SP_SearchUserByTextCriteria = "dbo.uspSearchUserByTextCriteria";
 
@@ -46,6 +45,7 @@
                 var values = csv.Split(',');
                 return values.Select(value => StatusOptions.FirstOrDefault(option => option.Value == value)?.Text)
                         .Where(text => text != null)
+                        .Select(text => text!) // Using null-forgiving operator to indicate that nulls are already filtered out
                         .ToList();
             }
         }

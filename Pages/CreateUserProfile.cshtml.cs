@@ -11,20 +11,18 @@ namespace Spider_EMT.Pages
 {
     public class CreateUserProfileModel : PageModel
     {
-        private readonly INavigationRepository _navigationRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        public CreateUserProfileModel(INavigationRepository navigationRepository, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public CreateUserProfileModel(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _navigationRepository = navigationRepository;
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
         [BindProperty]
-        public ProfileUser ProfileUsersData { get; set; }
-        public List<ProfileSite> ProfilesData { get; set; }
+        public ProfileUser? ProfileUsersData { get; set; }
+        public List<ProfileSite>? ProfilesData { get; set; }
         [BindProperty]
-        public List<string> UserStatusLst { get; set; }
+        public List<string>? UserStatusLst { get; set; }
         public List<CheckBoxOption> Checkboxes = UserStatusDescription.StatusOptions.Select(option => new CheckBoxOption
         {
             IsChecked = false,
@@ -33,8 +31,15 @@ namespace Spider_EMT.Pages
         }).ToList();
         public async Task<IActionResult> OnGet()
         {
-            await LoadAllProfilesData();
-            return Page();
+            try
+            {
+                await LoadAllProfilesData();
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex, "Error occurred while loading profile data.");
+            }
         }
         private async Task LoadAllProfilesData()
         {
@@ -55,26 +60,37 @@ namespace Spider_EMT.Pages
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/CreateUserProfile";
                 var jsonContent = JsonConvert.SerializeObject(ProfileUsersData);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                HttpResponseMessage response;
-                response = await client.PostAsync(apiUrl, httpContent);
+                HttpResponseMessage response = await client.PostAsync(apiUrl, httpContent);
 
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["success"] = "Profile Created Successfully";
-                    return RedirectToPage("/CreateUserAccessControl");
+                    return RedirectToPage("/CreateUserProfile");
                 }
                 else
                 {
-                    TempData["error"] = "Error occured in response with status : " + response.StatusCode + response.RequestMessage + response.ReasonPhrase;
+                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     await LoadAllProfilesData();
                     return Page();
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                return HandleError(ex, "Error occurred during HTTP request.");
+            }
+            catch (JsonException ex)
+            {
+                return HandleError(ex, "Error occurred while parsing JSON.");
+            }
             catch (Exception ex)
             {
-                TempData["error"] = "Error occured : " + ex.Message;
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return HandleError(ex, "An unexpected error occurred.");
             }
+        }
+        private IActionResult HandleError(Exception ex, string errorMessage)
+        {
+            TempData["error"] = errorMessage + " Error details: " + ex.Message;
+            return RedirectToPage("/Error");
         }
     }
 }

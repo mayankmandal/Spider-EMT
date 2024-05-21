@@ -27,7 +27,7 @@ namespace Spider_EMT.Repository.Domain
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
-                CurrentUser currentUser = null;
+                CurrentUser currentUser = new CurrentUser();
                 if (dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow row in dataTable.Rows)
@@ -53,39 +53,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
-        public List<ProfileUser> GetAllProfileUsers()
-        {
-            try
-            {
-                string commandText = "SELECT UserId,FirstName,LastName,BirthDate FROM tblUsers";
-
-                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-
-                List<ProfileUser> profileUsers = new List<ProfileUser>();
-                if (dataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        ProfileUser profileUser = new ProfileUser
-                        {
-                            UserId = (int)row["UserId"],
-                        };
-                        profileUsers.Add(profileUser);
-                    }
-                }
-                return profileUsers;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting All Users Data.", ex);
-            }
-        }
+        
         public List<ProfileSite> GetAllProfiles()
         {
             try
@@ -374,77 +342,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Categories.", ex);
             }
         }
-        public List<PageSite> GetNewUserPages()
-        {
-            try
-            {
-                string commandText = "SELECT DISTINCT tbp.PageUrl,tbp.PageId,tbp.PageDescription,tbp.PageCatId,tbp.MenuImgPath FROM tblPage tbp LEFT JOIN tblUserPermission tup ON tbp.PageId = tup.PageId LEFT JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId LEFT JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId LEFT JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId WHERE tbp.PageId NOT IN ( SELECT DISTINCT tbp.PageId  FROM tblPage tbp  INNER JOIN tblUserPermission tup ON tbp.PageId = tup.PageId  INNER JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId  INNER JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId  INNER JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId)";
-
-                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-
-                List<PageSite> pages = new List<PageSite>();
-                if (dataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        PageSite page = new PageSite
-                        {
-                            PageId = (int)row["PageId"],
-                            MenuImgPath = row["MenuImgPath"].ToString(),
-                            PageDescription = row["PageDescription"].ToString(),
-                            PageUrl = row["PageUrl"].ToString(),
-                        };
-                        pages.Add(page);
-                    }
-                }
-                return pages;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting new user pages.", ex);
-            }
-        }
-        public List<PageCategory> GetNewUserCategories()
-        {
-            try
-            {
-                string commandText = "SELECT DISTINCT tbpc.*, tbp.PageId FROM tblPageCatagory tbpc INNER JOIN tblPage tbp ON tbp.PageCatId = tbpc.PageCatId INNER JOIN tblUserPermission tup ON tbp.PageId = tup.PageId INNER JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId INNER JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId INNER JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId WHERE tbpc.PageCatId NOT IN (    SELECT DISTINCT tbpc.PageCatId FROM tblPageCatagory tbpc INNER JOIN tblPage tbp ON tbp.PageCatId = tbpc.PageCatId INNER JOIN tblUserPermission tup ON tbp.PageId = tup.PageId INNER JOIN tblProfile tp ON tup.ProfileId = tp.ProfileId INNER JOIN tblUserProfile tbup ON tbup.ProfileId = tp.ProfileId INNER JOIN tblCurrentUser tcu ON tbup.UserId = tcu.UserId)";
-
-                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-
-                List<PageCategory> pageCategories = new List<PageCategory>();
-                if (dataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        PageCategory pageCategory = new PageCategory
-                        {
-                            PageId = (int)row["PageId"],
-                            CategoryName = row["CatagoryName"].ToString(),
-                            PageCatId = (int)row["PageCatId"],
-                        };
-                        pageCategories.Add(pageCategory);
-                    }
-                }
-                return pageCategories;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting new user categories.", ex);
-            }
-        }
+        
         public List<PageCategory> GetPageToCategories(List<int> pageList)
         {
             try
@@ -503,13 +401,12 @@ namespace Spider_EMT.Repository.Domain
                 {
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        CurrentUserProfileViewModel userProfile = new CurrentUserProfileViewModel
+                        userProfiles.Add(new CurrentUserProfileViewModel
                         {
                             ProfileId = (int)row["ProfileId"],
                             ProfileName = row["ProfileName"].ToString(),
                             UserId = (int)row["UserId"],
-                        };
-                        userProfiles.Add(userProfile);
+                        });
                     }
                 }
                 return userProfiles;
@@ -583,7 +480,6 @@ namespace Spider_EMT.Repository.Domain
             try
             {
                 int NumberOfRowsAffected = 0;
-                bool isFailure = false;
                 // User Profile Updation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {

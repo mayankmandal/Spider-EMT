@@ -10,29 +10,34 @@ namespace Spider_EMT.Pages
 {
     public class ProfileCategoryAssignModel : PageModel
     {
-        private readonly INavigationRepository _navigationRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        public ProfileCategoryAssignModel(INavigationRepository navigationRepository, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public ProfileCategoryAssignModel(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _navigationRepository = navigationRepository;
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
-        public ProfileSite profileSite { get; set; }
-        public List<ProfileSite> AllProfilesData { get; set; }
-        public List<PageCategory> AllCategoriesData { get; set; }
+        public ProfileSite? profileSite { get; set; }
+        public List<ProfileSite>? AllProfilesData { get; set; }
+        public List<PageCategory>? AllCategoriesData { get; set; }
         [BindProperty]
         public int SelectedProfileId { get; set; }
         [BindProperty]
-        public string SelectedProfileName { get; set; }
+        public string? SelectedProfileName { get; set; }
         [BindProperty]
-        public string SelectedCategoriesJson { get; set; }
+        public string? SelectedCategoriesJson { get; set; }
         public async Task<IActionResult> OnGet()
         {
-            await LoadAllProfilesData();
-            await LoadAllCategoriesData();
-            return Page();
+            try
+            {
+                await LoadAllProfilesData();
+                await LoadAllCategoriesData();
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex, "Error occurred while loading profile data.");
+            }
         }
         private async Task LoadAllProfilesData()
         {
@@ -84,17 +89,29 @@ namespace Spider_EMT.Pages
                 }
                 else
                 {
-                    TempData["error"] = "Error occured in response with status : " + response.StatusCode + response.RequestMessage + response.ReasonPhrase;
+                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     await LoadAllProfilesData();
                     await LoadAllCategoriesData();
                     return Page();
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                return HandleError(ex, "Error occurred during HTTP request.");
+            }
+            catch (JsonException ex)
+            {
+                return HandleError(ex, "Error occurred while parsing JSON.");
+            }
             catch (Exception ex)
             {
-                TempData["error"] = "Error occured : " + ex.Message;
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return HandleError(ex, "An unexpected error occurred.");
             }
+        }
+        private IActionResult HandleError(Exception ex, string errorMessage)
+        {
+            TempData["error"] = errorMessage + " Error details: " + ex.Message;
+            return RedirectToPage("/Error");
         }
     }
 }

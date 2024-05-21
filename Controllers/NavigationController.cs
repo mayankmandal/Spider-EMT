@@ -16,19 +16,7 @@ namespace Spider_EMT.Controller
         {
             _navigationRepository = navigationRepository;
         }
-        [HttpGet("GetAllProfileUsers")]
-        public IActionResult GetAllProfileUsers()
-        {
-            try
-            {
-                IEnumerable<ProfileUser> allProfilesData = _navigationRepository.GetAllProfileUsers();
-                return Ok(allProfilesData);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
+        
         [HttpGet("GetAllProfiles")]
         public IActionResult GetAllProfiles()
         {
@@ -141,32 +129,6 @@ namespace Spider_EMT.Controller
             {
                 List<CategoriesSetDTO> categoriesSet = _navigationRepository.GetCurrentUserCategories();
                 return Ok(categoriesSet);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-        [HttpGet("GetNewUserPages")]
-        public async Task<IActionResult> GetNewUserPages()
-        {
-            try
-            {
-                List<PageSite> pageSites = _navigationRepository.GetNewUserPages();
-                return Ok(pageSites);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-        [HttpGet("GetNewUserCategories")]
-        public async Task<IActionResult> GetNewUserCategories()
-        {
-            try
-            {
-                List<PageCategory> pageCategories = _navigationRepository.GetNewUserCategories();
-                return Ok(pageCategories);
             }
             catch (Exception ex)
             {

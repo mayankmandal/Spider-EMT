@@ -6,7 +6,6 @@ namespace Spider_EMT.Repository.Skeleton
     public interface INavigationRepository
     {
         CurrentUser GetCurrentUser();
-        List<ProfileUser> GetAllProfileUsers();
         List<ProfileSite> GetAllProfiles();
         List<PageSite> GetAllPages();
         List<PageCategory> GetAllCategories();
@@ -14,9 +13,7 @@ namespace Spider_EMT.Repository.Skeleton
         ProfileSite GetCurrentUserProfile();
         List<PageSite> GetCurrentUserPages();
         List<PageSite> GetProfilePageData(string profileId);
-        List<PageSite> GetNewUserPages();
         List<CategoriesSetDTO> GetCurrentUserCategories();
-        List<PageCategory> GetNewUserCategories();
         List<PageCategory> GetPageToCategories(List<int> pageList);
         List<PageSite> GetCategoryToPages(int categoryId);
         Task<bool> CreateUserProfile(ProfileUser profileUsersData);

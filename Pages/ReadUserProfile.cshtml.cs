@@ -11,30 +11,35 @@ namespace Spider_EMT.Pages
 {
     public class ReadUserProfileModel : PageModel
     {
-        private readonly INavigationRepository _navigationRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        public ReadUserProfileModel(INavigationRepository navigationRepository, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public ReadUserProfileModel(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _navigationRepository = navigationRepository;
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
-        public CurrentUser CurrentUserData { get; set; }
-        public ProfileUser CurrentUserDetailsData { get; set; }
-        public List<PageSite> CurrentPageSites { get; set; }
-        private List<CategoriesSetDTO> CurrentCategoriesSetDTOs { get; set; }
-        public List<string> StatusCheckboxes { get; set; }
-        public List<CategoryDisplayViewModel> StructureData { get; set; }
+        public CurrentUser? CurrentUserData { get; set; }
+        public ProfileUser? CurrentUserDetailsData { get; set; }
+        public List<PageSite>? CurrentPageSites { get; set; }
+        private List<CategoriesSetDTO>? CurrentCategoriesSetDTOs { get; set; }
+        public List<string>? StatusCheckboxes { get; set; }
+        public List<CategoryDisplayViewModel>? StructureData { get; set; }
         public async Task<IActionResult> OnGet()
         {
-            await LoadCurrentUserData();
-            await LoadCurrentProfileUserData();
-            await LoadCurrentPageSites();
-            await LoadCurrentCategoriesSetDTOs();
+            try
+            {
+                await LoadCurrentUserData();
+                await LoadCurrentProfileUserData();
+                await LoadCurrentPageSites();
+                await LoadCurrentCategoriesSetDTOs();
 
-            StatusCheckboxes = Constants.UserStatusDescription.GetStatusTextsFromCsv(CurrentUserDetailsData.UserStatus.ToString());
-            return Page();
+                StatusCheckboxes = Constants.UserStatusDescription.GetStatusTextsFromCsv(CurrentUserDetailsData.UserStatus.ToString());
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex, "Error occurred while loading profile data.");
+            }
         }
         private async Task LoadCurrentUserData()
         {
@@ -91,6 +96,11 @@ namespace Spider_EMT.Pages
 
             // Sort the categories
             StructureData = StructureData.OrderBy(cat => cat.CategoryName).ToList();
+        }
+        private IActionResult HandleError(Exception ex, string errorMessage)
+        {
+            TempData["error"] = errorMessage + " Error details: " + ex.Message;
+            return RedirectToPage("/Error");
         }
     }
 }

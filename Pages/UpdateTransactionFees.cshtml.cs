@@ -19,12 +19,19 @@ namespace Spider_EMT.Pages
             _clientFactory = clientFactory;
         }
         [BindProperty]
-        public TransactionFee TransactionFeeAmounts { get; set; }
+        public TransactionFee? TransactionFeeAmounts { get; set; }
         public async Task<IActionResult> OnGet()
         {
-            // Retrieve the existing transaction fees values
-            TransactionFeeAmounts = await _siteSelectionRepository.GetTransactionFee();
-            return Page();
+            try
+            {
+                // Retrieve the existing transaction fees values
+                TransactionFeeAmounts = await _siteSelectionRepository.GetTransactionFee();
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex, "Error occurred while loading profile data.");
+            }
         }
 
         public async Task<IActionResult> OnPost()
@@ -67,16 +74,28 @@ namespace Spider_EMT.Pages
                 }
                 else
                 {
-                    TempData["error"] = "Error occured in response with status : " + response.StatusCode;
+                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     // Redirect to the Same page if error occurs
                     return Page();
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                return HandleError(ex, "Error occurred during HTTP request.");
+            }
+            catch (JsonException ex)
+            {
+                return HandleError(ex, "Error occurred while parsing JSON.");
+            }
             catch (Exception ex)
             {
-                TempData["error"] = "Error occured : " + ex.Message;
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return HandleError(ex, "An unexpected error occurred.");
             }
+        }
+        private IActionResult HandleError(Exception ex, string errorMessage)
+        {
+            TempData["error"] = errorMessage + " Error details: " + ex.Message;
+            return RedirectToPage("/Error");
         }
     }
 }
