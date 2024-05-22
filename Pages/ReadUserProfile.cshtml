@@ -2,6 +2,7 @@
 @model Spider_EMT.Pages.ReadUserProfileModel
 @{
     ViewData["Title"] = "View User Profile";
+    int @categoryCount = 0;
 }
 
 @if (TempData["success"] != null)
@@ -97,13 +98,26 @@
                 <hr />
 
                 <div class="card">
-                    <div class="card-header fw-bolder" style="font-size:1.2rem;">Categories View</div>
+                    <div class="card-header">
+                        <h3 class="card-title">Categories View</h3>
+                        <div class="card-tools">
+                            <span title="3 New Messages" class="badge badge-warning">@Model.StructureData.Count</span>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="card-body" style="font-size:1rem;">
-                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="dynamicCategoriesList">
+                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="categoriesAccordion">
                             <!-- Populate categories here -->
+                            
                             @foreach (var categoryData in Model.StructureData)
                             {
-                                <li class="nav-item" id="categoryViewDiv">
+                                <li class="nav-item" id="category-@categoryCount">
                                     <a href="#" class="nav-link">
                                         <i class="far ion-ios-briefcase-outline nav-icon"></i>
                                         <p>
@@ -111,7 +125,7 @@
                                             <i class="right fas fa-angle-left"></i>
                                         </p>
                                     </a>
-                                    <ul class="nav nav-treeview">
+                                    <ul class="nav-treeview">
                                         @foreach (var pageSite in categoryData.Pages)
                                         {
                                             <li class="nav-item">
@@ -123,9 +137,11 @@
                                         }
                                     </ul>
                                 </li>
+                                categoryCount++;
                             }
                         </ul>
                     </div>
+                    
                 </div>
 
                 <hr />
@@ -137,7 +153,7 @@
                             <!-- Populate pages here -->
                             @foreach (var pageSite in Model.CurrentPageSites)
                             {
-                                <li class="nav-item" style="flex: 1 0 30%; box-sizing: border-box; padding: 2px; list-style: none; height: auto;">
+                                <li class="nav-item pageViewDiv" style="flex: 1 0 30%; box-sizing: border-box; padding: 2px; list-style: none; height: auto;">
                                     <a href="@pageSite.PageUrl" class="nav-link" style="display: flex; flex-direction: row; justify-content: start; align-items: start; height: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; text-align: start;">
                                         <i class="far ion-paper-airplane nav-icon" style="margin-left:2px; margin-right:2px;"></i>
                                         <p>@pageSite.PageDescription</p>

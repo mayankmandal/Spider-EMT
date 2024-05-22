@@ -90,8 +90,8 @@ namespace Spider_EMT.Controller
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
-                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
+                        SlidingExpiration = TimeSpan.FromSeconds(300),
                         Size = 1024
                     };
 
@@ -134,8 +134,8 @@ namespace Spider_EMT.Controller
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
-                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
+                        SlidingExpiration = TimeSpan.FromSeconds(300),
                         Size = 1024
                     };
 
@@ -163,8 +163,8 @@ namespace Spider_EMT.Controller
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
-                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
+                        SlidingExpiration = TimeSpan.FromSeconds(300),
                         Size = 1024
                     };
 
@@ -207,8 +207,8 @@ namespace Spider_EMT.Controller
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(60),
-                        SlidingExpiration = TimeSpan.FromSeconds(60),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
+                        SlidingExpiration = TimeSpan.FromSeconds(300),
                         Size = 1024
                     };
 
@@ -258,6 +258,8 @@ namespace Spider_EMT.Controller
                 }
 
                 await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO);
+                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -280,6 +282,8 @@ namespace Spider_EMT.Controller
                 }
 
                 await _navigationRepository.UpdateUserAccessAsync(profilePagesAccessDTO);
+                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -324,6 +328,9 @@ namespace Spider_EMT.Controller
                 }
 
                 await _navigationRepository.UpdateUserProfileAsync(profileUsersData);
+                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -385,6 +392,8 @@ namespace Spider_EMT.Controller
                 }
 
                 await _navigationRepository.UpdateCategoryAsync(categoryPagesAccessDTO);
+                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -406,7 +415,12 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
+                // Method Call for assigning categories to profiles
                 await _navigationRepository.AssignProfileCategoriesAsync(profileCategoryAccessDTO);
+
+                // Remove the cached item to force a refresh next time
+                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
