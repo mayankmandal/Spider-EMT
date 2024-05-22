@@ -422,7 +422,6 @@ namespace Spider_EMT.Repository.Domain
             try
             {
                 int UserId = 0;
-                bool isFailure = false;
                 // User Profile Creation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {
@@ -444,18 +443,12 @@ namespace Spider_EMT.Repository.Domain
                         DataRow dataRow = dataTable.Rows[0];
                         UserId = (int)dataRow["UserId"];
                     }
-                    else
+                    if (UserId <= 0)
                     {
                         return false;
                     }
                 }
-                sqlParameters = new SqlParameter[]
-                {
-                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = userProfileData.ProfileSiteData.ProfileId},
-                    new SqlParameter("@UserId", SqlDbType.Int){Value = UserId},
-                };
-                isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddNewUserProfile, CommandType.StoredProcedure, sqlParameters);
-                if (isFailure)
+                else
                 {
                     return false;
                 }
