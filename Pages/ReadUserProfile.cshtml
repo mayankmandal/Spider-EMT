@@ -35,73 +35,15 @@
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
                 <div class="row pb-1 pt-2">
-                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">User Profile</h2>
+                    <div style="color:#17a2b8; text-align:center; font-size:1.5rem;" class="fw-bold" >User Profile</div>
                     <div>
                         <hr />
                     </div>
                 </div>
-
-                <!-- User ID and ID Number on one line -->
-                <div class="mb-3" style="display: flex; justify-content: space-between;">
-                    <div style="flex: 1; margin-right: 10px;">
-                        <label asp-for="CurrentUserDetailsData.UserId" class="form-label" style="font-size:1.2rem;"></label>
-                        <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" disabled />
-                    </div>
-                    <div style="flex: 1;">
-                        <label asp-for="CurrentUserDetailsData.IdNumber" class="form-label" style="font-size:1.2rem;"></label>
-                        <input asp-for="CurrentUserDetailsData.IdNumber" placeholder="National/Iqama Number" class="form-control" disabled />
-                        <span asp-validation-for="CurrentUserDetailsData.IdNumber" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                    </div>
-                </div>
-
-                <!-- Full Name Field -->
-                <div class="mb-3">
-                    <label asp-for="CurrentUserDetailsData.FullName" class="form-label" style="font-size:1.2rem;"></label>
-                    <input asp-for="CurrentUserDetailsData.FullName" placeholder="Full Name" class="form-control" style="font-size:1.2rem;" disabled />
-                    <span asp-validation-for="CurrentUserDetailsData.FullName" class="mt-auto text-danger fw-bold" style="font-size:1.2rem;"></span>
-                </div>
-
-                <!-- Email and Mobile Number on one line -->
-                <div class="mb-3" style="display: flex; justify-content: space-between;">
-                    <div style="flex: 1; margin-right: 10px;">
-                        <label asp-for="CurrentUserDetailsData.Email" class="form-label" style="font-size:1.2rem;"></label>
-                        <input asp-for="CurrentUserDetailsData.Email" placeholder="Email Address" class="form-control" disabled />
-                        <span asp-validation-for="CurrentUserDetailsData.Email" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                    </div>
-                    <div style="flex: 1;">
-                        <label asp-for="CurrentUserDetailsData.MobileNo" class="form-label" style="font-size:1.2rem;"></label>
-                        <input asp-for="CurrentUserDetailsData.MobileNo" placeholder="Mobile Number" class="form-control" disabled />
-                        <span asp-validation-for="CurrentUserDetailsData.MobileNo" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                    </div>
-                </div>
-
-                <!-- Dropdown to Select Profile Name -->
-                <!-- Profile Name Dropdown -->
-                <div class="mb-3">
-                    <label asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-label" style="font-size:1.2rem;"></label>
-                    <input asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-control" style="font-size:1.2rem;" disabled />
-                    <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                </div>
-
-                <!-- Status with radio buttons on one line -->
-                <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center; font-size:1.2rem; column-gap:2rem">
-                    <label asp-for="CurrentUserDetailsData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
-                    @foreach (var checkbox in Model.StatusCheckboxes)
-                    {
-                        <div>
-                            <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox" value="@checkbox" checked="true" disabled />
-                            <label for="checkbox_@checkbox" class="fw-normal" style="font-size:1.1rem">@checkbox</label>
-                        </div>
-                    }
-                </div>
-
-                <hr />
-
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Categories View</h3>
+                        <div class="card-title fw-bold" style="font-size:1.2rem">User Details</div>
                         <div class="card-tools">
-                            <span title="3 New Messages" class="badge badge-warning">@Model.StructureData.Count</span>
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
                             </button>
@@ -110,11 +52,84 @@
                             </button>
                         </div>
                     </div>
-                    
+                    <div class="card-body" style="font-size:1rem;">
+
+                    <!-- User ID and ID Number on one line -->
+                    <div class="mb-3" style="display: flex; justify-content: space-between;">
+                        <div style="flex: 1; margin-right: 10px;">
+                            <label asp-for="CurrentUserDetailsData.UserId" class="form-label" style=""></label>
+                            <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" disabled />
+                        </div>
+                        <div style="flex: 1;">
+                            <label asp-for="CurrentUserDetailsData.IdNumber" class="form-label" style=""></label>
+                            <input asp-for="CurrentUserDetailsData.IdNumber" placeholder="National/Iqama Number" class="form-control" disabled />
+                            <span asp-validation-for="CurrentUserDetailsData.IdNumber" class="text-danger fw-bold" style="font-size:1.2rem;"></span>
+                        </div>
+                    </div>
+
+                    <!-- Full Name Field -->
+                    <div class="mb-3">
+                        <label asp-for="CurrentUserDetailsData.FullName" class="form-label" style=""></label>
+                        <input asp-for="CurrentUserDetailsData.FullName" placeholder="Full Name" class="form-control" style="" disabled />
+                        <span asp-validation-for="CurrentUserDetailsData.FullName" class="mt-auto text-danger fw-bold" style=""></span>
+                    </div>
+
+                    <!-- Email and Mobile Number on one line -->
+                    <div class="mb-3" style="display: flex; justify-content: space-between;">
+                        <div style="flex: 1; margin-right: 10px;">
+                            <label asp-for="CurrentUserDetailsData.Email" class="form-label" style=""></label>
+                            <input asp-for="CurrentUserDetailsData.Email" placeholder="Email Address" class="form-control" disabled />
+                            <span asp-validation-for="CurrentUserDetailsData.Email" class="text-danger fw-bold" style=""></span>
+                        </div>
+                        <div style="flex: 1;">
+                            <label asp-for="CurrentUserDetailsData.MobileNo" class="form-label" style=""></label>
+                            <input asp-for="CurrentUserDetailsData.MobileNo" placeholder="Mobile Number" class="form-control" disabled />
+                            <span asp-validation-for="CurrentUserDetailsData.MobileNo" class="text-danger fw-bold" style=""></span>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown to Select Profile Name -->
+                    <!-- Profile Name Dropdown -->
+                    <div class="mb-3">
+                        <label asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-label" style=""></label>
+                        <input asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-select" style="" disabled />
+                        <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style=""></span>
+                    </div>
+
+                    <!-- Status with radio buttons on one line -->
+                    <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
+                        <label asp-for="CurrentUserDetailsData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
+                        @foreach (var checkbox in Model.StatusCheckboxes)
+                        {
+                            <div>
+                                <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox" value="@checkbox" checked="true" disabled />
+                                <label for="checkbox_@checkbox" class="fw-normal" style="font-size:1.1rem">@checkbox</label>
+                            </div>
+                        }
+                    </div>
+                    </div>
+                </div>
+
+
+                <hr />
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title fw-bold" style="font-size:1.2rem">Categories View</div>
+                        <div class="card-tools">
+                            <span title="New Messages" class="badge badge-warning">@Model.StructureData.Count</span>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="card-body" style="font-size:1rem;">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="categoriesAccordion">
                             <!-- Populate categories here -->
-                            
                             @foreach (var categoryData in Model.StructureData)
                             {
                                 <li class="nav-item" id="category-@categoryCount">
@@ -141,13 +156,25 @@
                             }
                         </ul>
                     </div>
-                    
+
                 </div>
 
                 <hr />
 
                 <div class="card">
-                    <div class="card-header fw-bolder" style="font-size:1.2rem;">Pages View</div>
+                    <div class="card-header">
+                        <div class="card-title fw-bold" style="font-size:1.2rem">Pages View</div>
+                        <div class="card-tools">
+                            <span class="badge badge-warning">@Model.CurrentPageSites.Count</span>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="card-body" style="font-size:1rem;">
                         <ul class="nav nav-pills nav-sidebar" data-widget="treeview" role="menu" data-accordion="false" id="dynamicPagesList" style="display: flex; flex-wrap: wrap; padding: 0;">
                             <!-- Populate pages here -->

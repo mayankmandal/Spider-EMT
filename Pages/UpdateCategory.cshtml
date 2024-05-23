@@ -43,7 +43,7 @@
                     <!-- Profile Dropdown -->
                     <div class="mb-3">
                         <label asp-for="SelectedPageCategory.CategoryName" class="form-label" style="font-size:1.2rem;">Select Category</label>
-                        <select asp-for="SelectedPageCategory.CategoryName" class="form-control" id="CategoryIdDiv" style="font-size:1.2rem;">
+                        <select asp-for="SelectedPageCategory.CategoryName" class="form-select" id="CategoryIdDiv" style="font-size:1.2rem;">
                             <option value="" disabled selected>Select a Category</option>
                             @foreach (var category in Model.AllCategories)
                             {

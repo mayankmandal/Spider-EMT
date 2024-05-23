@@ -29,134 +29,152 @@
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
 
-    <div class="container form-control pt-4 pb-2" style="height:auto;background-color: #f4f0ec; width:60%;font-size:1.2rem;">
-        <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
-            <!-- Search Section -->
-            <div class="mb-3">
-                <label for="searchCriteria" class="form-label" style="font-size:1.2rem;">
-                    Search By
-                </label>
-                <select id="searchCriteria" class="form-control" style="font-size:1.2rem">
-                    \
-                    <option value="UserId">User ID</option>
-                    <option value="IdNumber">National/Iqama Number</option>
-                    <option value="FullName">Full Name</option>
-                    <option value="Email">Email Address</option>
-                    <option value="MobileNo">Mobile Number</option>
-                    <option value="ProfileName">Profile Name</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="searchInput" class="form-label" style="font-size:1.2rem;">
-                    Search
-                </label>
-                <input type="text" id="searchInput" class="form-control mb-2" placeholder="Enter search term" style="font-size:1.2rem;" />
-                <div style="display:flex; justify-content:center; gap:10px;">
-                    <button id="searchButton" class="btn mt-2" style="font-size:1.2rem; width:140px; background-color:#17a2b8;color:white">Search</button>
-                    <button id="clearButton" class="btn btn-secondary mt-2" style="font-size:1.2rem; width:180px;">Clear</button>
+    <div class="container form-control pt-4 pb-2" style="height:auto;background-color: #f4f0ec; width:60%;">
+        <div class="container form-control border-2 mb-2 card" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
+            <div class="card">
+                <div class="card-header">
+                    User Search Box
                 </div>
-                
-            </div>
+                <div class="card-body">
+                    <!-- Search Section -->
+                    <div class="mb-3 form-group">
+                        <label for="searchCriteria" class="form-label">
+                            Search By 
+                        </label>
+                        <select id="searchCriteria" class="form-select" style="width:100%">
+                            <option value="UserId">User ID</option>
+                            <option value="IdNumber">National/Iqama Number</option>
+                            <option value="FullName" selected="selected">Full Name</option>
+                            <option value="Email">Email Address</option>
+                            <option value="MobileNo">Mobile Number</option>
+                            <option value="ProfileName">Profile Name</option>
+                        </select>
+                    </div>
 
-            <div id="resultsCount" class="mb-3" style="font-size:1.2rem; display:none;"></div>
+                    <div class="mb-3">
+                        <label for="searchInput" class="form-label" style="">
+                            Search
+                        </label>
+                        <input type="text" id="searchInput" class="form-control mb-2" placeholder="Enter search term" style="" />
+                        <div style="display:flex; justify-content:center; gap:10px;">
+                            <button id="searchButton" class="btn mt-2" style=" width:140px; background-color:#17a2b8;color:white">Search</button>
+                            <button id="clearButton" class="btn btn-secondary mt-2" style=" width:180px;">Clear</button>
+                        </div>
+                    </div>
 
-            <div id="searchResults" class="mb-3" style="font-size:0.7rem; display:none;">
-                <!-- Search results will be displayed here -->
+                    <div id="resultsCount" class="mb-3" style=" display:none;"></div>
+                    <div id="searchResults" class="mb-3" style="font-size:0.7rem; display:none;">
+                        <!-- Search results will be displayed here -->
+                    </div>
+                    <div>
+                        <button id="selectButton" class="btn btn-success mt-2" style=" display:none; width: 80%; align-items:center;">Select</button>
+                    </div>
+                </div>
             </div>
-            <button id="selectButton" class="btn btn-success mt-2" style="font-size:1.2rem; display:none;">Select</button>
         </div>
     </div>
 
     <form method="post">
-        <div id="createProfileSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;font-size:2rem;display:none;">
+        <div id="createProfileSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;display:none;">
 
-            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
                 <div class="row pb-1 pt-2">
-                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">Update User</h2>
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem;" class="fw-bold">Update User</div>
                     <div>
                         <hr />
                     </div>
                 </div>
-                <div style="">
-                    <!-- User ID and ID Number on one line -->
-                    <div class="mb-3" style="display: flex; justify-content: space-between;">
-                        <div style="flex: 1; margin-right: 10px;">
-                            <label asp-for="ProfileUsersData.UserId" class="form-label" style="font-size:1.2rem;"></label>
-                            <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" value="ProfileUsersData.UserId" readonly />
-                        </div>
-                        <div style="flex: 1;">
-                            <label asp-for="ProfileUsersData.IdNumber" class="form-label" style="font-size:1.2rem;"></label>
-                            <input asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" />
-                            <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                        </div>
-                    </div>
-
-                    <!-- Full Name Field -->
-                    <div class="mb-3">
-                        <label asp-for="ProfileUsersData.FullName" class="form-label" style="font-size:1.2rem;"></label>
-                        <input asp-for="ProfileUsersData.FullName" placeholder="Full Name" class="form-control" style="font-size:1.2rem;" />
-                        <span asp-validation-for="ProfileUsersData.FullName" class="mt-auto text-danger fw-bold" style="font-size:1.2rem;"></span>
-                    </div>
-
-                    <!-- Email and Mobile Number on one line -->
-                    <div class="mb-3" style="display: flex; justify-content: space-between;">
-                        <div style="flex: 1; margin-right: 10px;">
-                            <label asp-for="ProfileUsersData.Email" class="form-label" style="font-size:1.2rem;"></label>
-                            <input asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" />
-                            <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                        </div>
-                        <div style="flex: 1;">
-                            <label asp-for="ProfileUsersData.MobileNo" class="form-label" style="font-size:1.2rem;"></label>
-                            <input asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" />
-                            <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title fw-bold" style="font-size:1.2rem">User Details</div>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     </div>
-
-                    <!-- Dropdown to Select Profile Name -->
-                    <!-- Profile Name Dropdown -->
-                    <div class="mb-3">
-                        <label class="form-label" style="font-size:1.2rem;">Profile Name</label>
-                        <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-control" style="font-size:1.2rem;" id="profileSelect">
-                            <option value="" disabled selected>Select a Profile</option>
-                            @foreach (var profile in Model.ProfilesData)
-                            {
-                                <option value="@profile.ProfileName" data-profileid="@profile.ProfileId">@profile.ProfileName</option>
-                            }
-                        </select>
-                        <span asp-validation-for="ProfileUsersData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style="font-size: 1.2rem;"></span>
-                    </div>
-
-                    <!-- Hidden fields Profile Id -->
-                    <input type="hidden" asp-for="ProfileUsersData.ProfileSiteData.ProfileId" id="profileIdHidden" />
-
-                    <!-- Hidden field for UserStatus -->
-                    <input type="hidden" asp-for="ProfileUsersData.UserStatus" id="ProfileUsersData_UserStatus" />
-
-                    <!-- Status with radio buttons on one line -->
-                    <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center; font-size:1.2rem; column-gap:2rem">
-                        <label asp-for="ProfileUsersData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
-                        @foreach (var checkbox in Model.Checkboxes)
-                        {
-                            <div>
-                                <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
-                                <label for="checkbox_@checkbox.Value" class="fw-normal" style="font-size:1.1rem">@checkbox.Text</label>
+                    <div class="card-body">
+                        <!-- User ID and ID Number on one line -->
+                        <div class="mb-3" style="display: flex; justify-content: space-between;">
+                            <div style="flex: 1; margin-right: 10px;">
+                                <label asp-for="ProfileUsersData.UserId" class="form-label" style=""></label>
+                                <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" value="ProfileUsersData.UserId" readonly />
                             </div>
-                        }
-                    </div>
-                </div>
-            </div>
+                            <div style="flex: 1;">
+                                <label asp-for="ProfileUsersData.IdNumber" class="form-label" style=""></label>
+                                <input asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" />
+                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" style=""></span>
+                            </div>
+                        </div>
 
-            <div class="container form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
-                <div class="row">
-                    <div class="col-2"></div>
-                    <div class="col-3 me-4">
-                        <button type="submit" onclick="prepareFormSubmission()" class="btn" style="width:140px; background-color:#17a2b8;color:white">Update</button>
+                        <!-- Full Name Field -->
+                        <div class="mb-3">
+                            <label asp-for="ProfileUsersData.FullName" class="form-label" style=""></label>
+                            <input asp-for="ProfileUsersData.FullName" placeholder="Full Name" class="form-control" style="" />
+                            <span asp-validation-for="ProfileUsersData.FullName" class="mt-auto text-danger fw-bold" style=""></span>
+                        </div>
+
+                        <!-- Email and Mobile Number on one line -->
+                        <div class="mb-3" style="display: flex; justify-content: space-between;">
+                            <div style="flex: 1; margin-right: 10px;">
+                                <label asp-for="ProfileUsersData.Email" class="form-label" style=""></label>
+                                <input asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" />
+                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" style=""></span>
+                            </div>
+                            <div style="flex: 1;">
+                                <label asp-for="ProfileUsersData.MobileNo" class="form-label" style=""></label>
+                                <input asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" />
+                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold" style=""></span>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown to Select Profile Name -->
+                        <!-- Profile Name Dropdown -->
+                        <div class="mb-3">
+                            <label class="form-label" style="">Profile Name</label>
+                            <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-select" style="" id="profileSelect">
+                                <option value="" disabled selected>Select a Profile</option>
+                                @foreach (var profile in Model.ProfilesData)
+                                {
+                                    <option value="@profile.ProfileName" data-profileid="@profile.ProfileId">@profile.ProfileName</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ProfileUsersData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style=""></span>
+                        </div>
+
+                        <!-- Hidden fields Profile Id -->
+                        <input type="hidden" asp-for="ProfileUsersData.ProfileSiteData.ProfileId" id="profileIdHidden" />
+
+                        <!-- Hidden field for UserStatus -->
+                        <input type="hidden" asp-for="ProfileUsersData.UserStatus" id="ProfileUsersData_UserStatus" />
+
+                        <!-- Status with radio buttons on one line -->
+                        <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
+                            <label asp-for="ProfileUsersData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
+                            @foreach (var checkbox in Model.Checkboxes)
+                            {
+                                <div>
+                                    <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
+                                    <label for="checkbox_@checkbox.Value" class="fw-normal" style="font-size:1.1rem">@checkbox.Text</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2"></div>
+                            <div class="col-3 me-4">
+                                <button type="submit" onclick="prepareFormSubmission()" class="btn" style="width:140px; background-color:#17a2b8;color:white">Update</button>
+                            </div>
+                            <div class="col-4 ms-3">
+                                <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
+                            </div>
+                            <div class="col-3"></div>
+                        </div>
+
                     </div>
-                    <div class="col-4 ms-3">
-                        <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
-                    </div>
-                    <div class="col-3"></div>
                 </div>
             </div>
         </div>

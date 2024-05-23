@@ -10,7 +10,7 @@
         <div class="row mb-3" asp-validation-for="All">
             <div class="col-3">
                 <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.FromDate" for="startDate">From Date:</label>
-                <input type="text" class="form-control datepicker ps-3" asp-for="@Model.ChartsViewModelData.FromDate" id="startDate" style="width:70%" />
+                <input type="text" class="form-control datepicker-dropdown datepicker ps-3" asp-for="@Model.ChartsViewModelData.FromDate" id="startDate" style="width:70%" />
                 <span asp-validation-for="@Model.ChartsViewModelData.FromDate" class="text-danger fw-bold"></span>
             </div>
             <div class="col-3">

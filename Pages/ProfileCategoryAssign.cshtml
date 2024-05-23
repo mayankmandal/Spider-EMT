@@ -44,7 +44,7 @@
                     <!-- Profile Dropdown -->
                     <div class="mb-3">
                         <label class="form-label" style="font-size:1.2rem;">Select a Profile</label>
-                        <select asp-for="profileSite.ProfileName" id="ProfileId" class="form-control" style="font-size:1.2rem;" id="profileSelect">
+                        <select asp-for="profileSite.ProfileName" id="ProfileId" class="form-select" style="font-size:1.2rem;" id="profileSelect">
                             <option value="" disabled selected>Select a Profile</option>
                             @foreach (var profile in Model.AllProfilesData)
                             {
