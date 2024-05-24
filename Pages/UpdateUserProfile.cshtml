@@ -52,10 +52,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="searchInput" class="form-label" style="">
+                        <label for="searchInput" class="form-label" >
                             Search
                         </label>
-                        <input type="text" id="searchInput" class="form-control mb-2" placeholder="Enter search term" style="" />
+                        <input type="text" id="searchInput" class="form-control mb-2" placeholder="Enter search term"  />
                         <div style="display:flex; justify-content:center; gap:10px;">
                             <button id="searchButton" class="btn mt-2" style=" width:140px; background-color:#17a2b8;color:white">Search</button>
                             <button id="clearButton" class="btn btn-secondary mt-2" style=" width:180px;">Clear</button>
@@ -79,7 +79,7 @@
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
                 <div class="row pb-1 pt-2">
-                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem;" class="fw-bold">Update User</div>
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem; font-weight:500">UPDATE USER</div>
                     <div>
                         <hr />
                     </div>
@@ -100,49 +100,78 @@
                         <!-- User ID and ID Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1; margin-right: 10px;">
-                                <label asp-for="ProfileUsersData.UserId" class="form-label" style=""></label>
-                                <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" value="ProfileUsersData.UserId" readonly />
+                                <label asp-for="ProfileUsersData.UserId" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                    </div>
+                                    <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" value="ProfileUsersData.UserId" readonly />
+                                </div>
                             </div>
                             <div style="flex: 1;">
-                                <label asp-for="ProfileUsersData.IdNumber" class="form-label" style=""></label>
-                                <input asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" />
-                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" style=""></span>
+                                <label asp-for="ProfileUsersData.IdNumber" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" />
+                                </div>
+                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold"></span>
                             </div>
                         </div>
 
                         <!-- Full Name Field -->
                         <div class="mb-3">
-                            <label asp-for="ProfileUsersData.FullName" class="form-label" style=""></label>
-                            <input asp-for="ProfileUsersData.FullName" placeholder="Full Name" class="form-control" style="" />
-                            <span asp-validation-for="ProfileUsersData.FullName" class="mt-auto text-danger fw-bold" style=""></span>
+                            <label asp-for="ProfileUsersData.FullName" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input type="text" asp-for="ProfileUsersData.FullName" placeholder="Full Name" class="form-control" />
+                            </div>
+                            <span asp-validation-for="ProfileUsersData.FullName" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Email and Mobile Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1; margin-right: 10px;">
-                                <label asp-for="ProfileUsersData.Email" class="form-label" style=""></label>
-                                <input asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" />
-                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" style=""></span>
+                                <label asp-for="ProfileUsersData.Email" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    </div>
+                                    <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" />
+                                </div>
+                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold"></span>
                             </div>
                             <div style="flex: 1;">
-                                <label asp-for="ProfileUsersData.MobileNo" class="form-label" style=""></label>
-                                <input asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" />
-                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold" style=""></span>
+                                <label asp-for="ProfileUsersData.MobileNo" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    </div>
+                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" />
+                                </div>
+                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold"></span>
                             </div>
                         </div>
 
                         <!-- Dropdown to Select Profile Name -->
-                        <!-- Profile Name Dropdown -->
                         <div class="mb-3">
-                            <label class="form-label" style="">Profile Name</label>
-                            <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-select" style="" id="profileSelect">
-                                <option value="" disabled selected>Select a Profile</option>
-                                @foreach (var profile in Model.ProfilesData)
-                                {
-                                    <option value="@profile.ProfileName" data-profileid="@profile.ProfileId">@profile.ProfileName</option>
-                                }
-                            </select>
-                            <span asp-validation-for="ProfileUsersData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style=""></span>
+                            <label asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-select" id="profileSelect">
+                                    <option value="" disabled selected>Select a Profile</option>
+                                    @foreach (var profile in Model.ProfilesData)
+                                    {
+                                        <option value="@profile.ProfileName" data-profileid="@profile.ProfileId">@profile.ProfileName</option>
+                                    }
+                                </select>
+                            </div>
+                            <span asp-validation-for="ProfileUsersData.ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Hidden fields Profile Id -->
@@ -157,8 +186,8 @@
                             @foreach (var checkbox in Model.Checkboxes)
                             {
                                 <div>
-                                    <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
-                                    <label for="checkbox_@checkbox.Value" class="fw-normal" style="font-size:1.1rem">@checkbox.Text</label>
+                                    <input type="checkbox" class="form-check-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
+                                    <label for="checkbox_@checkbox.Value" class="fw-normal">@checkbox.Text</label>
                                 </div>
                             }
                         </div>

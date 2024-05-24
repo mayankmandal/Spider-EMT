@@ -35,7 +35,7 @@
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; font-size:1.5rem;">
                 <div class="row pb-1 pt-2">
-                    <div style="color:#17a2b8; text-align:center; font-size:1.5rem;" class="fw-bold" >User Profile</div>
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem; font-weight:500">USER PROFILE</div>
                     <div>
                         <hr />
                     </div>
@@ -54,47 +54,76 @@
                     </div>
                     <div class="card-body" style="font-size:1rem;">
 
-                    <!-- User ID and ID Number on one line -->
-                    <div class="mb-3" style="display: flex; justify-content: space-between;">
-                        <div style="flex: 1; margin-right: 10px;">
-                            <label asp-for="CurrentUserDetailsData.UserId" class="form-label" style=""></label>
-                            <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" disabled />
+                        <!-- User ID and ID Number on one line -->
+                        <div class="mb-3" style="display: flex; justify-content: space-between;">
+                            <div style="flex: 1; margin-right: 10px;">
+                                <label asp-for="CurrentUserDetailsData.UserId" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                    </div>
+                                    <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" value="CurrentUserDetailsData.UserId" disabled />
+                                </div>
+                            </div>
+                            <div style="flex: 1;">
+                                <label asp-for="CurrentUserDetailsData.IdNumber" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="CurrentUserDetailsData.IdNumber" placeholder="National/Iqama Number" class="form-control" disabled />
+                                </div>
+                                <span asp-validation-for="CurrentUserDetailsData.IdNumber" class="text-danger fw-bold"></span>
+                            </div>
                         </div>
-                        <div style="flex: 1;">
-                            <label asp-for="CurrentUserDetailsData.IdNumber" class="form-label" style=""></label>
-                            <input asp-for="CurrentUserDetailsData.IdNumber" placeholder="National/Iqama Number" class="form-control" disabled />
-                            <span asp-validation-for="CurrentUserDetailsData.IdNumber" class="text-danger fw-bold" style="font-size:1.2rem;"></span>
-                        </div>
-                    </div>
 
-                    <!-- Full Name Field -->
-                    <div class="mb-3">
-                        <label asp-for="CurrentUserDetailsData.FullName" class="form-label" style=""></label>
-                        <input asp-for="CurrentUserDetailsData.FullName" placeholder="Full Name" class="form-control" style="" disabled />
-                        <span asp-validation-for="CurrentUserDetailsData.FullName" class="mt-auto text-danger fw-bold" style=""></span>
-                    </div>
-
-                    <!-- Email and Mobile Number on one line -->
-                    <div class="mb-3" style="display: flex; justify-content: space-between;">
-                        <div style="flex: 1; margin-right: 10px;">
-                            <label asp-for="CurrentUserDetailsData.Email" class="form-label" style=""></label>
-                            <input asp-for="CurrentUserDetailsData.Email" placeholder="Email Address" class="form-control" disabled />
-                            <span asp-validation-for="CurrentUserDetailsData.Email" class="text-danger fw-bold" style=""></span>
+                        <!-- Full Name Field -->
+                        <div class="mb-3">
+                            <label asp-for="CurrentUserDetailsData.FullName" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input type="text" asp-for="CurrentUserDetailsData.FullName" placeholder="Full Name" class="form-control" disabled />
+                            </div>
+                            <span asp-validation-for="CurrentUserDetailsData.FullName" class="text-danger fw-bold"></span>
                         </div>
-                        <div style="flex: 1;">
-                            <label asp-for="CurrentUserDetailsData.MobileNo" class="form-label" style=""></label>
-                            <input asp-for="CurrentUserDetailsData.MobileNo" placeholder="Mobile Number" class="form-control" disabled />
-                            <span asp-validation-for="CurrentUserDetailsData.MobileNo" class="text-danger fw-bold" style=""></span>
-                        </div>
-                    </div>
 
-                    <!-- Dropdown to Select Profile Name -->
-                    <!-- Profile Name Dropdown -->
-                    <div class="mb-3">
-                        <label asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-label" style=""></label>
-                        <input asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-select" style="" disabled />
-                        <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold" style=""></span>
-                    </div>
+                        <!-- Email and Mobile Number on one line -->
+                        <div class="mb-3" style="display: flex; justify-content: space-between;">
+                            <div style="flex: 1; margin-right: 10px;">
+                                <label asp-for="CurrentUserDetailsData.Email" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    </div>
+                                    <input type="email" asp-for="CurrentUserDetailsData.Email" placeholder="Email Address" class="form-control" disabled />
+                                </div>
+                                <span asp-validation-for="CurrentUserDetailsData.Email" class="text-danger fw-bold"></span>
+                            </div>
+                            <div style="flex: 1;">
+                                <label asp-for="CurrentUserDetailsData.MobileNo" class="form-label"></label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    </div>
+                                    <input type="tel" asp-for="CurrentUserDetailsData.MobileNo" placeholder="Mobile Number" class="form-control" disabled />
+                                </div>
+                                <span asp-validation-for="CurrentUserDetailsData.MobileNo" class="text-danger fw-bold"></span>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown to Select Profile Name -->
+                        <div class="mb-3">
+                            <label asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-select" disabled />
+                            </div>
+                            <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
+                        </div>
 
                     <!-- Status with radio buttons on one line -->
                     <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
@@ -102,7 +131,7 @@
                         @foreach (var checkbox in Model.StatusCheckboxes)
                         {
                             <div>
-                                <input type="checkbox" class="form-input" name="UserStatusLst" id="checkbox_@checkbox" value="@checkbox" checked="true" disabled />
+                                    <input type="checkbox" class="form-check-input" name="UserStatusLst" id="checkbox_@checkbox" value="@checkbox" checked="true" disabled />
                                 <label for="checkbox_@checkbox" class="fw-normal" style="font-size:1.1rem">@checkbox</label>
                             </div>
                         }

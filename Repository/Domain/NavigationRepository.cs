@@ -168,14 +168,14 @@ namespace Spider_EMT.Repository.Domain
                     DataRow dataRow = dataTable.Rows[0];
                     profileUser = new ProfileUser
                     {
-                        UserId = (int)dataRow["UserId"],
-                        IdNumber = dataRow["IdNumber"].ToString(),
+                        UserId = Convert.ToInt32(dataRow["UserId"]),
+                        IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
-                        MobileNo = dataRow["MobileNo"].ToString(),
+                        MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
                         ProfileSiteData = new ProfileSite
                         {
-                            ProfileId = (int)dataRow["ProfileId"],
+                            ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                             ProfileName = dataRow["ProfileName"].ToString()
                         },
                         UserStatus = dataRow["Status"].ToString(),
@@ -867,14 +867,14 @@ namespace Spider_EMT.Repository.Domain
                     {
                         ProfileUser profileUser = new ProfileUser
                         {
-                            UserId = (int)dataRow["UserId"],
-                            IdNumber = dataRow["IdNumber"].ToString(),
+                            UserId = Convert.ToInt32(dataRow["UserId"]),
+                            IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
-                            MobileNo = dataRow["MobileNo"].ToString(),
+                            MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
                             ProfileSiteData = new ProfileSite
                             {
-                                ProfileId = (int)dataRow["ProfileId"],
+                                ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                                 ProfileName = dataRow["ProfileName"].ToString()
                             },
                             UserStatus = dataRow["Status"].ToString(),

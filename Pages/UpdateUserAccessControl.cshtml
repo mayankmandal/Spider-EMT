@@ -29,51 +29,73 @@
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post" onsubmit="prepareFormSubmission();">
-        <div id="createProfileSection" class="form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:fit-content;font-size:2rem;">
+        <div id="updateAccessSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%;">
             <input type="hidden" id="SelectedProfileId" name="SelectedProfileId" />
             <input type="hidden" id="SelectedProfileName" name="SelectedProfileName" />
             <input type="hidden" id="SelectedPagesJson" name="SelectedPagesJson" />
 
-            <div class="form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;font-size:1.5rem;">
+            <div class="form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;">
                 <div class="row pb-1 pt-2">
-                    <h2 style="color:#17a2b8; text-align:center; font-size:2rem;">Update User Access Control List</h2>
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem;">UPDATE USER ACCESS CONTROL LIST</div>
                     <div>
                         <hr />
                     </div>
-                    <!-- Profile Dropdown -->
-                    <div class="mb-3">
-                        <label for="ProfileId" class="form-label" style="font-size:1.2rem;">Select Profile</label>
-                        <select id="ProfileId" class="form-select" name="ProfileId" style="font-size:1.2rem;">
-                            <option value="" disabled selected>Select a Profile</option>
-                            @foreach (var profile in Model.AllProfilesData)
-                            {
-                                <option value="@profile.ProfileId">@profile.ProfileName</option>
-                            }
-                        </select>
-                        <input type="hidden" id="ProfileName" name="ProfileName" />
-                    </div>
-
-                    <!-- Checkboxes to select pages -->
-                    <div class="mb-3">
-                        <label class="form-label" style="font-size:1.2rem;">Select Pages</label>
-                        <div id="pageCheckboxContainer" class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
-                            <!-- Checkboxes will be dynamically rendered here -->
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title fw-bold">User Details</div>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <div class="card-body">
+                        <!-- Profile Dropdown -->
+                        <div class="mb-3">
+                            <label for="ProfileId" class="form-label">Select Profile</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <select id="ProfileId" class="form-select" name="ProfileId">
+                                    <option value="" disabled selected>Select a Profile</option>
+                                    @foreach (var profile in Model.AllProfilesData)
+                                    {
+                                        <option value="@profile.ProfileId">@profile.ProfileName</option>
+                                    }
+                                </select>
+                                <input type="hidden" id="ProfileName" name="ProfileName" />
+                            </div>
+                        </div>
 
-            <!-- Buttons for form submission -->
-            <div class="form-control border-2" style="display: flex; justify-content:space-around;height:auto;">
-                <div class="row">
-                    <div class="col-2"></div>
-                    <div class="col-3 me-4">
-                        <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Update</button>
+                        <hr />
+
+                        <!-- Checkboxes to select pages -->
+                        <div class="mb-3">
+                            <label class="form-label">Select Pages</label>
+                            <div id="pageCheckboxContainer" class="form-check" style="display: flex; flex-wrap: wrap; column-gap: 10px; justify-content: flex-start;">
+                                <!-- Checkboxes will be dynamically rendered here -->
+                            </div>
+                        </div>
+
+                        <!-- Buttons for form submission -->
+                        <div style="display: flex; justify-content:space-around;height:auto;">
+                            <div class="row">
+                                <div class="col-2"></div>
+                                <div class="col-3 me-4">
+                                    <button type="submit" class="btn" style="width:140px; background-color:#17a2b8;color:white">Update</button>
+                                </div>
+                                <div class="col-4 ms-3">
+                                    <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
+                                </div>
+                                <div class="col-3"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4 ms-3">
-                        <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
-                    </div>
-                    <div class="col-3"></div>
                 </div>
             </div>
         </div>

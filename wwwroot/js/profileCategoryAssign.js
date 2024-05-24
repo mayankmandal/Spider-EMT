@@ -121,6 +121,12 @@
     $('#CategoryIds').click(function (e) {
         var $target = $(e.target);
         var categoryId = $target.val();
+
+        // Check if the selected value is valid
+        if (!categoryId || categoryId.length === 0) {
+            return; // Exit if the selected value is not a valid category ID
+        }
+
         var isSelected = $target.hasClass('selected-category'); // Check if already selected
 
         if (isSelected) {

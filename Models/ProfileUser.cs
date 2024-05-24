@@ -10,13 +10,14 @@ namespace Spider_EMT.Models
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "ID Number is required")]
-        [DisplayName("ID Number")]
-        [StringLength(20, ErrorMessage = "ID Number must be 20 characters or fewer")]
-        public string IdNumber { get; set; }
+        [DisplayName("Iqama Number")]
+        [Range(1000000000, 9999999999, ErrorMessage = "ID Number must be a 10-digit integer")]
+        public long IdNumber { get; set; }
 
         [Required(ErrorMessage = "Full Name is required")]
         [DisplayName("Full Name")]
         [StringLength(100, ErrorMessage = "Full Name must be 100 characters or fewer")]
+        [RegularExpression(@"^[a-zA-Z\s]*$", ErrorMessage = "Full Name must contain only letters and spaces")]
         public string FullName { get; set; }
 
         [Required(ErrorMessage = "Email Address is required")]
@@ -27,8 +28,9 @@ namespace Spider_EMT.Models
 
         [Required(ErrorMessage = "Mobile Number is required")]
         [DisplayName("Mobile Number")]
-        [StringLength(15, ErrorMessage = "Mobile Number must be 15 characters or fewer")]
-        public string MobileNo { get; set; }
+        [Range(1000000000, 9999999999, ErrorMessage = "Mobile Number must be a 10-digit integer")]
+        public long MobileNo { get; set; }
+
         [Required(ErrorMessage = "Profile Data is required")]
         public ProfileSite ProfileSiteData { get; set; }
 
