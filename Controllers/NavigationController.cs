@@ -1,12 +1,10 @@
 ﻿using LazyCache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.IdentityModel.Tokens;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
-using System.Drawing.Printing;
 
 namespace Spider_EMT.Controller
 {
@@ -90,8 +88,8 @@ namespace Spider_EMT.Controller
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
-                        SlidingExpiration = TimeSpan.FromSeconds(300),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
+                        SlidingExpiration = TimeSpan.FromSeconds(10),
                         Size = 1024
                     };
 
@@ -134,8 +132,8 @@ namespace Spider_EMT.Controller
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
-                        SlidingExpiration = TimeSpan.FromSeconds(300),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
+                        SlidingExpiration = TimeSpan.FromSeconds(10),
                         Size = 1024
                     };
 
@@ -160,11 +158,10 @@ namespace Spider_EMT.Controller
                 {
                     pageSites = await _navigationRepository.GetCurrentUserPagesAsync();
 
-
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
-                        SlidingExpiration = TimeSpan.FromSeconds(300),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
+                        SlidingExpiration = TimeSpan.FromSeconds(10),
                         Size = 1024
                     };
 
@@ -201,20 +198,45 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserCategoriesKey, out List<CategoriesSetDTO> categoriesSet))
+                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserCategoriesKey, out List<CategoryDisplayViewModel> StructureData))
                 {
-                    categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync();
+                    List<CategoriesSetDTO> categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync();
+                    var groupedCategories = categoriesSet.GroupBy(cat => string.IsNullOrEmpty(cat.CatagoryName) ? Constants.CategoryType_UncategorizedPages : cat.CatagoryName);
+                    StructureData = new List<CategoryDisplayViewModel>();
+
+                    foreach (var categoryGroup in groupedCategories)
+                    {
+                        var category = new CategoryDisplayViewModel
+                        {
+                            CatagoryName = categoryGroup.Key,
+                            Pages = categoryGroup.Select(page => new PageDisplayViewModel
+                            {
+                                PageDescription = page.PageDescription,
+                                PageUrl = page.PageUrl,
+                            }).ToList()
+                        };
+                        StructureData.Add(category);
+                    }
+
+                    // Sort the pages within each category
+                    foreach (var category in StructureData)
+                    {
+                        category.Pages = category.Pages.OrderBy(page => page.PageDescription).ToList();
+                    }
+
+                    // Sort the categories
+                    StructureData = StructureData.OrderBy(cat => cat.CatagoryName).ToList();
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(300),
-                        SlidingExpiration = TimeSpan.FromSeconds(300),
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
+                        SlidingExpiration = TimeSpan.FromSeconds(10),
                         Size = 1024
                     };
 
-                    _cacheProvider.Set(CacheKeys.CurrentUserCategoriesKey, categoriesSet, cacheEntryOption);
+                    _cacheProvider.Set(CacheKeys.CurrentUserCategoriesKey, StructureData, cacheEntryOption);
                 }
-                return Ok(categoriesSet);
+                return Ok(StructureData);
             }
             catch (Exception ex)
             {

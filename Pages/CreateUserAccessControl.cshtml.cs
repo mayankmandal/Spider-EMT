@@ -111,7 +111,7 @@ namespace Spider_EMT.Pages
         private IActionResult HandleError(Exception ex, string errorMessage)
         {
             TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return RedirectToPage("/CreateUserAccessControl");
         }
     }
 }

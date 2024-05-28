@@ -21,7 +21,6 @@ namespace Spider_EMT.Pages
         public CurrentUser? CurrentUserData { get; set; }
         public ProfileUser? CurrentUserDetailsData { get; set; }
         public List<PageSite>? CurrentPageSites { get; set; }
-        private List<CategoriesSetDTO>? CurrentCategoriesSetDTOs { get; set; }
         public List<string>? StatusCheckboxes { get; set; }
         public List<CategoryDisplayViewModel>? StructureData { get; set; }
         public async Task<IActionResult> OnGet()
@@ -64,38 +63,7 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserCategories");
-            CurrentCategoriesSetDTOs = JsonConvert.DeserializeObject<List<CategoriesSetDTO>>(response);
-            ProcessCategories();
-        }
-        private void ProcessCategories()
-        {
-            StructureData = new List<CategoryDisplayViewModel>();
-
-            // Group pages by category name
-            var groupedCategories = CurrentCategoriesSetDTOs.GroupBy(cat => cat.CatagoryName);
-
-            foreach(var categoryGroup in groupedCategories)
-            {
-                var category = new CategoryDisplayViewModel
-                {
-                    CategoryName = categoryGroup.Key,
-                    Pages = categoryGroup.Select(page => new PageDisplayViewModel
-                    {
-                         PageDescription = page.PageDescription,
-                         PageUrl = page.PageUrl,
-                    }).ToList()
-                };
-                StructureData.Add(category);
-            }
-
-            // Sort the pages within each category
-            foreach (var category in StructureData)
-            {
-                category.Pages = category.Pages.OrderBy(page => page.PageDescription).ToList();
-            }
-
-            // Sort the categories
-            StructureData = StructureData.OrderBy(cat => cat.CategoryName).ToList();
+            StructureData = JsonConvert.DeserializeObject<List<CategoryDisplayViewModel>>(response);
         }
         private IActionResult HandleError(Exception ex, string errorMessage)
         {

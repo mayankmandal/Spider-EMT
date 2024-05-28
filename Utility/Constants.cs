@@ -4,6 +4,8 @@
     {
         public const string MagicString = "";
 
+        public const string CategoryType_UncategorizedPages = "Uncategorized Pages";
+
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";
         public const string SP_AddNewProfile = "dbo.uspAddNewProfile";
         public const string SP_AddPageCategoryMap = "dbo.uspAddPageCategoryMap";

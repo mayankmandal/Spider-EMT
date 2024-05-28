@@ -15,6 +15,20 @@ function prepareFormSubmission() {
     // Set the hidden field with selected user statuses
     $('#ProfileUsersData_UserStatus').val(selectedUserStatusLst); // Assuming a comma-separated string for UserStatus
 }
+function mapUserStatus(status) {
+    const statusMap = {
+        'AC': 'IsActive',
+        'AD': 'IsActiveDirectoryUser',
+        'CH': 'ChangePassword'
+    }
+
+    // Split the status string by comma and map each individually
+    const statusArray = status.split(',');
+    const mappedStatusArray = statusArray.map(s => statusMap[s.trim()] || s.trim());
+
+    // Join the mapped statuses back into a string 
+    return mappedStatusArray.join(', ');
+}
 
 function handleResultItemClick(item, resultItem) {
     // Deselect all items
@@ -70,6 +84,9 @@ $(document).ready(function () {
                             cursor: 'pointer'
                         });
 
+                        // Map user status
+                        var mappedStatus = mapUserStatus(item.userStatus);
+
                         var itemDetails = `
                         <p>User ID: ${item.userId}</p>
                         <p>Id Number: ${item.idNumber}</p>
@@ -77,7 +94,7 @@ $(document).ready(function () {
                         <p>Email Address: ${item.email}</p>
                         <p>Mobile Number: ${item.mobileNo}</p>
                         <p>Profile Name: ${item.profileSiteData.profileName}</p>
-                        <p>User Status: ${item.userStatus}</p>
+                        <p>User Status: ${mappedStatus}</p>
                         `;
                         resultItem.html(itemDetails);
 
@@ -92,8 +109,10 @@ $(document).ready(function () {
                     });
                     $('#selectButton').show();
                 } else {
+                    results.show();
+                    resultsCount.show();
                     resultsCount.text(`0 results present`);
-                    results.append($('<div>No results found</div>'));
+                    results.append($('<div class="p-2" style="border:1px solid #ccc; height:5rem; width: 45%;">No results found</div>'));
                     $('#selectButton').hide();
                 }
             },

@@ -13,7 +13,7 @@
 
     public class CategoryDisplayViewModel
     {
-        public string CategoryName { get; set; }
+        public string CatagoryName { get; set; }
         public List<PageDisplayViewModel> Pages { get; set; }
     }
 

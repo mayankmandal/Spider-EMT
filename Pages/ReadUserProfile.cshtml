@@ -62,7 +62,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                     </div>
-                                    <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" value="CurrentUserDetailsData.UserId" disabled />
+                                    <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" readonly />
                                 </div>
                             </div>
                             <div style="flex: 1;">
@@ -76,7 +76,6 @@
                                 <span asp-validation-for="CurrentUserDetailsData.IdNumber" class="text-danger fw-bold"></span>
                             </div>
                         </div>
-
                         <!-- Full Name Field -->
                         <div class="mb-3">
                             <label asp-for="CurrentUserDetailsData.FullName" class="form-label"></label>
@@ -159,18 +158,18 @@
                     <div class="card-body" style="font-size:1rem;">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="categoriesAccordion">
                             <!-- Populate categories here -->
-                            @foreach (var categoryData in Model.StructureData)
+                            @foreach (var catagoryData in Model.StructureData)
                             {
                                 <li class="nav-item" id="category-@categoryCount">
                                     <a href="#" class="nav-link">
                                         <i class="far ion-ios-briefcase-outline nav-icon"></i>
                                         <p>
-                                            @categoryData.CategoryName
+                                            @catagoryData.CatagoryName
                                             <i class="right fas fa-angle-left"></i>
                                         </p>
                                     </a>
                                     <ul class="nav-treeview">
-                                        @foreach (var pageSite in categoryData.Pages)
+                                        @foreach (var pageSite in catagoryData.Pages)
                                         {
                                             <li class="nav-item">
                                                 <a href="@pageSite.PageUrl" class="nav-link">

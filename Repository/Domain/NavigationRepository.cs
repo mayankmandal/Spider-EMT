@@ -303,7 +303,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT tbpc.PageCatId,tbpc.CatagoryName,tbp.PageId, tbp.PageDescription,tbp.PageUrl,tbp.MenuImgPath from tblPageCatagory tbpc  INNER JOIN tblPageCategoryMap tcm on tcm.PageCatId = tbpc.PageCatId INNER JOIN tblPage tbp on tbp.PageId = tcm.PageId  INNER JOIN tblUserPermission tup on tup.PageCatId = tbpc.PageCatId  INNER JOIN tblUserProfile tbup on tbup.ProfileId = tup.ProfileId  INNER JOIN tblCurrentUser tcu on tcu.UserId = tbup.UserId";
+                string commandText = "SELECT * FROM vwUserPagesData";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -314,12 +314,12 @@ namespace Spider_EMT.Repository.Domain
                     {
                         CategoriesSetDTO category = new CategoriesSetDTO
                         {
-                            PageCatId = (int)row["PageCatId"],
-                            CatagoryName = row["CatagoryName"].ToString(),
-                            PageId = (int)row["PageId"],
-                            PageDescription = row["PageDescription"].ToString(),
-                            PageUrl = row["PageUrl"].ToString(),
-                            MenuImgPath = row["MenuImgPath"].ToString()
+                            PageCatId = row["PageCatId"] != DBNull.Value? (int)row["PageCatId"] : 0,
+                            CatagoryName = row["CatagoryName"] != DBNull.Value ? row["CatagoryName"].ToString() : string.Empty,
+                            PageId = row["PageId"] != DBNull.Value ? (int)row["PageId"] : 0,
+                            PageDescription = row["PageDescription"] != DBNull.Value ? row["PageDescription"].ToString() : string.Empty,
+                            PageUrl = row["PageUrl"] != DBNull.Value ? row["PageUrl"].ToString() : string.Empty,
+                            MenuImgPath = row["MenuImgPath"] != DBNull.Value ? row["MenuImgPath"].ToString() : string.Empty
                         };
                         categoriesSet.Add(category);
                     }

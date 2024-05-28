@@ -20,7 +20,7 @@
     function populateSidebarforProfiles(profile) {
         const list = document.getElementById('dynamicProfileName');
         list.innerHTML = ''; // Clear existing list items if any
-        
+
         const listItem = document.createElement('li');
         listItem.className = 'nav-item';
 
@@ -52,7 +52,7 @@
             pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
             populateSidebarforPages(pages);
         }
-        catch(error) {
+        catch (error) {
             console.error('Fetch error: ', error);
         }
     }
@@ -88,33 +88,14 @@
             if (!response.ok) {
                 throw new Error(`Http Error! Status : ${response.status}`);
             }
-            const categories = await response.json();
-
-            const structureData = categories.reduce((acc, item) => {
-                const existingCategory = acc.find(cat => cat.catagoryName == item.catagoryName);
-                if (existingCategory) {
-                    existingCategory.pages.push({
-                        pageDescription: item.pageDescription,
-                        pageUrl: item.pageUrl
-                    });
-                } else {
-                    acc.push({
-                        catagoryName: item.catagoryName,
-                        pages: [{
-                            pageDescription: item.pageDescription,
-                            pageUrl: item.pageUrl
-                        }]
-                    })
-                }
-                return acc;
-            },[]);
-
-            // Sort the pages within each category
+            const structureData = await response.json();
+            
+            // Sort the pages within each category (if not already sorted by the API)
             structureData.forEach(category => {
                 category.pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
             });
 
-            // Sort the categories
+            // Sort the categories (if not already sorted by the API)
             structureData.sort((a, b) => a.catagoryName.localeCompare(b.catagoryName));
 
             populateSidebarforCategories(structureData);
@@ -140,7 +121,7 @@
 
             const submenu = document.createElement('ul');
             submenu.className = 'nav nav-treeview ml-3';
-            submenu.style.borderLeft = '3px solid #D3D3D3';
+            submenu.style.borderLeft = '1px ridge #DDDFBF';
 
             // Populate pages under this category
             category.pages.forEach(page => {

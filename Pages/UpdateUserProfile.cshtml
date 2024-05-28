@@ -33,7 +33,15 @@
         <div class="container form-control border-2 mb-2 card" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
             <div class="card">
                 <div class="card-header">
-                    User Search Box
+                    <div class="card-title fw-bold">User Search Box</div>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Search Section -->
@@ -66,8 +74,8 @@
                     <div id="searchResults" class="mb-3" style="font-size:0.7rem; display:none;">
                         <!-- Search results will be displayed here -->
                     </div>
-                    <div>
-                        <button id="selectButton" class="btn btn-success mt-2" style=" display:none; width: 80%; align-items:center;">Select</button>
+                    <div style="display: flex; justify-content: center;">
+                        <button id="selectButton" class="btn btn-success mt-2" style=" display:none; width: 80%">Select</button>
                     </div>
                 </div>
             </div>
@@ -195,7 +203,7 @@
                         <div class="row">
                             <div class="col-2"></div>
                             <div class="col-3 me-4">
-                                <button type="submit" onclick="prepareFormSubmission()" class="btn" style="width:140px; background-color:#17a2b8;color:white">Update</button>
+                                <button type="submit" onclick="prepareFormSubmission()" class="btn create-btn" style="width:140px;">Update</button>
                             </div>
                             <div class="col-4 ms-3">
                                 <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
