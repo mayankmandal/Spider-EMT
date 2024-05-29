@@ -4,28 +4,7 @@
     ViewData["Title"] = "Update Category";
 }
 
-@if (TempData["success"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.success('@TempData["success"]');
-    </script>
-}
-@if (TempData["error"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.error('@TempData["error"]');
-    </script>
-}
+<partial name="_Notification" />
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post" onsubmit="prepareFormSubmission();">
@@ -57,7 +36,7 @@
                         <!-- Profile Dropdown -->
                         <div class="mb-3">
                             <label asp-for="SelectedPageCategory.CategoryName" class="form-label">Select Category</label>
-                            <select asp-for="SelectedPageCategory.CategoryName" class="form-select" id="CategoryIdDiv">
+                            <select asp-for="SelectedPageCategory.CategoryName" class="form-select striped-select" id="CategoryIdDiv">
                                 <option value="" disabled selected>Select a Category</option>
                                 @foreach (var category in Model.AllCategories)
                                 {

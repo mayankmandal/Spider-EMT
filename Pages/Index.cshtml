@@ -4,28 +4,7 @@
     ViewData["Title"] = "Transaction Overview";
 }
 
-@if (TempData["success"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.success('@TempData["success"]');
-    </script>
-}
-@if (TempData["error"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.error('@TempData["error"]');
-    </script>
-}
+<partial name="_Notification" />
 
 <div class="container mt-2 mb-2 border rounded" style="align-content:center">
     <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f7f7f7; height: 20%; color:gray">
@@ -58,7 +37,7 @@
                 <tr>
                     <td>
                         <label for="allBankName" class="fw-bold">Bank Name</label><br />
-                        <select id="allBankName" class="form-select" style="width:80%;">
+                        <select id="allBankName" class="form-select striped-select" style="width:80%;">
                             <option value="All">All</option>
                             <option value="None">None</option>
                             @foreach (var bank in Model.Banks)

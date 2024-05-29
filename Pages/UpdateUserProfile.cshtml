@@ -4,31 +4,9 @@
     ViewData["Title"] = "Update Profile";
 }
 
-@if (TempData["success"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.success('@TempData["success"]');
-    </script>
-}
-@if (TempData["error"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.error('@TempData["error"]');
-    </script>
-}
+<partial name="_Notification" />
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
-
     <div class="container form-control pt-4 pb-2" style="height:auto;background-color: #f4f0ec; width:60%;">
         <div class="container form-control border-2 mb-2 card" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
             <div class="card">
@@ -49,7 +27,7 @@
                         <label for="searchCriteria" class="form-label">
                             Search By 
                         </label>
-                        <select id="searchCriteria" class="form-select" style="width:100%">
+                        <select id="searchCriteria" class="form-select striped-select" style="width:100%">
                             <option value="UserId">User ID</option>
                             <option value="IdNumber">National/Iqama Number</option>
                             <option value="FullName" selected="selected">Full Name</option>
@@ -71,7 +49,7 @@
                     </div>
 
                     <div id="resultsCount" class="mb-3" style=" display:none;"></div>
-                    <div id="searchResults" class="mb-3" style="font-size:0.7rem; display:none;">
+                    <div id="searchResults" class="mb-3 overflow-auto" style="font-size:0.7rem; display:none; max-height: 300px;">
                         <!-- Search results will be displayed here -->
                     </div>
                     <div style="display: flex; justify-content: center;">
@@ -171,7 +149,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-select" id="profileSelect">
+                                <select asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-select striped-select" id="profileSelect">
                                     <option value="" disabled selected>Select a Profile</option>
                                     @foreach (var profile in Model.ProfilesData)
                                     {

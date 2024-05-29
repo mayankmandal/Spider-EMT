@@ -26,6 +26,21 @@ namespace Spider_EMT.Controller
         #endregion
 
         #region Actions
+        [HttpGet("GetAllUsers")]
+        [ProducesResponseType(typeof(IEnumerable<ProfileUser>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var allUsersData = await _navigationRepository.GetAllUsersDataAsync();
+                return Ok(allUsersData);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
 
         [HttpGet("GetAllProfiles")]
         [ProducesResponseType(typeof(IEnumerable<ProfileSite>), StatusCodes.Status200OK)]
@@ -466,6 +481,28 @@ namespace Spider_EMT.Controller
 
                 var profileUsers = await _navigationRepository.SearchUserDetailsByCriteriaAsync(criteria, input);
                 return Ok(profileUsers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("DeleteEntity")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteEntity(int deleteId, string deleteType)
+        {
+            try
+            {
+                if (deleteId <= 0 || string.IsNullOrEmpty(deleteType))
+                {
+                    return BadRequest();
+                }
+
+                bool isSuccess = await _navigationRepository.DeleteEntityAsync(deleteId,deleteType);
+                return Ok(isSuccess);
             }
             catch (Exception ex)
             {

@@ -141,6 +141,10 @@ $(document).ready(function () {
             var selectedItemData = apiResultData[itemIndex];
             handleResultItemClick(selectedItemData, selectedResultItem);
             $('#createProfileSection').show();
+            // Scroll to the createProfileSection
+            $('html, body').animate({
+                scrollTop: $('#createProfileSection').offset().top
+            }, 'fast');
         }
     });
 });

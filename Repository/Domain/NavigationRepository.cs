@@ -48,7 +48,50 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
-        
+        public async Task<List<ProfileUser>> GetAllUsersDataAsync()
+        {
+            try
+            {
+                string commandText = "select u.*, tp.ProfileId,tp.ProfileName from tblUsers u INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<ProfileUser> users = new List<ProfileUser>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow dataRow in dataTable.Rows)
+                    {
+                        ProfileUser profileUser = new ProfileUser
+                        {
+                            UserId = Convert.ToInt32(dataRow["UserId"]),
+                            IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                            FullName = dataRow["FullName"].ToString(),
+                            Email = dataRow["Email"].ToString(),
+                            MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                            ProfileSiteData = new ProfileSite
+                            {
+                                ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
+                                ProfileName = dataRow["ProfileName"].ToString()
+                            },
+                            UserStatus = dataRow["Status"].ToString(),
+                        };
+                        users.Add(profileUser);
+                    }
+                }
+                return users;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting All Users Details.", ex);
+            }
+        }
+
         public async Task<List<ProfileSite>> GetAllProfilesAsync()
         {
             try
@@ -891,6 +934,32 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 throw new Exception("Error adding relationship between new user profile.", ex);
+            }
+        }
+        public async Task<bool> DeleteEntityAsync(int deleteId, string deleteType)
+        {
+            try
+            {
+                SqlParameter[] sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Id", SqlDbType.Int){Value = deleteId},
+                    new SqlParameter("@Type", SqlDbType.VarChar, 10){Value = deleteType},
+                };
+
+                bool isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeleteEntityRecord, CommandType.StoredProcedure, sqlParameters);
+                if (isFailure)
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception($"Error deleting record for {deleteType} - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting record for {deleteType}.", ex);
             }
         }
     }

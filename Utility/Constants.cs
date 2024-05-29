@@ -13,6 +13,7 @@
         public const string SP_AddUserPermission = "dbo.uspAddUserPermission";
         public const string SP_AddNewUser = "dbo.uspAddNewUser";
 
+        public const string SP_DeleteEntityRecord = "dbo.uspDeleteEntityRecord";
         public const string SP_DeletePageCategoryMap = "dbo.uspDeletePageCategoryMap";
         public const string SP_DeleteUserPermission = "dbo.uspDeleteUserPermission";
 

@@ -4,28 +4,7 @@
     ViewData["Title"] = "Create User Access Control";
 }
 
-@if (TempData["success"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.success('@TempData["success"]');
-    </script>
-}
-@if (TempData["error"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.error('@TempData["error"]');
-    </script>
-}
+<partial name="_Notification" />
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post" onsubmit="prepareFormSubmission();">
@@ -70,7 +49,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-user"></i></span>
                                     </div>
-                                    <select id="ProfileId" class="form-select" name="ProfileId">
+                                    <select id="ProfileId" class="form-select striped-select" name="ProfileId">
                                         <option value="" disabled selected>Select a Profile</option>
                                         @foreach (var profile in Model.AllProfilesData)
                                         {

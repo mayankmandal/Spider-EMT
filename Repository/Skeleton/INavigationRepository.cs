@@ -6,6 +6,7 @@ namespace Spider_EMT.Repository.Skeleton
     public interface INavigationRepository
     {
         Task<CurrentUser> GetCurrentUserAsync();
+        Task<List<ProfileUser>> GetAllUsersDataAsync();
         Task<List<ProfileSite>> GetAllProfilesAsync();
         Task<List<PageSite>> GetAllPagesAsync();
         Task<List<PageCategory>> GetAllCategoriesAsync();
@@ -24,5 +25,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<bool> UpdateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO);
         Task<List<ProfileUser>> SearchUserDetailsByCriteriaAsync(string criteriaText, string inputText);
+        Task<bool> DeleteEntityAsync(int deleteId, string deleteType);
     }
 }

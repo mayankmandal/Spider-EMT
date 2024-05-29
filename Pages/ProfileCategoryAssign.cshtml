@@ -4,28 +4,7 @@
     ViewData["Title"] = "Assign Profile Category";
 }
 
-@if (TempData["success"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.success('@TempData["success"]');
-    </script>
-}
-@if (TempData["error"] != null)
-{
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/toastr.min.js"></script>
-    <script type="text/javascript">
-        toastr.options = {
-            "positionClass": "toast-bottom-right", // Set the position to right bottom
-        };
-        toastr.error('@TempData["error"]');
-    </script>
-}
+<partial name="_Notification" />
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post" id="categoryAssignForm">
@@ -62,7 +41,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                <select asp-for="profileSite.ProfileName" id="ProfileId" class="form-select" id="profileSelect">
+                                <select asp-for="profileSite.ProfileName" id="ProfileId" class="form-select striped-select" id="profileSelect">
                                     <option value="" disabled selected>Select a Profile</option>
                                     @foreach (var profile in Model.AllProfilesData)
                                     {
@@ -79,7 +58,7 @@
                                 <label id="CategoryIdsLabel" for="CategoryIds" class="form-label" style="white-space:nowrap;">Select Multiple Categories</label>
                             </div>
 
-                            <select id="CategoryIds" class="form-control" style="height:15rem;" name="CategoryIds" multiple required>
+                            <select id="CategoryIds" class="form-select striped-select" style="height:15rem;" name="CategoryIds" multiple required>
                                 <option value="" disabled selected>Select Categories</option>
                                 @foreach (var category in Model.AllCategoriesData)
                                 {
