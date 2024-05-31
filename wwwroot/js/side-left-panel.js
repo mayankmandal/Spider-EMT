@@ -123,7 +123,7 @@
             `;
 
             const submenu = document.createElement('ul');
-            submenu.className = 'nav nav-treeview ml-3';
+            submenu.className = 'nav nav-treeview ms-2';
             submenu.style.borderLeft = '1px ridge #DDDFBF';
 
             // Populate pages under this category
