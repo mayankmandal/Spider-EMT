@@ -27,6 +27,7 @@
         const link = document.createElement('a');
         link.href = '/ReadUserProfile';
         link.className = 'nav-link';
+        link.target = '_self';
 
         const icon = document.createElement('i');
         icon.className = 'far ion-android-contact nav-icon';
@@ -66,6 +67,7 @@
             const link = document.createElement('a');
             link.href = page.pageUrl;
             link.className = 'nav-link';
+            link.target = '_self';
 
             const icon = document.createElement('i');
             icon.className = 'far ion-android-open nav-icon';
@@ -114,6 +116,7 @@
             const link = document.createElement('a');
             link.href = '#'; // Link to a placeholder since it's a submenu
             link.className = 'nav-link';
+            link.target = '_self';
             link.innerHTML = `
                 <i class="far ion-merge nav-icon"></i>
                 <p>${category.catagoryName}<i class="fas fa-angle-left right"></i></p>
@@ -129,6 +132,7 @@
                 pageItem.className = 'nav-item';
 
                 const pageLink = document.createElement('a');
+                pageLink.target = '_self';
                 pageLink.href = page.pageUrl;
                 pageLink.className = 'nav-link';
                 pageLink.innerHTML = `

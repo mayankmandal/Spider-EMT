@@ -7,7 +7,7 @@
 <partial name="_Notification" />
 
 <div class="container mt-2 mb-2 border rounded" style="align-content:center">
-    <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f7f7f7; height: 20%; color:gray">
+    <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f2f1e6; height: 20%; color:#373A40">
         OTHER BANKS ATM TOP PERFORMANCE ON US (@Model.CurrentBankDetailsData.CurrentBankName <img src="@Model.CurrentBankDetailsData.CurrentBankLogoPath" alt="@Model.CurrentBankDetailsData.CurrentBankName" style="max-width: 70px; height:auto;" loading="lazy" />)
     </div>
     <div class="mb-2">
@@ -29,7 +29,7 @@
                         <input id="msInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.MSTxnFee" style="padding-inline-start:10px;  width:80%;" disabled />
                     </td>
                 </tr>
-                <tr style="border-color:white;">
+                <tr>
                     <td id="allBankNameDateValidationMsg" class="text-danger fw-bold"></td>
                     <td id="dateCheckValidationError" class="text-danger fw-bold"</td>
                     <td></td>
@@ -53,11 +53,11 @@
                     </td>
                     <td id="tblEndDate">
                         <label for="endDate" class="fw-bold">To Date</label><br />
-                        <input id="endDate" type="text" class="form-control datepicker ps-3" style="border-width:thin;  width:80%;" />
+                        <input id="endDate" type="text" class="form-control datepicker ps-3" style="border-width:thin; width:80%;" />
                         <span id="endDateValidationMsg" class="text-danger fw-bold"></span>
                     </td>
                     <td id="tblApplyFilterBtn">
-                        <br />
+                        <label for="applyDateFilterBtn" class="fw-bold">Apply Filter</label><br />
                         <button id="applyDateFilterBtn" class="form-control btn btn-secondary ps-3" style=" width:80%;">Apply</button>
                     </td>
                 </tr>
@@ -215,16 +215,23 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body mx-2">
                 <form class="row" id="terminalDetailsForm">
-                    <!-- Terminal details contents -->
-                    <div id="terminalDetailsFormColumn1" class="col-2 fw-bold"></div>
-                    <div id="terminalDetailsFormColumn2" class="col-4"></div>
-                    <div id="terminalDetailsFormColumn3" class="col-2 fw-bold"></div>
-                    <div id="terminalDetailsFormColumn4" class="col-4"></div>
+                    <div class="col-6">
+                        <div class="row">
+                            <div id="terminalDetailsFormColumn1" class="col-4 fw-bold"></div>
+                            <div id="terminalDetailsFormColumn2" class="col-8"></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="row">
+                            <div id="terminalDetailsFormColumn3" class="col-4 fw-bold"></div>
+                            <div id="terminalDetailsFormColumn4" class="col-8"></div>
+                        </div>
+                    </div>
                 </form>
             </div>
-            <hr class="mx-2" />
+            <div><hr class="mx-1" /></div>
             <div>
                 <div id="mapContainer" class="mx-auto mb-3 col-auto" ></div>
             </div>

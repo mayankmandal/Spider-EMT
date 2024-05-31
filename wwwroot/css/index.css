@@ -36,9 +36,9 @@
     content: '\2193'; /* Unicode character for down arrow */
 }
 
-#bankTransactionSummaryTable th[data-column].sorted {
-    color: #ffc107; /* Bootstrap warning color for active state */
-}
+    #bankTransactionSummaryTable th[data-column].sorted {
+        color: #ffd700; /* Bootstrap warning color for active state */
+    }
 
 #bankTransactionSummaryTable th[data-column]:not(.sort-asc):not(.sort-desc):not(.sorted):after {
     content: ''; /* No arrow for non-sorted columns */
