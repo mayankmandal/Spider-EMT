@@ -42,8 +42,33 @@
         });
     }
 
-    // This function is called before form submission
-    function prepareFormSubmission() {
+    // Event Listener for profile type radio buttons
+    $('input[name="profileType"]').change(function () {
+        var selectedProfileType = $(this).val();
+        renderPageCheckboxes();
+
+        if (selectedProfileType === 'newProfile') {
+            renderProfileInput(); // Render profile input section for new profile
+        }
+        else {
+            renderProfileDropdown(); // Render profile dropdown section for existing profile
+        }
+    });
+
+    // Initial rendering based on the default selected radio button
+    if ($('input[name="profileType"]:checked').val() === 'newProfile') {
+        renderProfileInput(); // Render profile input section for new profile
+    } else {
+        renderProfileDropdown(); // Render profile dropdown section for existing profile
+    }
+
+    // Initial render of the checkboxes without selections
+    renderPageCheckboxes();
+
+    // Attach the prepare function to the form submission event
+    $('form').submit(function (e) {
+        e.preventDefault();
+
         // Initialize the list of selected pages
         selectedPagesLst = [];
 
@@ -87,32 +112,21 @@
 
         // Store the selected pages as JSON in a hidden field
         $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
-    }
 
-    // Event Listener for profile type radio buttons
-    $('input[name="profileType"]').change(function () {
-        var selectedProfileType = $(this).val();
-
-        if (selectedProfileType === 'newProfile') {
-            renderProfileInput(); // Render profile input section for new profile
-        }
-        else {
-            renderProfileDropdown(); // Render profile dropdown section for existing profile
-        }
-    });
-
-    // Initial rendering based on the default selected radio button
-    if ($('input[name="profileType"]:checked').val() === 'newProfile') {
-        renderProfileInput(); // Render profile input section for new profile
-    } else {
-        renderProfileDropdown(); // Render profile dropdown section for existing profile
-    }
-
-    // Initial render of the checkboxes without selections
-    renderPageCheckboxes();
-
-    // Attach the prepare function to the form submission event
-    $('form').submit(function (e) {
-        prepareFormSubmission();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (response) {
+                toastr.error(response.message);
+            }
+        });
     });
 });

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Models;
-using Spider_EMT.Repository.Skeleton;
 using System.Text;
 using Spider_EMT.Utility;
 
@@ -51,13 +50,13 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
             AllPageSites = JsonConvert.DeserializeObject<List<PageSite>>(response);
         }
-        public async Task<IActionResult> OnPost()
+        public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllCategoriesData();
                 await LoadAllPagesData();
-                return Page(); // Return to the same page if validation fails
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
             try
             {
@@ -84,15 +83,13 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = "User Access Control Updated Successfully";
-                    return RedirectToPage("/UpdateCategory");
+                    return new JsonResult(new {success = true, message = $"Category Updated Successfully" });
                 }
                 else
                 {
-                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     await LoadAllCategoriesData();
                     await LoadAllPagesData();
-                    return Page();
+                    return new JsonResult(new { success = true, message = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
             }
             catch (HttpRequestException ex)
@@ -108,10 +105,9 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private IActionResult HandleError(Exception ex, string errorMessage)
+        private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return new JsonResult(new { success = false, message = errorMessage + ". Error details: " + ex.Message });
         }
     }
 }

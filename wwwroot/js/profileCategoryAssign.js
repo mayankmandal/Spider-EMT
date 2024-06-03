@@ -150,9 +150,9 @@
         updateSelectedCategoryDisplay(); // Refresh the display
     });
 
-    $('#categoryAssignForm').submit(function (e) {
+    $('form').submit(function (e) {
+        e.preventDefault();
         if ($('#ProfileId').val() === "") {
-            e.preventDefault();
             toastr.error("Please select a Profile");
             return;
         }
@@ -160,7 +160,6 @@
         var selectedCategoryCount = $('#CategoryIds option.selected-category').length;
 
         if (selectedCategoryCount === 0) {
-            e.preventDefault();
             toastr.error("Please select at least one Category");
             return;
         }
@@ -185,6 +184,22 @@
         // Set the hidden fields with ProfileId and ProfileName
         $('#SelectedProfileId').val(selectedProfileId);
         $('#SelectedProfileName').val(selectedProfileName);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (response) {
+                toastr.error(response.message);
+            }
+        });
     });
 
     $('#ClearBtn').click(function () {

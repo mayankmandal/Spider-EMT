@@ -218,5 +218,28 @@ $(document).ready(function () {
             alert("Please select an item from the list");
         }
     });
+
+    $('form').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#deleteEntitySection').hide();
+                    // Trigger the search button click event
+                    $('#searchButton').trigger('click');
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (response) {
+                toastr.error(response.message);
+            }
+        });
+    });
 });
 

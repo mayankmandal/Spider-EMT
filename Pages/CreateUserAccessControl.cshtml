@@ -5,10 +5,8 @@
     TempData["NavigationalPageName"] = "Create User Access Control";
 }
 
-<partial name="_Notification" />
-
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
-    <form method="post" onsubmit="prepareFormSubmission();">
+    <form id="createUserAccessForm" asp-page-handler="Submit">
         <div id="createAccessSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%">
             <input type="hidden" id="SelectedProfileId" name="SelectedProfileId" />
             <input type="hidden" id="SelectedProfileName" name="SelectedProfileName" />
@@ -102,7 +100,7 @@
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/createUserAccessControl.js"></script>
+    <script src="~/js/createUserAccessControl.js" asp-append-version="true"></script>
     <script>
         // Serialize the pages and categories models into JSON objects
         var availablePagesLst = @Html.Raw(Json.Serialize(Model.AllPageSites));

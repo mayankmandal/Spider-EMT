@@ -100,8 +100,10 @@ $(document).ready(function () {
     // Initial render of the checkboxes without selections
     renderPageCheckboxes([]);
 
-    // This function is called before form submission
-    function prepareFormSubmission() {
+    // Attach the prepare function to the form submission event
+    $('form').submit(function (e) {
+        e.preventDefault();
+
         // Initialize the list of selected pages
         selectedPagesLst = [];
 
@@ -138,10 +140,21 @@ $(document).ready(function () {
 
         // Store the selected pages as JSON in a hidden field
         $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
-    }
 
-    // Attach the prepare function to the form submission event
-    $('form').submit(function (e) {
-        prepareFormSubmission();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (response) {
+                toastr.error(response.message);
+            }
+        });
     });
 });

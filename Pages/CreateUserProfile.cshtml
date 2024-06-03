@@ -5,10 +5,8 @@
     TempData["NavigationalPageName"] = "Create User";
 }
 
-<partial name="_Notification" />
-
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
-    <form method="post">
+    <form asp-page-handler="Submit" id="createProfileForm">
         <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:60%;">
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column;">

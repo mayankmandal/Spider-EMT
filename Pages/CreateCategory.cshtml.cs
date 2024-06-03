@@ -40,12 +40,12 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
             AllPageSites = JsonConvert.DeserializeObject<List<PageSite>>(response);
         }
-        public async Task<IActionResult> OnPost()
+        public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllPagesData();
-                return Page(); // Return to the same page if validation fails
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
             try
             {
@@ -71,14 +71,12 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = "New Category Created Successfully";
-                    return RedirectToPage("/CreateCategory");
+                    return new JsonResult(new { success = true, message = $"{SelectedPageCategory.CategoryName} - New Category Created Successfully" });
                 }
                 else
                 {
-                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     await LoadAllPagesData();
-                    return Page();
+                    return new JsonResult(new { success = true, message = $"{SelectedPageCategory.CategoryName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
             }
             catch (HttpRequestException ex)
@@ -94,10 +92,9 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private IActionResult HandleError(Exception ex, string errorMessage)
+        private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return new JsonResult(new { success = false, message = $"{SelectedPageCategory.CategoryName} - " + errorMessage + ". Error details: " + ex.Message });
         }
     }
 }

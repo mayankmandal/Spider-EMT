@@ -20,4 +20,7 @@ function getCurrentFormattedDateTime() {
 $(document).ready(function () {
     var currentYear = new Date().getFullYear();
     $('#copyright-year').text(currentYear);
+    toastr.options = {
+        "positionClass": "toast-bottom-right", // Set the position to right bottom
+    };
 });

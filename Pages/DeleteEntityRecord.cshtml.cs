@@ -29,11 +29,11 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "Error occurred while loading data.");
             }
         }
-        public async Task<IActionResult> OnPost()
+        public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
-                return Page(); // Return to the same page if validation fails
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
             try
             {
@@ -44,13 +44,11 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = $"{DeleteEntityViewModelData.EntityType} Deleted Successfully";
-                    return RedirectToPage("/DeleteEntityRecord");
+                    return new JsonResult(new { success = true, message = $"{DeleteEntityViewModelData.EntityType} Deleted Successfully" });
                 }
                 else
                 {
-                    TempData["error"] = "Error occured in response with status : " + response.StatusCode + response.RequestMessage + response.ReasonPhrase;
-                    return Page();
+                    return new JsonResult(new { success = true, message = $"{DeleteEntityViewModelData.EntityType} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
             }
             catch (HttpRequestException ex)
@@ -66,10 +64,9 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private IActionResult HandleError(Exception ex, string errorMessage)
+        private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return new JsonResult(new { success = false, message = $"{DeleteEntityViewModelData.EntityType} - " + errorMessage + ". Error details: " + ex.Message });
         }
     }
 }

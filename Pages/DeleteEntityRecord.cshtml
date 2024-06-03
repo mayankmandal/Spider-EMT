@@ -5,8 +5,6 @@
     TempData["NavigationalPageName"] = "Delete Entity";
 }
 
-<partial name="_Notification" />
-
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <div class="container form-control pt-4 pb-2" style="height:auto;background-color: #f4f0ec; width:60%;">
         <div class="container form-control border-2 mb-2 card" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
@@ -61,7 +59,7 @@
         </div>
     </div>
 
-    <form method="post">
+    <form asp-page-handler="Submit" id="deleteEntityForm">
         <div id="deleteEntitySection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;display:none;">
             <input type="hidden" asp-for="DeleteEntityViewModelData.EntityId" id="EntityId" />
             <input type="hidden" asp-for="DeleteEntityViewModelData.EntityType" id="EntityType" />

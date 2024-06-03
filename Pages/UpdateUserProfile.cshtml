@@ -5,8 +5,6 @@
     TempData["NavigationalPageName"] = "Update User";
 }
 
-<partial name="_Notification" />
-
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <div class="container form-control pt-4 pb-2" style="height:auto;background-color: #f4f0ec; width:60%;">
         <div class="container form-control border-2 mb-2 card" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
@@ -48,7 +46,15 @@
                         <label for="searchInput" class="form-label" >
                             Search
                         </label>
-                        <input type="text" id="searchInput" class="form-control mb-2" placeholder="Enter search term"  />
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control border-end-0 border" placeholder="Enter search term" />
+                            <span class="input-group-append">
+                                <button id="searchButtonIcon" class="btn btn-secondary bg-white border-start-0 border" typeof="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+
                         <div style="display:flex; justify-content:center; gap:10px;">
                             <button id="searchButton" class="btn mt-2" style=" width:140px; background-color:#17a2b8;color:white">Search</button>
                             <button id="clearButton" class="btn btn-secondary mt-2" style=" width:180px;">Clear</button>
@@ -67,8 +73,8 @@
         </div>
     </div>
 
-    <form method="post">
-        <div id="createProfileSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;display:none;">
+    <form id="updateProfileForm" asp-page-handler="Submit">
+        <div id="updateProfileSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;display:none;">
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
                 <div class="row pb-1 pt-2">
@@ -188,7 +194,7 @@
                         <div class="row">
                             <div class="col-2"></div>
                             <div class="col-3 me-4">
-                                <button type="submit" onclick="prepareFormSubmission()" class="btn create-btn" style="width:140px;">Update</button>
+                                <button type="submit" class="btn create-btn" style="width:140px;">Update</button>
                             </div>
                             <div class="col-4 ms-3">
                                 <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>

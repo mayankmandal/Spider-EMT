@@ -5,10 +5,8 @@
     TempData["NavigationalPageName"] = "Assign Profile Category";
 }
 
-<partial name="_Notification" />
-
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
-    <form method="post" id="categoryAssignForm">
+    <form id="categoryAssignForm" asp-page-handler="Submit">
             <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%">
             <input type="hidden" id="SelectedProfileId" name="SelectedProfileId" />
             <input type="hidden" id="SelectedCategoriesJson" name="SelectedCategoriesJson" />

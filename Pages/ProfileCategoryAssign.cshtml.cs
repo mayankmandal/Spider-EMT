@@ -51,13 +51,13 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllCategories");
             AllCategoriesData = JsonConvert.DeserializeObject<List<PageCategory>>(response);
         }
-        public async Task<IActionResult> OnPost()
+        public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData();
                 await LoadAllCategoriesData();
-                return Page(); // Return to the same page if validation fails
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
             try
             {
@@ -84,15 +84,13 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = "Relation between Profile and Categories Created Successfully";
-                    return RedirectToPage("/ProfileCategoryAssign");
+                    return new JsonResult(new { success = true, message = $"{SelectedProfileName} - Relation between Profile and Categories Created Successfully" });
                 }
                 else
                 {
-                    TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
                     await LoadAllProfilesData();
                     await LoadAllCategoriesData();
-                    return Page();
+                    return new JsonResult(new { success = true, message = $"{SelectedProfileName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
             }
             catch (HttpRequestException ex)
@@ -108,10 +106,9 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private IActionResult HandleError(Exception ex, string errorMessage)
+        private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return new JsonResult(new { success = false, message = $"{SelectedProfileName} - " + errorMessage + ". Error details: " + ex.Message });
         }
     }
 }

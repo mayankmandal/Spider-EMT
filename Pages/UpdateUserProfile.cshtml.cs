@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
-using Spider_EMT.Repository.Skeleton;
-using Spider_EMT.Utility;
 using System.Text;
 using static Spider_EMT.Utility.Constants;
 
@@ -47,12 +45,12 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
             ProfilesData = JsonConvert.DeserializeObject<List<ProfileSite>>(response);
         }
-        public async Task<IActionResult> OnPost()
+        public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
-                return Page(); // Return to the same page if validation fails
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
             try
             {
@@ -65,14 +63,12 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["success"] = "Profile Updated Successfully";
-                    return RedirectToPage("/UpdateUserProfile");
+                    return new JsonResult(new { success = true, message = $"{ProfileUsersData.FullName} - Profile Updated Successfully" });
                 }
                 else
                 {
-                    TempData["error"] = "Error occured in response with status : " + response.StatusCode + response.RequestMessage + response.ReasonPhrase;
                     await LoadAllProfilesData();
-                    return Page();
+                    return new JsonResult(new { success = true, message = $"{ProfileUsersData.FullName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
             }
             catch (HttpRequestException ex)
@@ -88,10 +84,9 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private IActionResult HandleError(Exception ex, string errorMessage)
+        private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return new JsonResult(new { success = false, message = $"{ProfileUsersData.FullName} - " + errorMessage + ". Error details: " + ex.Message });
         }
     }
 }

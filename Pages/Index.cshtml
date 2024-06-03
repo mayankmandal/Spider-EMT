@@ -5,8 +5,6 @@
     TempData["NavigationalPageName"] = "Dashboard";
 }
 
-<partial name="_Notification" />
-
 <div class="container mt-2 mb-2 border rounded" style="align-content:center">
     <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f2f1e6; height: 20%; color:#373A40">
         OTHER BANKS ATM TOP PERFORMANCE ON US (@Model.CurrentBankDetailsData.CurrentBankName <img src="@Model.CurrentBankDetailsData.CurrentBankLogoPath" alt="@Model.CurrentBankDetailsData.CurrentBankName" style="max-width: 70px; height:auto;" loading="lazy" />)
@@ -118,7 +116,7 @@
     <div id="searchfiltertransaction" class="col-7 mt-2">
         <div class="row" style="align-content:center;">
             <div class="col-5 ms-3">
-                <label for="rowsPerPage" class="form-label fw-bold">Search:</label>
+                <label for="filterInput" class="form-label fw-bold">Search:</label>
                 <input type="text" id="filterInput" class="form-control" placeholder="Type to Filter" style="width: 90%; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);" onmousedown="this.style.boxShadow='none'" onmouseup="this.style.boxShadow='2px 2px 8px rgba(0, 0, 0, 0.2)'">
             </div>
             <div class="col-3">

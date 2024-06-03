@@ -34,11 +34,11 @@ namespace Spider_EMT.Pages
             }
         }
 
-        public async Task<IActionResult> OnPost()
+        public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
-                return Page();
+                return new JsonResult(new {success = false, message = "Model State Validation Failed." });
             }
 
             try
@@ -69,14 +69,12 @@ namespace Spider_EMT.Pages
                     {
                         TempData["success"] = "Transaction Fee Amounts Added Successfully";
                     }
-                    // Redirect to the Index page
-                    return RedirectToPage("/Index");
+                    return new JsonResult(new { success = true, message = TempData["success"] });
                 }
                 else
                 {
                     TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
-                    // Redirect to the Same page if error occurs
-                    return Page();
+                    return new JsonResult(new {success = false, message = TempData["error"] });
                 }
             }
             catch (HttpRequestException ex)
@@ -92,10 +90,10 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private IActionResult HandleError(Exception ex, string errorMessage)
+        private JsonResult HandleError(Exception ex, string errorMessage)
         {
             TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return RedirectToPage("/Error");
+            return new JsonResult(new {success = false, message = TempData["error"] });
         }
     }
 }

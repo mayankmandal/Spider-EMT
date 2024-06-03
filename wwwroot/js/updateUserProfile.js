@@ -1,20 +1,5 @@
 ﻿var apiResultData = []; // Global variable to store the result set
-function prepareFormSubmission() {
-    // Get the selected profile ID
-    var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
 
-    // Set the hidden fields with ProfileId and ProfileName
-    $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
-
-    // Get the selected user statuses
-    var selectedUserStatusLst = [];
-    $('input[name="UserStatusLst"]:checked').each(function () {
-        selectedUserStatusLst.push($(this).val());
-    });
-
-    // Set the hidden field with selected user statuses
-    $('#ProfileUsersData_UserStatus').val(selectedUserStatusLst); // Assuming a comma-separated string for UserStatus
-}
 function mapUserStatus(status) {
     const statusMap = {
         'AC': 'IsActive',
@@ -59,6 +44,15 @@ $(document).ready(function () {
     $('#searchButton').on('click', function () {
         var searchCriteria = $('#searchCriteria').val();
         var searchInput = $('#searchInput').val();
+
+        if (searchInput === null || searchInput === undefined || searchInput === "" || searchInput === 0) {
+            $('#searchInput').addClass("is-invalid border-danger");
+            $('#searchButtonIcon').addClass("border-danger");
+            return;
+        }
+        $('#searchInput').removeClass("is-invalid border-danger");
+        $('#searchButtonIcon').removeClass("border-danger");
+
         $.ajax({
             url: '/api/Navigation/SearchUserDetails',
             type: 'GET',
@@ -123,13 +117,13 @@ $(document).ready(function () {
     });
 
     $('#clearButton').on('click', function () {
-        // Clear all inputs fields and hide createProfileSection
+        // Clear all inputs fields and hide updateProfileSection
         $('#searchInput').val('');
         $('#searchResults').empty();
         $('#searchResults').hide();
         $('#resultsCount').text('');
         $('#resultsCount').hide();
-        $('#createProfileSection').hide();
+        $('#updateProfileSection').hide();
         $('#selectButton').hide();
     })
 
@@ -140,12 +134,46 @@ $(document).ready(function () {
             var itemIndex = selectedResultItem.data('itemIndex');
             var selectedItemData = apiResultData[itemIndex];
             handleResultItemClick(selectedItemData, selectedResultItem);
-            $('#createProfileSection').show();
-            // Scroll to the createProfileSection
+            $('#updateProfileSection').show();
+            // Scroll to the updateProfileSection
             $('html, body').animate({
-                scrollTop: $('#createProfileSection').offset().top
+                scrollTop: $('#updateProfileSection').offset().top
             }, 'fast');
         }
+    });
+    $('form').submit(function (e) {
+        e.preventDefault();
+
+        // Get the selected profile ID
+        var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
+
+        // Set the hidden fields with ProfileId and ProfileName
+        $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
+
+        // Get the selected user statuses
+        var selectedUserStatusLst = [];
+        $('input[name="UserStatusLst"]:checked').each(function () {
+            selectedUserStatusLst.push($(this).val());
+        });
+
+        // Set the hidden field with selected user statuses
+        $('#ProfileUsersData_UserStatus').val(selectedUserStatusLst); // Assuming a comma-separated string for UserStatus
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    toastr.success(response.message);
+                } else {
+                    toastr.error(response.message);
+                }
+            },
+            error: function (response) {
+                toastr.error(response.message);
+            }
+        });
     });
 });
 
