@@ -10,13 +10,27 @@
     <form method="post" asp-page-handler="Submit Chart">
         <div class="row mb-3" asp-validation-for="All">
             <div class="col-3">
-                <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.FromDate" for="startDate">From Date:</label>
-                <input type="text" class="form-control datepicker-dropdown datepicker ps-3" asp-for="@Model.ChartsViewModelData.FromDate" id="startDate" style="width:70%" />
+                <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.FromDate" for="startDate">
+                    From Date:
+                </label>
+                <div class="input-group" style="width:70%;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                    </div>
+                    <input type="text" class="form-control datepicker-dropdown datepicker ps-3" asp-for="@Model.ChartsViewModelData.FromDate" id="startDate" />
+                </div>
                 <span asp-validation-for="@Model.ChartsViewModelData.FromDate" class="text-danger fw-bold"></span>
             </div>
             <div class="col-3">
-                <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.ToDate" for="endDate">To Date:</label>
-                <input type="text" class="form-control datepicker ps-3" asp-for="@Model.ChartsViewModelData.ToDate" id="endDate" style="width:70%" />
+                <label class="form-label fw-bold" asp-for="@Model.ChartsViewModelData.ToDate" for="endDate">
+                    To Date:
+                </label>
+                <div class="input-group" style="width:70%;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                    </div>
+                    <input type="text" class="form-control datepicker ps-3" asp-for="@Model.ChartsViewModelData.ToDate" id="endDate" />
+                </div>
                 <span asp-validation-for="@Model.ChartsViewModelData.ToDate" class="text-danger fw-bold"></span>
             </div>
             <div class="col-6"></div>

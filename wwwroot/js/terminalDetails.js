@@ -10,16 +10,16 @@ function createLeafletMap(terminalData) {
 
     // Customize tooltip content with HTML
     var tooltipContent = `
-        <div class="map-tooltip-content">
-            <div class="map-bank-name">${terminalData.bankNameEn}</div>
-            <div class="map-address-info">
-                <div>${terminalData.cityAr}</div>
-                <div>&nbsp;|&nbsp;</div>
-                <div>${terminalData.streetAr}</div>
-                <div>&nbsp;|&nbsp;</div>
-                <div>${terminalData.districtAr}</div>
-            </div>
-        </div>`;
+    <div class="map-tooltip-content">
+        <div class="map-bank-name"><i class="fas fa-university" style="margin-right: 5px;"></i>${terminalData.bankNameEn}</div>
+        <div class="map-address-info">
+            <div><i class="fas fa-city" style="margin-right: 5px;"></i>${terminalData.cityAr}</div>
+            <div>&nbsp;|&nbsp;</div>
+            <div><i class="fas fa-road" style="margin-right: 5px;"></i>${terminalData.streetAr}</div>
+            <div>&nbsp;|&nbsp;</div>
+            <div><i class="fas fa-building" style="margin-right: 5px;"></i>${terminalData.districtAr}</div>
+        </div>
+    </div>`;
 
     // Set an offset to position the tooltip correctly
     var tooltipOffset = L.point(0, -28); // Adjust the offset as needed
@@ -127,43 +127,51 @@ function renderTerminalDetails(terminalResult) {
     var column4 = $('#terminalDetailsFormColumn4');
 
     var details1 = [
-        { label: 'Term Id', value: terminalResult.termId },
-        { label: 'Bank Name', value: terminalResult.bankNameEn, style: 'color: #dc6f26'},
-        { label: 'City Name English', value: terminalResult.cityEn },
-        { label: 'District Name', value: terminalResult.districtEn },
-        { label: 'Longitude', value: terminalResult.longitude },
-        { label: 'Address English', value: terminalResult.addressEn },
-        { label: 'Brand Name', value: terminalResult.atmBrand },
-        { label: 'Site Type', value: terminalResult.siteTypeEn },
-        { label: 'Cash Center Name', value: terminalResult.cashCenterNameEn },
-        { label: 'Foreign Currency Withdrawal', value: terminalResult.foreignCurrWdl },
-        { label: 'Deposit', value: terminalResult.deposit },
-        { label: 'Connection Type', value: terminalResult.connectionType }
+        { label: 'Term Id', value: terminalResult.termId, iconClass: 'fas fa-id-card' },
+        { label: 'Bank Name', value: terminalResult.bankNameEn, iconClass: 'fas fa-university', style: 'color: #dc6f26' },
+        { label: 'City Name English', value: terminalResult.cityEn, iconClass: 'fas fa-city' },
+        { label: 'District Name', value: terminalResult.districtEn, iconClass: 'fas fa-building' },
+        { label: 'Longitude', value: terminalResult.longitude, iconClass: 'fas fa-globe' },
+        { label: 'Address English', value: terminalResult.addressEn, iconClass: 'fas fa-address-card' },
+        { label: 'Brand Name', value: terminalResult.atmBrand, iconClass: 'fas fa-tags' },
+        { label: 'Site Type', value: terminalResult.siteTypeEn, iconClass: 'fas fa-map-signs' },
+        { label: 'Cash Center Name', value: terminalResult.cashCenterNameEn, iconClass: 'fas fa-money-bill-wave' },
+        { label: 'Foreign Currency Withdrawal', value: terminalResult.foreignCurrWdl, iconClass: 'fas fa-exchange-alt' },
+        { label: 'Deposit', value: terminalResult.deposit, iconClass: 'fas fa-piggy-bank' },
+        { label: 'Connection Type', value: terminalResult.connectionType, iconClass: 'fas fa-network-wired' }
     ];
 
     var details2 = [
-        { label: 'Bank Name Arabic', value: terminalResult.bankNameAr, style: 'color: #dc6f26' },
-        { label: 'Region Name', value: terminalResult.regionEn },
-        { label: 'City Name Arabic', value: terminalResult.cityAr },
-        { label: 'Street Name', value: terminalResult.streetEn },
-        { label: 'Latitude', value: terminalResult.latitude },
-        { label: 'Address Arabic', value: terminalResult.addressAr },
-        { label: 'ATM Type', value: terminalResult.atmType },
-        { label: 'District Arabic', value: terminalResult.districtAr },
-        { label: 'Cash Center Name Arabic', value: terminalResult.cashCenterNameAr },
-        { label: 'Site Type Arabic', value: terminalResult.siteTypeAr },
-        { label: 'Street Arabic', value: terminalResult.streetAr },
-        { label: 'Region Arabic', value: terminalResult.regionAr },
+        { label: 'Bank Name Arabic', value: terminalResult.bankNameAr, iconClass: 'fas fa-university', style: 'color: #dc6f26' },
+        { label: 'Region Name', value: terminalResult.regionEn, iconClass: 'fas fa-map-marked' },
+        { label: 'City Name Arabic', value: terminalResult.cityAr, iconClass: 'fas fa-city' },
+        { label: 'Street Name', value: terminalResult.streetEn, iconClass: 'fas fa-road' },
+        { label: 'Latitude', value: terminalResult.latitude, iconClass: 'fas fa-globe' },
+        { label: 'Address Arabic', value: terminalResult.addressAr, iconClass: 'fas fa-address-card' },
+        { label: 'ATM Type', value: terminalResult.atmType, iconClass: 'fas fa-money-check-alt' },
+        { label: 'District Arabic', value: terminalResult.districtAr, iconClass: 'fas fa-building' },
+        { label: 'Cash Center Name Arabic', value: terminalResult.cashCenterNameAr, iconClass: 'fas fa-money-bill-wave' },
+        { label: 'Site Type Arabic', value: terminalResult.siteTypeAr, iconClass: 'fas fa-map-signs' },
+        { label: 'Street Arabic', value: terminalResult.streetAr, iconClass: 'fas fa-road' },
+        { label: 'Region Arabic', value: terminalResult.regionAr, iconClass: 'fas fa-map-marked' }
     ];
 
     details1.forEach(detail => {
         column1.append($('<label>', { 'class': 'form-label py-0', 'style': 'margin-bottom: 12px;', text: detail.label }));
-        column2.append($('<input>', { 'type': 'text', 'class': 'form-control mb-1 py-1', 'value': detail.value, 'disabled': 'disabled', 'style' : detail.style || '' }));
+        column2.append($('<div>', { 'class': 'input-group mb-1 py-0' })
+            .append($('<div>', { 'class': 'input-group-prepend' })
+                .append($('<span>', { 'class': 'input-group-text', 'style': 'width: 40px; text-align: center;' })
+                    .append($('<i>', { 'class': detail.iconClass}))))
+            .append($('<input>', { 'type': 'text', 'class': 'form-control', 'value': detail.value, 'disabled': 'disabled', 'style': detail.style || '' })));
     });
 
     details2.forEach(detail => {
         column3.append($('<label>', { 'class': 'form-label py-0 ms-2', 'style': 'margin-bottom: 12px;', text: detail.label }));
-        column4.append($('<input>', { 'type': 'text', 'class': 'form-control mb-1 py-1', 'value': detail.value, 'disabled': 'disabled', 'style': detail.style || '' }));
+        column4.append($('<div>', { 'class': 'input-group mb-1 py-0' })
+            .append($('<div>', { 'class': 'input-group-prepend' })
+                .append($('<span>', { 'class': 'input-group-text', 'style': 'width: 40px; text-align: center;' })
+                    .append($('<i>', { 'class': detail.iconClass}))))
+            .append($('<input>', { 'type': 'text', 'class': 'form-control', 'value': detail.value, 'disabled': 'disabled', 'style': detail.style || '' })));
     });
 
     // Show the modal

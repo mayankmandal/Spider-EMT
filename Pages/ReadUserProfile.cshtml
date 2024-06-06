@@ -58,7 +58,7 @@
                             <label asp-for="CurrentUserDetailsData.FullName" class="form-label"></label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                 </div>
                                 <input type="text" asp-for="CurrentUserDetailsData.FullName" placeholder="Full Name" class="form-control" disabled />
                             </div>
@@ -138,13 +138,13 @@
                             {
                                 <li class="nav-item" id="category-@categoryCount">
                                     <a href="#" class="nav-link">
-                                        <i class="far ion-ios-briefcase-outline nav-icon"></i>
+                                        <i class="fas fa-atom nav-icon"></i>
                                         <p>
                                             @catagoryData.CatagoryName
                                             <i class="right fas fa-angle-left"></i>
                                         </p>
                                     </a>
-                                    <ul class="nav-treeview">
+                                    <ul class="nav nav-treeview ms-2" style="border-left: 1px ridge #DDDFBF;">
                                         @foreach (var pageSite in catagoryData.Pages)
                                         {
                                             <li class="nav-item">

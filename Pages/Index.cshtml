@@ -12,22 +12,38 @@
     <div class="mb-2">
         <table class="table mb-0">
             <tbody>
-                <tr >
-                    <td>
-                    </td>
+                <tr>
+                    <td></td>
                     <td>
                         <label for="cwInput" class="">Withdrawal Fee Amount</label><br />
-                        <input id="cwInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.CWTxnFee" style="padding-inline-start:10px;  width:80%;" disabled />
+                        <div class="input-group" style="width:70%;">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span> <!-- General currency icon -->
+                            </div>
+                            <input id="cwInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.CWTxnFee" style="padding-inline-start:10px;" disabled />
+                        </div>
                     </td>
                     <td>
                         <label for="biInput" class="">Inquiry Fee Amount</label><br />
-                        <input id="biInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.BITxnFee" style="padding-inline-start:10px;  width:80%;" disabled />
+                        <div class="input-group" style="width:70%;">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span> <!-- General currency icon -->
+                            </div>
+                            <input id="biInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.BITxnFee" style="padding-inline-start:10px;" disabled />
+                        </div>
                     </td>
                     <td>
                         <label for="msInput" class="">Mini Statement Fee Amount</label><br />
-                        <input id="msInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.MSTxnFee" style="padding-inline-start:10px;  width:80%;" disabled />
+                        <div class="input-group" style="width:70%;">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span> <!-- General currency icon -->
+                            </div>
+                            <input id="msInput" class="form-control fw-bold" value="@Model.TransactionFeesAmount.MSTxnFee" style="padding-inline-start:10px;" disabled />
+                        </div>
                     </td>
                 </tr>
+
+
                 <tr>
                     <td id="allBankNameDateValidationMsg" class="text-danger fw-bold"></td>
                     <td id="dateCheckValidationError" class="text-danger fw-bold"</td>
@@ -36,7 +52,7 @@
                 <tr>
                     <td>
                         <label for="allBankName" class="fw-bold">Bank Name</label><br />
-                        <select id="allBankName" class="form-select striped-select" style="width:80%;">
+                        <select id="allBankName" class="form-select striped-select" style="width:70%;">
                             <option value="All">All</option>
                             <option value="None">None</option>
                             @foreach (var bank in Model.Banks)
@@ -47,17 +63,27 @@
                     </td>
                     <td id="tblStartDate">
                         <label for="startDate" class="fw-bold">From Date</label><br />
-                        <input id="startDate" type="text" class="form-control datepicker ps-3" style="border-width:thin; width:80%;" />
+                        <div class="input-group" style="width:70%;">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-calendar-alt"></i></span>
+                            </div>
+                            <input id="startDate" type="text" class="form-control datepicker ps-3" />
+                        </div>
                         <span id="startDateValidationMsg" class="text-danger fw-bold"></span>
                     </td>
                     <td id="tblEndDate">
                         <label for="endDate" class="fw-bold">To Date</label><br />
-                        <input id="endDate" type="text" class="form-control datepicker ps-3" style="border-width:thin; width:80%;" />
+                        <div class="input-group" style="width:70%;">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-calendar-alt"></i></span>
+                            </div>
+                            <input id="endDate" type="text" class="form-control datepicker ps-3" />
+                        </div>
                         <span id="endDateValidationMsg" class="text-danger fw-bold"></span>
                     </td>
                     <td id="tblApplyFilterBtn">
                         <label for="applyDateFilterBtn" class="fw-bold">Apply Filter</label><br />
-                        <button id="applyDateFilterBtn" class="form-control btn btn-secondary ps-3" style=" width:80%;">Apply</button>
+                        <button id="applyDateFilterBtn" class="form-control btn btn-secondary ps-3" style="width:70%;">Apply</button>
                     </td>
                 </tr>
             </tbody>
@@ -141,18 +167,18 @@
                     <table id="bankTransactionSummaryTable" class="table table-striped m-2" style="white-space: nowrap;">
                         <thead class="" style="background-color: #17a2b8;color:white">
                             <tr>
-                                <th data-column="bankNameEn">Bank Name</th>
-                                <th data-column="termId">Terminal Id</th>
-                                <th data-column="regionEn">Region</th>
-                                <th data-column="cityEn">City</th>
-                                <th data-column="txnDate">Transaction Date</th>
-                                <th data-column="totalCWCount">Withdrawals #</th>
-                                <th data-column="totalCWFeeAmount">Withdrawals Fee Amount</th>
-                                <th data-column="balanceInquiryCount">Balance Inquiry #</th>
-                                <th data-column="totalBICount">Mini Statement #</th>
-                                <th data-column="totalBI_MSFeeAmount">Inquiry & Statement Fee Amount</th>
-                                <th data-column="totalTxnOnUsCount">Total Txn On Us</th>
-                                <th data-column="totalPayedAmount">Total Payed Amount</th>
+                                <th data-column="bankNameEn"><i class="fas fa-university"></i> Bank Name</th>
+                                <th data-column="termId"><i class="fas fa-id-card"></i> Terminal Id</th>
+                                <th data-column="regionEn"><i class="fas fa-map-marked-alt"></i> Region</th>
+                                <th data-column="cityEn"><i class="fas fa-city"></i> City</th>
+                                <th data-column="txnDate"><i class="far fa-calendar-alt"></i> Transaction Date</th>
+                                <th data-column="totalCWCount"><i class="fas fa-money-bill-wave"></i> Withdrawals #</th>
+                                <th data-column="totalCWFeeAmount"><i class="fas fa-money-bill-wave"></i> Withdrawals Fee Amount</th>
+                                <th data-column="balanceInquiryCount"><i class="far fa-address-card"></i> Balance Inquiry #</th>
+                                <th data-column="totalBICount"><i class="far fa-address-card"></i> Mini Statement #</th>
+                                <th data-column="totalBI_MSFeeAmount"><i class="far fa-address-card"></i> Inquiry & Statement Fee Amount</th>
+                                <th data-column="totalTxnOnUsCount"><i class="fas fa-dollar-sign"></i> Total Txn On Us</th>
+                                <th data-column="totalPayedAmount"><i class="fas fa-dollar-sign"></i> Total Payed Amount</th>
                             </tr>
                         </thead>
                         <tbody>
