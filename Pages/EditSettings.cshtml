@@ -1,0 +1,120 @@
+﻿@page
+@model Spider_EMT.Pages.EditSettingsModel
+@{
+    ViewData["Title"] = "Settings";
+    TempData["NavigationalPageName"] = "Settings";
+}
+
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <form id="updateSettingsForm" asp-page-handler="Submit" enctype="multipart/form-data" method="post">
+        <div id="updateSettingsSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:50%;">
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
+                <div class="row pb-1 pt-2">
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem; font-weight:500">User Settings</div>
+                    <div>
+                        <hr />
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title fw-bold" style="font-size:1.2rem">Details</div>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Profile Picture Field -->
+                        <div class="text-center">
+                            <div class="position-relative d-inline-block mx-auto mb-4">
+                                @if (Model.UserProfilePathUrl != null)
+                                {
+                                    <img src="@Model.UserProfilePathUrl" class="rounded-circle img-thumbnail" alt="Profile Picture" style="width: 150px; height: 150px;" id="loadedProfilePicture">
+                                    <div class="position-absolute bottom-0 end-0 rounded-circle bg-light p-1" style="transform: translate(20%, 20%);">
+                                        <input class="d-none" asp-for="SettingsData.SettingPhotoFile" type="file" id="profile-img-file-input" />
+                                        <label for="profile-img-file-input" class="rounded-circle bg-gradient-blue p-2" style="cursor: pointer; width: 40px; height: 40px;">
+                                            <i class="ion ion-android-camera" style="font-size: 1.5rem;"></i>
+                                        </label>
+                                    </div>
+                                    <span asp-validation-for="SettingsData.SettingPhotoFile" class="text-danger fw-bold"></span>
+                                }
+                            </div>
+                            <h5 class="fs-16 mb-1">@Model.SettingsData.SettingName</h5>
+                            <p class="text-muted mb-0">@Model.SettingsData.SettingEmail (@Model.SettingsData.SettingUsername)</p>
+                        </div>
+                        
+                        <!-- UserId Field -->
+                        <div class="mb-3">
+                            <label asp-for="SettingsData.SettingId" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                </div>
+                                <input type="text" asp-for="SettingsData.SettingId" class="form-control" readonly />
+                            </div>
+                            <span asp-validation-for="SettingsData.SettingId" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <!-- Username Field -->
+                        <div class="mb-3">
+                            <label asp-for="SettingsData.SettingUsername" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-address-card"></i></span>
+                                </div>
+                                <input type="text" asp-for="SettingsData.SettingUsername" placeholder="User Name" class="form-control" />
+                            </div>
+                            <span asp-validation-for="SettingsData.SettingUsername" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <!-- FullName Field -->
+                        <div class="mb-3">
+                            <label asp-for="SettingsData.SettingName" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                </div>
+                                <input type="text" asp-for="SettingsData.SettingName" placeholder="Name" class="form-control" />
+                            </div>
+                            <span asp-validation-for="SettingsData.SettingName" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="mb-3">
+                            <label asp-for="SettingsData.SettingEmail" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="text" asp-for="SettingsData.SettingEmail" placeholder="Email Address" class="form-control" />
+                            </div>
+                            <span asp-validation-for="SettingsData.SettingEmail" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <div style="display: flex; justify-content:space-around;height:auto;">
+                            <div class="row">
+                                <div class="col-2"></div>
+                                <div class="col-3 me-4">
+                                    <button type="submit" class="btn create-btn" style="width:140px;">Update</button>
+                                </div>
+                                <div class="col-4 ms-3">
+                                    <a asp-page="/Index" class="btn btn-secondary" style="width:180px;"> Back to Transactions</a>
+                                </div>
+                                <div class="col-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/editSettings.js" asp-append-version="true"></script>
+}

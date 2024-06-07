@@ -10,8 +10,8 @@ namespace Spider_EMT.Repository.Domain
 {
     public class NavigationRepository : INavigationRepository
     {
-        public NavigationRepository()
-        {
+        public NavigationRepository() 
+        { 
 
         }
         public async Task<CurrentUser> GetCurrentUserAsync()
@@ -357,7 +357,7 @@ namespace Spider_EMT.Repository.Domain
                     {
                         CategoriesSetDTO category = new CategoriesSetDTO
                         {
-                            PageCatId = row["PageCatId"] != DBNull.Value? (int)row["PageCatId"] : 0,
+                            PageCatId = row["PageCatId"] != DBNull.Value ? (int)row["PageCatId"] : 0,
                             CatagoryName = row["CatagoryName"] != DBNull.Value ? row["CatagoryName"].ToString() : string.Empty,
                             PageId = row["PageId"] != DBNull.Value ? (int)row["PageId"] : 0,
                             PageDescription = row["PageDescription"] != DBNull.Value ? row["PageDescription"].ToString() : string.Empty,
@@ -380,7 +380,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Categories.", ex);
             }
         }
-        
+
         public async Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList)
         {
             try
@@ -532,7 +532,7 @@ namespace Spider_EMT.Repository.Domain
                     {
                         DataRow dataRow = dataTable.Rows[0];
                         NumberOfRowsAffected = (int)dataRow["RowsAffected"];
-                        if (NumberOfRowsAffected < 0) 
+                        if (NumberOfRowsAffected < 0)
                         {
                             return false;
                         }
@@ -560,7 +560,7 @@ namespace Spider_EMT.Repository.Domain
                 SqlParameter[] sqlParameters;
                 bool isFailure;
                 int UserIdentity = 0;
-                
+
                 if (profilePagesAccessDTO.ProfileData.ProfileId > 0)
                 {
                     // Deletion of existing access for profiles for a user
@@ -889,13 +889,13 @@ namespace Spider_EMT.Repository.Domain
                 int InputValue = 0;
                 foreach (var d in Enum.GetValues(typeof(SearchByTextStates)))
                 {
-                    if(criteriaText == d.ToString())
+                    if (criteriaText == d.ToString())
                     {
                         InputValue = (int)d;
                         break;
                     }
                 }
-                
+
                 sqlParameters = new SqlParameter[]
                 {
                     new SqlParameter("@TextCriteria", SqlDbType.Int){Value = InputValue},
@@ -906,7 +906,7 @@ namespace Spider_EMT.Repository.Domain
                 List<ProfileUser> profileUserLst = new List<ProfileUser>();
                 if (dataTable.Rows.Count > 0)
                 {
-                    foreach(DataRow dataRow in dataTable.Rows)
+                    foreach (DataRow dataRow in dataTable.Rows)
                     {
                         ProfileUser profileUser = new ProfileUser
                         {
@@ -961,6 +961,103 @@ namespace Spider_EMT.Repository.Domain
             {
                 throw new Exception($"Error deleting record for {deleteType}.", ex);
             }
+        }
+        public async Task<UserSettings> GetSettingsDataAsync()
+        {
+            try
+            {
+                UserSettings userSettings = new UserSettings();
+                string commandText = "SELECT tcu.UserId, tcu.Username, tcu.Userimgpath, tu.FullName, tu.Email from tblCurrentUser tcu INNER JOIN tblUsers tu on tcu.UserId = tu.UserId";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                if (dataTable.Rows.Count > 0)
+                {
+                    DataRow dataRow = dataTable.Rows[0];
+                    userSettings = new UserSettings
+                    {
+                        UserId = dataRow["UserId"] != DBNull.Value ? (int)dataRow["UserId"] : 0,
+                        FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                        EmailAddress = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                        ProfilePhotoPath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                    };
+                }
+                return userSettings;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Current User Categories.", ex);
+            }
+        }
+        public async Task<string> UpdateSettingsDataAsync(UserSettings userSettings)
+        {
+            try
+            {
+                int NumberOfRowsAffectedUsers = 0;
+                int NumberOfRowsAffectedCurrentUser = 0;
+                string PreviousProfilePhotoPath = MagicString;
+                // User Profile Updation
+                SqlParameter[] sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = userSettings.UserId },
+                    new SqlParameter("@NewUsername", SqlDbType.VarChar, 20) { Value = userSettings.Username },
+                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userSettings.FullName },
+                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userSettings.EmailAddress },
+                    new SqlParameter("@NewProfilePhotoPath", SqlDbType.VarChar, 200) { Value = userSettings.ProfilePhotoPath }
+                };
+
+                // Execute the command
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_UpdateUserSettings, CommandType.StoredProcedure, sqlParameters);
+                if (tables.Count > 0)
+                {
+                    foreach (DataTable dataTable in tables)
+                    {
+                        foreach (DataRow dataRow in dataTable.Rows)
+                        {
+                            // Check if the required columns exist before accessing them
+                            if (dataTable.Columns.Contains("RowsAffectedUsers"))
+                            {
+                                NumberOfRowsAffectedUsers = (int)dataRow["RowsAffectedUsers"];
+                            }
+
+                            if (dataTable.Columns.Contains("RowsAffectedCurrentUser"))
+                            {
+                                NumberOfRowsAffectedCurrentUser = (int)dataRow["RowsAffectedCurrentUser"];
+                            }
+
+                            if (dataTable.Columns.Contains("OldProfilePhotoPath"))
+                            {
+                                PreviousProfilePhotoPath = dataRow["OldProfilePhotoPath"].ToString();
+                            }
+                        }
+                    }
+
+                    if (NumberOfRowsAffectedUsers > 0 && NumberOfRowsAffectedCurrentUser > 0)
+                    {
+                        if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                        {
+                            return PreviousProfilePhotoPath;
+                        }
+                        return MagicString;
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error while adding User Profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while adding User Profile.", ex);
+            }
+            return MagicString;
         }
     }
 }

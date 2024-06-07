@@ -15,17 +15,46 @@ namespace Spider_EMT.Controller
         #region Fields
         private readonly INavigationRepository _navigationRepository;
         private ICacheProvider _cacheProvider;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
         #endregion
 
         #region Constructor
-        public NavigationController(INavigationRepository navigationRepository, ICacheProvider cacheProvider)
+        public NavigationController(INavigationRepository navigationRepository, ICacheProvider cacheProvider, IWebHostEnvironment webHostEnvironment)
         {
             _navigationRepository = navigationRepository;
             _cacheProvider = cacheProvider;
+            _webHostEnvironment = webHostEnvironment;
         }
         #endregion
 
         #region Actions
+
+        public async Task<bool> DeleteFileAsync(string filePath)
+        {
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    // Ensure any operations on the file are completed before deletion
+                    using (var stream = new FileStream(filePath,FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose))
+                    {
+                        // This will ensure the file is closed properly before deletion
+                        stream.Close();
+                    }
+
+                    // Delete the file after ensuring it is not being used by another process
+                    System.IO.File.Delete(filePath);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while deleting the file.", ex);
+            }
+        }
+
         [HttpGet("GetAllUsers")]
         [ProducesResponseType(typeof(IEnumerable<ProfileUser>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -97,10 +126,10 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                if(!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
+                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
                 {
                     currentUserData = await _navigationRepository.GetCurrentUserAsync();
-
+                    currentUserData.UserImgPath = "/images/profiles_picture/" + currentUserData.UserImgPath;
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
                         AbsoluteExpiration = DateTime.Now.AddSeconds(10),
@@ -501,8 +530,50 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                bool isSuccess = await _navigationRepository.DeleteEntityAsync(deleteId,deleteType);
+                bool isSuccess = await _navigationRepository.DeleteEntityAsync(deleteId, deleteType);
                 return Ok(isSuccess);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetSettingsData")]
+        [ProducesResponseType(typeof(UserSettings), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetSettingsData()
+        {
+            try
+            {
+                UserSettings userSettings = await _navigationRepository.GetSettingsDataAsync();
+                return Ok(userSettings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("UpdateSettingsData")]
+        [ProducesResponseType(typeof(UserSettings), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateSettingsData(UserSettings userSettings)
+        {
+            try
+            {
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(userSettings);
+
+                // Remove the cached item to force a refresh next time
+                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+
+                if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                {
+                    string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "images\\profiles_picture", PreviousProfilePhotoPath);
+                    bool isSucess = await DeleteFileAsync(oldFilePath);
+                    return Ok(isSucess);
+                }
+                return Ok();
             }
             catch (Exception ex)
             {

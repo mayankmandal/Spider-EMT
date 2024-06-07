@@ -21,6 +21,7 @@
 
         public const string SP_UpdateTransactionFees = "dbo.uspUpdateTransactionFees";
         public const string SP_UpdateUser = "dbo.uspUpdateUser";
+        public const string SP_UpdateUserSettings = "dbo.uspUpdateUserSettings";
 
         public static class UserStatusDescription
         {

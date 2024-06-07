@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\dist\js\pages\" />
-    <Folder Include="wwwroot\images\extra\" />
+    <Folder Include="wwwroot\images\profiles_picture\" />
   </ItemGroup>
 
 </Project>
