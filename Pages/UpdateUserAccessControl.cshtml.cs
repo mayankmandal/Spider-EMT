@@ -61,8 +61,8 @@ namespace Spider_EMT.Pages
             try
             {
                 // Deserialize the Json string into a list of PageSite objects
-                var selectedPages = JsonConvert.DeserializeObject<List<PageSite>>(SelectedPagesJson);
-                ProfileSite selectedProfileData = new ProfileSite
+                var selectedPages = JsonConvert.DeserializeObject<List<PageSiteVM>>(SelectedPagesJson);
+                ProfileSiteVM selectedProfileData = new ProfileSiteVM
                 {
                     ProfileId = JsonConvert.DeserializeObject<int>(SelectedProfileId),
                     ProfileName = SelectedProfileName

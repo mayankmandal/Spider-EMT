@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
+using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
 using System.Text;
@@ -19,16 +20,9 @@ namespace Spider_EMT.Pages
             _clientFactory = httpClientFactory;
         }
         [BindProperty]
-        public ProfileUser? ProfileUsersData { get; set; }
-        public List<ProfileSite>? ProfilesData { get; set; }
-        [BindProperty]
-        public List<string>? UserStatusLst { get; set; }
-        public List<CheckBoxOption> Checkboxes = UserStatusDescription.StatusOptions.Select(option => new CheckBoxOption
-        {
-            IsChecked = false,
-            Text = option.Text,
-            Value = option.Value
-        }).ToList();
+        public ProfileUserVM ProfileUsersData { get; set; }
+        public List<ProfileSiteVM>? ProfilesData { get; set; }
+        public string UserProfilePathUrl = string.Empty;
         public async Task<IActionResult> OnGet()
         {
             try
@@ -45,7 +39,7 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
-            ProfilesData = JsonConvert.DeserializeObject<List<ProfileSite>>(response);
+            ProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
         public async Task<JsonResult> OnPost()
         {

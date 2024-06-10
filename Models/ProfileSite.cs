@@ -5,12 +5,12 @@ namespace Spider_EMT.Models
 {
     public class ProfileSite
     {
-        [Required(ErrorMessage = "Profile Id is required")]
         [DisplayName("Profile Id")]
         public int ProfileId { get; set; }
-        [Required(ErrorMessage = "Profile Name is required")]
-        [DisplayName("Profile Name")]
-        [StringLength(100, ErrorMessage = "Profile Name must be 100 characters or fewer")]
         public string ProfileName { get; set; }
+        public DateTime CreateDate { get; set; }
+        public int CreateUserId { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public int UpdateUserId { get; set; }
     }
 }

@@ -3,7 +3,7 @@
     public class UserProfileDTO
     {
         public ProfileSite Profile { get; set; }
-        public List<PageSite> Pages { get; set; }
+        public List<PageSiteVM> Pages { get; set; }
         public List<PageCategory> PageCategories { get; set; }
     }
 }

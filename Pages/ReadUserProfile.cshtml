@@ -101,17 +101,6 @@
                             <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
                         </div>
 
-                    <!-- Status with radio buttons on one line -->
-                    <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
-                        <label asp-for="CurrentUserDetailsData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
-                        @foreach (var checkbox in Model.StatusCheckboxes)
-                        {
-                            <div>
-                                <input type="checkbox" class="form-check-input" name="UserStatusLst" id="checkbox_@checkbox" value="@checkbox" checked disabled />
-                                <label for="checkbox_@checkbox" class="fw-normal" style="font-size:1.1rem">@checkbox</label>
-                            </div>
-                        }
-                    </div>
                     </div>
                 </div>
 

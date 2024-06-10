@@ -61,8 +61,8 @@ namespace Spider_EMT.Pages
             try
             {
                 // Deserialize the Json string into a list of PageSite objects
-                var selectedPages = JsonConvert.DeserializeObject<List<PageSite>>(SelectedPagesJson);
-                PageCategory selectedProfileData = new PageCategory
+                var selectedPages = JsonConvert.DeserializeObject<List<PageSiteVM>>(SelectedPagesJson);
+                PageCategoryVM selectedProfileData = new PageCategoryVM
                 {
                     PageCatId = Int32.Parse(SelectedPageCategory.CategoryName),
                     CategoryName = Constants.MagicString

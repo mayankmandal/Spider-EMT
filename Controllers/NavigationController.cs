@@ -16,15 +16,16 @@ namespace Spider_EMT.Controller
         private readonly INavigationRepository _navigationRepository;
         private ICacheProvider _cacheProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
+        private readonly IConfiguration _configuration;
         #endregion
 
         #region Constructor
-        public NavigationController(INavigationRepository navigationRepository, ICacheProvider cacheProvider, IWebHostEnvironment webHostEnvironment)
+        public NavigationController(INavigationRepository navigationRepository, ICacheProvider cacheProvider, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
             _navigationRepository = navigationRepository;
             _cacheProvider = cacheProvider;
             _webHostEnvironment = webHostEnvironment;
+            _configuration = configuration;
         }
         #endregion
 
@@ -129,7 +130,6 @@ namespace Spider_EMT.Controller
                 if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
                 {
                     currentUserData = await _navigationRepository.GetCurrentUserAsync();
-                    currentUserData.UserImgPath = "/images/profiles_picture/" + currentUserData.UserImgPath;
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
                         AbsoluteExpiration = DateTime.Now.AddSeconds(10),

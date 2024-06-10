@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
+using Spider_EMT.Models.ViewModels;
 using System.Text;
 using static Spider_EMT.Utility.Constants;
 
@@ -17,7 +18,7 @@ namespace Spider_EMT.Pages
             _clientFactory = httpClientFactory;
         }
         [BindProperty]
-        public ProfileUser? ProfileUsersData { get; set; }
+        public ProfileUserVM ProfileUsersData { get; set; }
         public List<ProfileSite>? ProfilesData { get; set; }
         [BindProperty]
         public List<string>? UserStatusLst { get; set; }

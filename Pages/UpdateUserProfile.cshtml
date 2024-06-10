@@ -176,20 +176,6 @@
                         <!-- Hidden fields Profile Id -->
                         <input type="hidden" asp-for="ProfileUsersData.ProfileSiteData.ProfileId" id="profileIdHidden" />
 
-                        <!-- Hidden field for UserStatus -->
-                        <input type="hidden" asp-for="ProfileUsersData.UserStatus" id="ProfileUsersData_UserStatus" />
-
-                        <!-- Status with radio buttons on one line -->
-                        <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
-                            <label asp-for="ProfileUsersData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
-                            @foreach (var checkbox in Model.Checkboxes)
-                            {
-                                <div>
-                                    <input type="checkbox" class="form-check-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
-                                    <label for="checkbox_@checkbox.Value" class="fw-normal">@checkbox.Text</label>
-                                </div>
-                            }
-                        </div>
                         <div style="display: flex; justify-content:space-around;height:auto;">
                             <div class="row">
                                 <div class="col-2"></div>

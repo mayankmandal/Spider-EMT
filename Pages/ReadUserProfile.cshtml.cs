@@ -19,7 +19,7 @@ namespace Spider_EMT.Pages
             _clientFactory = httpClientFactory;
         }
         public CurrentUser? CurrentUserData { get; set; }
-        public ProfileUser? CurrentUserDetailsData { get; set; }
+        public ProfileUserVM CurrentUserDetailsData { get; set; }
         public List<PageSite>? CurrentPageSites { get; set; }
         public List<string>? StatusCheckboxes { get; set; }
         public List<CategoryDisplayViewModel>? StructureData { get; set; }
@@ -32,7 +32,6 @@ namespace Spider_EMT.Pages
                 await LoadCurrentPageSites();
                 await LoadCurrentCategoriesSetDTOs();
 
-                StatusCheckboxes = Constants.UserStatusDescription.GetStatusTextsFromCsv(CurrentUserDetailsData.UserStatus.ToString());
                 return Page();
             }
             catch (Exception ex)
@@ -50,7 +49,7 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserDetails");
-            CurrentUserDetailsData = JsonConvert.DeserializeObject<ProfileUser>(response);
+            CurrentUserDetailsData = JsonConvert.DeserializeObject<ProfileUserVM>(response);
         }
         private async Task LoadCurrentPageSites()
         {

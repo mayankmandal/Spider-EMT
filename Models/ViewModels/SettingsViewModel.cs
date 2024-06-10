@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using Spider_EMT.Models.ValidationAttributes;
+using System.ComponentModel;
 
 namespace Spider_EMT.Models.ViewModels
 {
@@ -16,25 +16,5 @@ namespace Spider_EMT.Models.ViewModels
         [DisplayName("User Photo")]
         [MaxFileSize(20 * 1024, ErrorMessage = "Image size cannot exceed 20 KB")]
         public IFormFile SettingPhotoFile { get; set; }
-    }
-
-    public class MaxFileSizeAttribute : ValidationAttribute
-    {
-        private readonly int _maxFileSize;
-        public MaxFileSizeAttribute(int maxFileSize)
-        {
-            _maxFileSize = maxFileSize;
-        }
-        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
-        {
-            if(value is IFormFile file)
-            {
-                if(file.Length > _maxFileSize)
-                {
-                    return new ValidationResult(ErrorMessage ?? $"File size cannot exceed {_maxFileSize / 1024} KB.");
-                }
-            }
-            return ValidationResult.Success;
-        }
     }
 }

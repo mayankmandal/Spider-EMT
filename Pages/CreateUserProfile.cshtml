@@ -29,6 +29,23 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Profile Picture Field -->
+                        <div class="text-center">
+                            <div class="position-relative d-inline-block mx-auto mb-4">
+                                @if (Model.UserProfilePathUrl != null)
+                                {
+                                    <img src="@Model.UserProfilePathUrl" class="rounded-circle img-thumbnail" alt="Profile Picture" style="width: 150px; height: 150px;" id="loadedProfilePicture">
+                                    <div class="position-absolute bottom-0 end-0 rounded-circle bg-light p-1" style="transform: translate(20%, 20%);">
+                                        <input class="d-none" asp-for="ProfileUsersData.SettingPhotoFile" type="file" id="profile-img-file-input" />
+                                        <label for="profile-img-file-input" class="rounded-circle bg-gradient-blue p-2" style="cursor: pointer; width: 40px; height: 40px;">
+                                            <i class="ion ion-android-camera" style="font-size: 1.5rem;"></i>
+                                        </label>
+                                    </div>
+                                    <span asp-validation-for="ProfileUsersData.SettingPhotoFile" class="text-danger fw-bold"></span>
+                                }
+                            </div>
+                        </div>
+
                         <!-- User ID and ID Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1;">
@@ -79,6 +96,20 @@
                             </div>
                         </div>
 
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label asp-for="ProfileUsersData.Username" class="form-label"></label>
+                            <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" />
+                            <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                        <label asp-for="ProfileUsersData.Password" class="form-label"></label>
+                            <input type="password" asp-for="ProfileUsersData.Password" placeholder="Password" class="form-control" />
+                            <span asp-validation-for="ProfileUsersData.Password" class="text-danger fw-bold"></span>
+                        </div>
+
                         <!-- Dropdown to Select Profile Name -->
                         <div class="mb-3">
                             <label asp-for="ProfileUsersData.ProfileSiteData.ProfileName" class="form-label"></label>
@@ -100,19 +131,34 @@
                         <!-- Hidden fields Profile Id -->
                         <input type="hidden" asp-for="ProfileUsersData.ProfileSiteData.ProfileId" id="profileIdHidden" />
 
-                        <!-- Hidden field for UserStatus -->
-                        <input type="hidden" asp-for="ProfileUsersData.UserStatus" id="ProfileUsersData_UserStatus" />
+                        <!-- Is Active -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="ProfileUsersData.IsActive" id="isActiveCheckbox" />
+                                <label class="form-check-label" for="isActiveCheckbox">
+                                    Active User
+                                </label>
+                            </div>
+                        </div>
 
-                        <!-- Status with radio buttons on one line -->
-                        <div class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
-                            <label asp-for="ProfileUsersData.UserStatus" class="form-label" style="margin-right: 10px;">Status</label>
-                            @foreach (var checkbox in Model.Checkboxes)
-                            {
-                                <div>
-                                    <input type="checkbox" class="form-check-input" name="UserStatusLst" id="checkbox_@checkbox.Value" value="@checkbox.Value" checked="@checkbox.IsChecked" />
-                                    <label for="checkbox_@checkbox.Value" class="fw-normal">@checkbox.Text</label>
-                                </div>
-                            }
+                        <!-- Is Active Directory User -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="ProfileUsersData.IsActiveDirectoryUser" id="isActiveDirectoryUserCheckbox" />
+                                <label class="form-check-label" for="isActiveDirectoryUserCheckbox">
+                                    Active Directory User
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Change Password -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="ProfileUsersData.ChangePassword" id="changePasswordCheckbox" />
+                                <label class="form-check-label" for="changePasswordCheckbox">
+                                    Change Password
+                                </label>
+                            </div>
                         </div>
 
                         <!-- Buttons for form submission -->
