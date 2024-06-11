@@ -13,7 +13,9 @@ GO
 ALTER PROCEDURE [dbo].[uspAddPageCategoryMap]
     -- Add the parameters for the stored procedure here
     @NewPageCatId INT,
-    @NewPageId INT
+    @NewPageId INT,
+	@NewCreateUserId INT,
+	@NewUpdateUserId INT
 AS
 BEGIN
     
@@ -23,8 +25,8 @@ BEGIN
         -- Check if both @NewPageCatId and @NewPageId are not null
         IF @NewPageCatId IS NOT NULL AND @NewPageId IS NOT NULL
         BEGIN
-			INSERT INTO tblPageCategoryMap (PageId, PageCatId)
-			VALUES (@NewPageId, @NewPageCatId)
+			INSERT INTO tblPageCategoryMap (PageId, PageCatId, CreateDate, CreateUserId, UpdateDate, UpdateUserId)
+			VALUES (@NewPageId, @NewPageCatId, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId)
         END
     END TRY
 

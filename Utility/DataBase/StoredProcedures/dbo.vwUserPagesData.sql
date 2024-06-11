@@ -1,4 +1,4 @@
-CREATE VIEW vwUserPagesData AS
+ALTER VIEW vwUserPagesData AS
 WITH CombinedData AS (
   -- For Pages Data
   SELECT 
@@ -7,13 +7,12 @@ WITH CombinedData AS (
     p.PageId,
     p.PageUrl,
     p.PageDescription,
-    p.MenuImgPath,
     u.PageCatId,
-    CatagoryName = NULL
+    CatagoryName = NULL,
+	tbup.UserId
   FROM tblUserPermission u WITH (NOLOCK) 
   INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = u.PageId
   INNER JOIN tblUserProfile tbup WITH (NOLOCK) ON tbup.ProfileId = u.ProfileId 
-  INNER JOIN tblCurrentUser tcu WITH (NOLOCK) ON tbup.UserId = tcu.UserId
   WHERE u.PageCatId IS NULL
 
   UNION  
@@ -25,15 +24,14 @@ WITH CombinedData AS (
     p.PageId,
     p.PageUrl,
     p.PageDescription,
-    p.MenuImgPath,
     pc.PageCatId,
-    tpc.CatagoryName
+    tpc.CatagoryName,
+	tbup.UserId
   FROM tblUserPermission u WITH (NOLOCK) 
   INNER JOIN tblPageCategoryMap pc WITH (NOLOCK) ON pc.PageCatId = u.PageCatId
   INNER JOIN tblPageCatagory tpc WITH (NOLOCK) ON pc.PageCatId = tpc.PageCatId
   INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = pc.PageId
   INNER JOIN tblUserProfile tbup WITH (NOLOCK) ON tbup.ProfileId = u.ProfileId 
-  INNER JOIN tblCurrentUser tcu WITH (NOLOCK) ON tbup.UserId = tcu.UserId
 )
 
 SELECT DISTINCT
@@ -41,9 +39,9 @@ SELECT DISTINCT
   cd.PageId,
   cd.PageUrl,
   cd.PageDescription,
-  cd.MenuImgPath,
   cd.PageCatId,
-  cd.CatagoryName
+  cd.CatagoryName,
+  cd.UserId
 FROM CombinedData cd
 WHERE NOT EXISTS (
   SELECT 1

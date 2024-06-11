@@ -1,20 +1,5 @@
 ﻿var apiResultData = []; // Global variable to store the result set
 
-function mapUserStatus(status) {
-    const statusMap = {
-        'AC': 'IsActive',
-        'AD': 'IsActiveDirectoryUser',
-        'CH': 'ChangePassword'
-    }
-
-    // Split the status string by comma and map each individually
-    const statusArray = status.split(',');
-    const mappedStatusArray = statusArray.map(s => statusMap[s.trim()] || s.trim());
-
-    // Join the mapped statuses back into a string 
-    return mappedStatusArray.join(', ');
-}
-
 function handleResultItemClick(item, resultItem) {
     // Deselect all items
     $('.search-result-item').removeClass('selected');
@@ -30,17 +15,32 @@ function handleResultItemClick(item, resultItem) {
     $('#ProfileUsersData_MobileNo').val(item.mobileNo);
     $('#profileSelect').val(item.profileSiteData.profileName);
     $('#profileIdHidden').val(item.profileSiteData.profileId);
-    $('#ProfileUsersData_UserStatus').val(item.userStatus);
-
-    // Uncheck all the checkboxes first
-    $('input[name="UserStatusLst"]').prop('checked', false);
-    // Check the ones matching the user status
-    item.userStatus.split(',').forEach(function (status) {
-        $('input[value="' + status + '"]').prop('checked', true);
-    });
+    $('#ProfileUsersData_Username').val(item.profileSiteData.username);
+    /*$('input[name="ProfileUsersData.IsActive"]').prop('checked',item.profileSiteData.isActive === true);
+    $('input[name="ProfileUsersData.IsActiveDirectoryUser"]').prop('checked', item.profileSiteData.isActiveDirectoryUser === true);
+    $('input[name="ProfileUsersData.ChangePassword"]').prop('checked', item.profileSiteData.changePassword === true);*/
 }
 
 $(document).ready(function () {
+    $('#profile-img-file-input').change(function () {
+        // Get the selected file
+        var file = this.files[0];
+
+        // Check if a file is selected
+        if (file) {
+            // Create a file reader object
+            var reader = new FileReader();
+
+            // Set up the FileReader Onload event
+            reader.onload = function (e) {
+                // Set the SRC attribute of the image element to the data URL of the selected file
+                $('#loadedProfilePicture').attr('src', e.target.result);
+            };
+
+            // Read the selected file as a data URL
+            reader.readAsDataURL(file);
+        }
+    });
     $('#searchButton').on('click', function () {
         var searchCriteria = $('#searchCriteria').val();
         var searchInput = $('#searchInput').val();
@@ -78,9 +78,6 @@ $(document).ready(function () {
                             cursor: 'pointer'
                         });
 
-                        // Map user status
-                        var mappedStatus = mapUserStatus(item.userStatus);
-
                         var itemDetails = `
                         <p>User ID: ${item.userId}</p>
                         <p>Id Number: ${item.idNumber}</p>
@@ -88,7 +85,7 @@ $(document).ready(function () {
                         <p>Email Address: ${item.email}</p>
                         <p>Mobile Number: ${item.mobileNo}</p>
                         <p>Profile Name: ${item.profileSiteData.profileName}</p>
-                        <p>User Status: ${mappedStatus}</p>
+                        <p>User Name: ${item.username}</p>
                         `;
                         resultItem.html(itemDetails);
 
@@ -149,15 +146,6 @@ $(document).ready(function () {
 
         // Set the hidden fields with ProfileId and ProfileName
         $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
-
-        // Get the selected user statuses
-        var selectedUserStatusLst = [];
-        $('input[name="UserStatusLst"]:checked').each(function () {
-            selectedUserStatusLst.push($(this).val());
-        });
-
-        // Set the hidden field with selected user statuses
-        $('#ProfileUsersData_UserStatus').val(selectedUserStatusLst); // Assuming a comma-separated string for UserStatus
 
         $.ajax({
             url: $(this).attr('action'),

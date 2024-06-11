@@ -12,7 +12,9 @@ GO
 -- =============================================
 ALTER PROCEDURE [dbo].[uspAddNewCategory]
     -- Add the parameters for the stored procedure here
-    @NewCategoryName Varchar(50)
+    @NewCategoryName Varchar(50),
+	@NewCreateUserId INT,
+	@NewUpdateUserId INT
 AS
 BEGIN
     
@@ -22,7 +24,7 @@ BEGIN
 	
     BEGIN TRY
         -- Insert User Profile
-        INSERT INTO [dbo].[tblPageCatagory](CatagoryName) VALUES (@NewCategoryName);
+        INSERT INTO [dbo].[tblPageCatagory](CatagoryName, CreateDate, CreateUserId, UpdateDate, UpdateUserId) VALUES (@NewCategoryName, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId);
 		-- Retrieve the newly generated ProfileId
 		SET @UserIdentity = SCOPE_IDENTITY(); -- Get the last inserted identity value
     END TRY

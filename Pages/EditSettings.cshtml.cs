@@ -52,7 +52,7 @@ namespace Spider_EMT.Pages
                     SettingEmail = userSettings.EmailAddress,
                     SettingPhotoFile = null,
                 };
-                UserProfilePathUrl = "/images/profiles_picture/" + userSettings.ProfilePhotoPath;
+                UserProfilePathUrl = _configuration["UserProfileImgPath"] + userSettings.ProfilePhotoPath;
             };
         }
 
@@ -69,7 +69,7 @@ namespace Spider_EMT.Pages
                 string uploadFolder = null;
                 if (SettingsData.SettingPhotoFile != null)
                 {
-                    uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/profiles_picture");
+                    uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + SettingsData.SettingPhotoFile.FileName;
                     filePath = Path.Combine(uploadFolder, uniqueFileName);
 

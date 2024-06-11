@@ -18,11 +18,11 @@ namespace Spider_EMT.Pages
             _clientFactory = httpClientFactory;
         }
         [BindProperty]
-        public List<PageSite>? AllPageSites { get; set; }
+        public List<PageSiteVM>? AllPageSites { get; set; }
         [BindProperty]
-        public List<PageCategory>? AllCategories { get; set; }
+        public List<PageCategoryVM>? AllCategories { get; set; }
         [BindProperty]
-        public PageCategory? SelectedPageCategory { get; set; }
+        public PageCategoryVM? SelectedPageCategory { get; set; }
         [BindProperty]
         public string? SelectedPagesJson { get; set; }
         public async Task<IActionResult> OnGet()
@@ -42,13 +42,13 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllCategories");
-            AllCategories = JsonConvert.DeserializeObject<List<PageCategory>>(response);
+            AllCategories = JsonConvert.DeserializeObject<List<PageCategoryVM>>(response);
         }
         private async Task LoadAllPagesData()
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
-            AllPageSites = JsonConvert.DeserializeObject<List<PageSite>>(response);
+            AllPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
         }
         public async Task<JsonResult> OnPost()
         {

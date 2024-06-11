@@ -10,15 +10,22 @@ namespace Spider_EMT.Repository.Domain
 {
     public class NavigationRepository : INavigationRepository
     {
-        public NavigationRepository() 
-        { 
+        private readonly IConfiguration _configuration;
+        private readonly CurrentUser _currentUser;
+        public NavigationRepository(IConfiguration configuration) 
+        {
+            _configuration = configuration;
+            _currentUser = new CurrentUser
+            {
+                UserId = Int32.Parse(_configuration["RecentUserId"])
+            };
 
         }
         public async Task<CurrentUser> GetCurrentUserAsync()
         {
             try
             {
-                string commandText = "SELECT UserId,Username,Userimgpath FROM tblCurrentUser";
+                string commandText = $"SELECT UserId,Username,Userimgpath FROM tblUsers where UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -29,7 +36,7 @@ namespace Spider_EMT.Repository.Domain
                     {
                         currentUser = new CurrentUser
                         {
-                            UserId = (int)row["UserId"],
+                            UserId = _currentUser.UserId,
                             UserName = row["Username"].ToString(),
                             UserImgPath = row["Userimgpath"].ToString()
                         };
@@ -64,16 +71,27 @@ namespace Spider_EMT.Repository.Domain
                         ProfileUser profileUser = new ProfileUser
                         {
                             UserId = Convert.ToInt32(dataRow["UserId"]),
-                            IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                            IdNumber = dataRow["IdNumber"].ToString(),
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
-                            MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                            MobileNo = dataRow["MobileNo"].ToString(),
                             ProfileSiteData = new ProfileSite
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                                 ProfileName = dataRow["ProfileName"].ToString()
                             },
-                            UserStatus = dataRow["Status"].ToString(),
+                            Username = dataRow["Username"].ToString(),
+                            Userimgpath = dataRow["Userimgpath"].ToString(),
+                            PasswordHash = dataRow["PasswordHash"].ToString(),
+                            PasswordSalt = dataRow["PasswordSalt"].ToString(),
+                            IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
+                            IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
+                            ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
+                            LastLoginActivity = (DateTime)dataRow["LastLoginActivity"],
+                            CreateDate = (DateTime)dataRow["CreateDate"],
+                            UpdateDate = (DateTime)dataRow["UpdateDate"],
+                            CreateUserId = (int)dataRow["CreateUserId"],
+                            UpdateUserId = (int)dataRow["UpdateUserId"]
                         };
                         users.Add(profileUser);
                     }
@@ -96,7 +114,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT ProfileId, ProfileName FROM tblProfile";
+                string commandText = "SELECT ProfileId, ProfileName, CreateDate, CreateUserId, UpdateDate, UpdateUserId FROM tblProfile";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -108,7 +126,11 @@ namespace Spider_EMT.Repository.Domain
                         ProfileSite profile = new ProfileSite
                         {
                             ProfileId = (int)row["ProfileId"],
-                            ProfileName = row["ProfileName"].ToString()
+                            ProfileName = row["ProfileName"].ToString(),
+                            CreateDate = (DateTime)row["CreateDate"],
+                            CreateUserId = (int)row["CreateUserId"],
+                            UpdateDate = (DateTime)row["UpdateDate"],
+                            UpdateUserId = (int)row["UpdateUserId"],
                         };
                         profiles.Add(profile);
                     }
@@ -130,7 +152,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT PageId, PageUrl, PageDescription, MenuImgPath FROM tblPage";
+                string commandText = "SELECT PageId, PageUrl, PageDescription, CreateDate, CreateUserId, UpdateDate, UpdateUserId FROM tblPage";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -144,7 +166,11 @@ namespace Spider_EMT.Repository.Domain
                             PageId = (int)row["PageId"],
                             PageUrl = row["PageUrl"].ToString(),
                             PageDescription = row["PageDescription"].ToString(),
-                            MenuImgPath = row["MenuImgPath"].ToString()
+                            CreateDate = (DateTime)row["CreateDate"],
+                            CreateUserId = (int)row["CreateUserId"],
+                            UpdateDate = (DateTime)row["UpdateDate"],
+                            UpdateUserId = (int)row["UpdateUserId"],
+                            isSelected = false
                         };
                         pages.Add(page);
                     }
@@ -166,7 +192,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT PageCatId, CatagoryName FROM tblPageCatagory";
+                string commandText = "SELECT PageCatId,CatagoryName, CreateDate, CreateUserId, UpdateDate, UpdateUserId FROM tblPageCatagory";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -179,7 +205,11 @@ namespace Spider_EMT.Repository.Domain
                         {
                             PageCatId = (int)row["PageCatId"],
                             CategoryName = row["CatagoryName"].ToString(),
-                            PageId = 0
+                            PageId = 0,
+                            CreateDate = (DateTime)row["CreateDate"],
+                            CreateUserId = (int)row["CreateUserId"],
+                            UpdateDate = (DateTime)row["UpdateDate"],
+                            UpdateUserId = (int)row["UpdateUserId"],
                         };
                         pageCategories.Add(pageCategory);
                     }
@@ -201,7 +231,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "select u.*, tp.ProfileId,tp.ProfileName from tblUsers u INNER JOIN tblCurrentUser cu on u.UserId = cu.UserId INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId";
+                string commandText = $"select u.*, tp.ProfileId,tp.ProfileName from tblUsers u INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId WHERE u.UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -212,16 +242,27 @@ namespace Spider_EMT.Repository.Domain
                     profileUser = new ProfileUser
                     {
                         UserId = Convert.ToInt32(dataRow["UserId"]),
-                        IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                        IdNumber = dataRow["IdNumber"].ToString(),
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
-                        MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                        MobileNo = dataRow["MobileNo"].ToString(),
                         ProfileSiteData = new ProfileSite
                         {
                             ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                             ProfileName = dataRow["ProfileName"].ToString()
                         },
-                        UserStatus = dataRow["Status"].ToString(),
+                        Username = dataRow["Username"].ToString(),
+                        Userimgpath = dataRow["Userimgpath"].ToString(),
+                        PasswordHash = dataRow["PasswordHash"].ToString(),
+                        PasswordSalt = dataRow["PasswordSalt"].ToString(),
+                        IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
+                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
+                        ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
+                        LastLoginActivity = (DateTime)dataRow["LastLoginActivity"],
+                        CreateDate = (DateTime)dataRow["CreateDate"],
+                        UpdateDate = (DateTime)dataRow["UpdateDate"],
+                        CreateUserId = (int)dataRow["CreateUserId"],
+                        UpdateUserId = (int)dataRow["UpdateUserId"]
                     };
                 }
                 return profileUser;
@@ -241,7 +282,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT tp.* FROM tblProfile tp INNER JOIN tblUserProfile tbup on tp.ProfileId = tbup.ProfileId INNER JOIN tblCurrentUser tcu on tbup.UserId = tcu.UserId";
+                string commandText = $"SELECT tp.* FROM tblProfile tp INNER JOIN tblUserProfile tbup on tp.ProfileId = tbup.ProfileId WHERE tbup.UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -252,7 +293,12 @@ namespace Spider_EMT.Repository.Domain
                     {
                         profileSite = new ProfileSite
                         {
+                            ProfileId = (int)row["ProfileId"],
                             ProfileName = row["ProfileName"].ToString(),
+                            CreateDate = (DateTime)row["CreateDate"],
+                            CreateUserId = (int)row["CreateUserId"],
+                            UpdateDate = (DateTime)row["UpdateDate"],
+                            UpdateUserId = (int)row["UpdateUserId"],
                         };
                     }
                 }
@@ -273,7 +319,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT * FROM vwUserPageAccess";
+                string commandText = $"SELECT * FROM vwUserPageAccess where UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -285,7 +331,6 @@ namespace Spider_EMT.Repository.Domain
                         PageSite page = new PageSite
                         {
                             PageId = (int)row["PageId"],
-                            MenuImgPath = row["MenuImgPath"].ToString(),
                             PageDescription = row["PageDescription"].ToString(),
                             PageUrl = row["PageUrl"].ToString(),
                         };
@@ -322,9 +367,13 @@ namespace Spider_EMT.Repository.Domain
                         PageSite page = new PageSite
                         {
                             PageId = (int)row["PageId"],
-                            MenuImgPath = row["MenuImgPath"].ToString(),
                             PageDescription = row["PageDescription"].ToString(),
                             PageUrl = row["PageUrl"].ToString(),
+                            isSelected = false,
+                            CreateDate = (DateTime)row["CreateDate"],
+                            CreateUserId = (int)row["CreateUserId"],
+                            UpdateDate = (DateTime)row["UpdateDate"],
+                            UpdateUserId = (int)row["UpdateUserId"],
                         };
                         pages.Add(page);
                     }
@@ -346,7 +395,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT * FROM vwUserPagesData";
+                string commandText = $"SELECT * FROM vwUserPagesData where UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -362,7 +411,6 @@ namespace Spider_EMT.Repository.Domain
                             PageId = row["PageId"] != DBNull.Value ? (int)row["PageId"] : 0,
                             PageDescription = row["PageDescription"] != DBNull.Value ? row["PageDescription"].ToString() : string.Empty,
                             PageUrl = row["PageUrl"] != DBNull.Value ? row["PageUrl"].ToString() : string.Empty,
-                            MenuImgPath = row["MenuImgPath"] != DBNull.Value ? row["MenuImgPath"].ToString() : string.Empty
                         };
                         categoriesSet.Add(category);
                     }
@@ -389,7 +437,7 @@ namespace Spider_EMT.Repository.Domain
 
                 foreach (int pageId in pageList)
                 {
-                    string commandText = "SELECT DISTINCT tpc.PageCatId, tpc.CatagoryName from tblPageCatagory tpc INNER JOIN tblPage tp on tpc.PageCatId = tp.PageCatId WHERE tp.PageId = @PageId";
+                    string commandText = "SELECT DISTINCT tpc.PageCatId, tpc.CatagoryName, tpcm.CreateDate, tpcm.CreateUserId, tpcm.UpdateDate, tpcm.UpdateUserId from tblPageCatagory tpc INNER JOIN tblPageCategoryMap tpcm on tpc.PageCatId = tpcm.PageCatId INNER JOIN tblPage tp on tpcm.PageId = tp.PageId WHERE tp.PageId = = @PageId";
                     SqlParameter[] sqlParameter =
                     {
                         new SqlParameter("@PageId", SqlDbType.Int){Value = pageId}
@@ -403,7 +451,11 @@ namespace Spider_EMT.Repository.Domain
                             {
                                 CategoryName = row["CatagoryName"].ToString(),
                                 PageCatId = (int)row["PageCatId"],
-                                PageId = pageId
+                                PageId = pageId,
+                                CreateDate = (DateTime)row["CreateDate"],
+                                CreateUserId = (int)row["CreateUserId"],
+                                UpdateDate = (DateTime)row["UpdateDate"],
+                                UpdateUserId = (int)row["UpdateUserId"],
                             };
                             // Check if the page category already exists in the list
                             if (!pageCategories.Any(pc => pc.PageCatId == pageCategory.PageCatId))
@@ -430,7 +482,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT pro.ProfileId,ProfileName,usrpro.UserId from tblProfile pro INNER JOIN tblUserProfile usrpro on pro.ProfileId = usrpro.ProfileId INNER JOIN tblCurrentUser cur on usrpro.UserId = cur.UserId";
+                string commandText = $"SELECT pro.ProfileId,ProfileName,usrpro.UserId from tblProfile pro INNER JOIN tblUserProfile usrpro on pro.ProfileId = usrpro.ProfileId WHERE usrpro.UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -468,12 +520,21 @@ namespace Spider_EMT.Repository.Domain
                 // User Profile Creation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 20) { Value = userProfileData.IdNumber },
-                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userProfileData.FullName },
+                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 10) { Value = userProfileData.IdNumber },
+                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 200) { Value = userProfileData.FullName },
                     new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
                     new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
                     new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
-                    new SqlParameter("@NewUserStatus", SqlDbType.VarChar, 20) { Value = userProfileData.UserStatus },
+                    new SqlParameter("@NewUsername", SqlDbType.VarChar, 100) { Value = userProfileData.Username },
+                    new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = userProfileData.Userimgpath },
+                    new SqlParameter("@NewPasswordHash", SqlDbType.VarChar, 255) { Value = userProfileData.PasswordHash },
+                    new SqlParameter("@NewPasswordSalt", SqlDbType.VarChar, 255) { Value = userProfileData.PasswordSalt },
+                    new SqlParameter("@NewIsActive", SqlDbType.Bit) { Value = userProfileData.IsActive ? 1 : 0 },
+                    new SqlParameter("@NewIsActiveDirectoryUser", SqlDbType.Bit) { Value = userProfileData.IsActiveDirectoryUser ? 1 : 0  },
+                    new SqlParameter("@NewChangePassword", SqlDbType.Bit) { Value = userProfileData.ChangePassword ? 1 : 0 },
+                    new SqlParameter("@NewLastLoginActivity", SqlDbType.DateTime) { Value = userProfileData.LastLoginActivity.HasValue ? (object)userProfileData.LastLoginActivity.Value : DBNull.Value }, // Handle nullable DateTime
+                    new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = _currentUser.UserId },
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = _currentUser.UserId }
                 };
 
                 // Execute the command
@@ -520,7 +581,6 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
                     new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
                     new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
-                    new SqlParameter("@NewUserStatus", SqlDbType.VarChar, 20) { Value = userProfileData.UserStatus },
                 };
 
                 // Execute the command
@@ -575,13 +635,15 @@ namespace Spider_EMT.Repository.Domain
                         return false;
                     }
                     // User Profile Access Allotment
-                    foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
+                    foreach (PageSiteVM pageSite in profilePagesAccessDTO.PagesList)
                     {
                         sqlParameters = new SqlParameter[]
                         {
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
                         };
                         isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                         if (isFailure)
@@ -595,6 +657,8 @@ namespace Spider_EMT.Repository.Domain
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@NewProfileName", SqlDbType.VarChar,50){Value = profilePagesAccessDTO.ProfileData.ProfileName},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
                     };
                     // Execute the command
                     List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_AddNewProfile, CommandType.StoredProcedure, sqlParameters);
@@ -613,13 +677,15 @@ namespace Spider_EMT.Repository.Domain
                     }
 
                     // User Profile Access Allotment
-                    foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
+                    foreach (PageSiteVM pageSite in profilePagesAccessDTO.PagesList)
                     {
                         sqlParameters = new SqlParameter[]
                         {
-                        new SqlParameter("@NewProfileId", SqlDbType.Int){Value = UserIdentity},
-                        new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
-                        new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
+                            new SqlParameter("@NewProfileId", SqlDbType.Int){Value = UserIdentity},
+                            new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                            new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
+                            new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                            new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
                         };
                         isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                         if (isFailure)
@@ -657,13 +723,15 @@ namespace Spider_EMT.Repository.Domain
                     return false;
                 }
                 // User Profile Access Allotment
-                foreach (PageSite pageSite in profilePagesAccessDTO.PagesList)
+                foreach (PageSiteVM pageSite in profilePagesAccessDTO.PagesList)
                 {
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId}
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -703,8 +771,10 @@ namespace Spider_EMT.Repository.Domain
                             PageId = (int)row["PageId"],
                             PageUrl = row["PageUrl"].ToString(),
                             PageDescription = row["PageDescription"].ToString(),
-                            MenuImgPath = row["MenuImgPath"].ToString(),
-
+                            CreateDate = (DateTime)row["CreateDate"],
+                            CreateUserId = (int)row["CreateUserId"],
+                            UpdateDate = (DateTime)row["UpdateDate"],
+                            UpdateUserId = (int)row["UpdateUserId"],
                         };
                         pages.Add(pageSite);
                     }
@@ -732,7 +802,9 @@ namespace Spider_EMT.Repository.Domain
                 SqlParameter[] sqlParameters;
                 sqlParameters = new SqlParameter[]
                 {
-                    new SqlParameter("@NewCategoryName", SqlDbType.VarChar,50){Value = categoryPagesAccessDTO.PageCategoryData.CategoryName}
+                    new SqlParameter("@NewCategoryName", SqlDbType.VarChar,50){Value = categoryPagesAccessDTO.PageCategoryData.CategoryName},
+                    new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
                 };
 
                 // Creation of New Category
@@ -752,12 +824,12 @@ namespace Spider_EMT.Repository.Domain
                 }
 
                 // Deletion
-                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                foreach (PageSiteVM pageSite in categoryPagesAccessDTO.PagesList)
                 {
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@State", SqlDbType.VarChar, 2){Value = PageCategoryMapStates.PageIdOnly},
-                        new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId},
+                        new SqlParameter("@PageId", SqlDbType.Int){Value = pageSite.PageId}
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_DeletePageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -767,12 +839,14 @@ namespace Spider_EMT.Repository.Domain
                 }
 
                 // Insertion
-                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                foreach (PageSiteVM pageSite in categoryPagesAccessDTO.PagesList)
                 {
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -813,12 +887,14 @@ namespace Spider_EMT.Repository.Domain
                 }
 
                 // Insertion
-                foreach (PageSite pageSite in categoryPagesAccessDTO.PagesList)
+                foreach (PageSiteVM pageSite in categoryPagesAccessDTO.PagesList)
                 {
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId}
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -862,6 +938,8 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profileCategoryAccessDTO.ProfileSiteData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = DBNull.Value},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = _currentUser.UserId },
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = _currentUser.UserId }
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -881,7 +959,7 @@ namespace Spider_EMT.Repository.Domain
             return true;
         }
 
-        public async Task<List<ProfileUser>> SearchUserDetailsByCriteriaAsync(string criteriaText, string InputText)
+        public async Task<List<ProfileUserAPIVM>> SearchUserDetailsByCriteriaAsync(string criteriaText, string InputText)
         {
             try
             {
@@ -903,26 +981,29 @@ namespace Spider_EMT.Repository.Domain
                 };
 
                 DataTable dataTable = SqlDBHelper.ExecuteParameterizedSelectCommand(SP_SearchUserByTextCriteria, CommandType.StoredProcedure, sqlParameters);
-                List<ProfileUser> profileUserLst = new List<ProfileUser>();
+                List<ProfileUserAPIVM> profileUserLst = new List<ProfileUserAPIVM>();
                 if (dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow dataRow in dataTable.Rows)
                     {
-                        ProfileUser profileUser = new ProfileUser
+                        ProfileUserAPIVM profileUserAPIVM = new ProfileUserAPIVM
                         {
                             UserId = Convert.ToInt32(dataRow["UserId"]),
                             IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
                             MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
-                            ProfileSiteData = new ProfileSite
+                            ProfileSiteData = new ProfileSiteVM
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                                 ProfileName = dataRow["ProfileName"].ToString()
                             },
-                            UserStatus = dataRow["Status"].ToString(),
+                            Username = dataRow["Username"].ToString(),
+                            IsActive = dataRow["IsActive"] == "1"? true:false,
+                            IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] == "1" ? true : false,
+                            ChangePassword = dataRow["ChangePassword"] == "1" ? true : false,
                         };
-                        profileUserLst.Add(profileUser);
+                        profileUserLst.Add(profileUserAPIVM);
                     }
                 }
                 return profileUserLst;
@@ -967,7 +1048,7 @@ namespace Spider_EMT.Repository.Domain
             try
             {
                 UserSettings userSettings = new UserSettings();
-                string commandText = "SELECT tcu.UserId, tcu.Username, tcu.Userimgpath, tu.FullName, tu.Email from tblCurrentUser tcu INNER JOIN tblUsers tu on tcu.UserId = tu.UserId";
+                string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email from tblUsers tu where tu.UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 

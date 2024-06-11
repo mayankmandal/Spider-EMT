@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using Spider_EMT.Models.ValidationAttributes;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Spider_EMT.Models.ViewModels
 {
@@ -12,7 +13,7 @@ namespace Spider_EMT.Models.ViewModels
         [Required(ErrorMessage = "ID Number is required")]
         [DisplayName("Iqama Number")]
         [Range(1000000000, 9999999999, ErrorMessage = "ID Number must be a 10-digit integer")]
-        public string IdNumber { get; set; }
+        public long IdNumber { get; set; }
 
         [Required(ErrorMessage = "Full Name is required")]
         [DisplayName("Full Name")]
@@ -29,7 +30,7 @@ namespace Spider_EMT.Models.ViewModels
         [Required(ErrorMessage = "Mobile Number is required")]
         [DisplayName("Mobile Number")]
         [Range(1000000000, 9999999999, ErrorMessage = "Mobile Number must be a 10-digit integer")]
-        public string MobileNo { get; set; }
+        public long MobileNo { get; set; }
 
         [Required(ErrorMessage = "Profile Data is required")]
         public ProfileSiteVM ProfileSiteData { get; set; }
@@ -39,9 +40,10 @@ namespace Spider_EMT.Models.ViewModels
         [StringLength(255, ErrorMessage = "Username must be 255 characters or fewer")]
         public string Username { get; set; }
 
+        [Required(ErrorMessage = "Please upload a profile picture.")]
         [DisplayName("User Photo")]
         [MaxFileSize(20 * 1024, ErrorMessage = "Image size cannot exceed 20 KB")]
-        public IFormFile SettingPhotoFile { get; set; }
+        public IFormFile PhotoFile { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
         [DisplayName("Password")]
@@ -54,6 +56,7 @@ namespace Spider_EMT.Models.ViewModels
         [DisplayName("Is Active User")]
         public bool IsActive { get; set; }
 
+        [Required(ErrorMessage = "Is Active Directory User is required")]
         [DisplayName("Is Active Directory User")]
         public bool IsActiveDirectoryUser { get; set; }
 
@@ -61,12 +64,8 @@ namespace Spider_EMT.Models.ViewModels
         [DisplayName("Change Password")]
         public bool ChangePassword { get; set; }
 
-        [Required(ErrorMessage = "Create User ID is required")]
-        [DisplayName("Create User ID")]
         public int CreateUserId { get; set; }
 
-        [Required(ErrorMessage = "Update User ID is required")]
-        [DisplayName("Update User ID")]
         public int UpdateUserId { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace Spider_EMT.Repository.Skeleton
         Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
         Task<bool> UpdateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO);
-        Task<List<ProfileUser>> SearchUserDetailsByCriteriaAsync(string criteriaText, string inputText);
+        Task<List<ProfileUserAPIVM>> SearchUserDetailsByCriteriaAsync(string criteriaText, string inputText);
         Task<bool> DeleteEntityAsync(int deleteId, string deleteType);
         Task<UserSettings> GetSettingsDataAsync();
         Task<string> UpdateSettingsDataAsync(UserSettings userSettings);

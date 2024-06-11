@@ -16,9 +16,9 @@ namespace Spider_EMT.Pages
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
-        public List<ProfileSite>? AllProfilesData { get; set; }
+        public List<ProfileSiteVM>? AllProfilesData { get; set; }
         [BindProperty]
-        public List<PageSite>? AllPageSites { get; set; }
+        public List<PageSiteVM>? AllPageSites { get; set; }
         [BindProperty]
         public string? SelectedProfileId { get; set; }
         [BindProperty]
@@ -42,13 +42,13 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
-            AllProfilesData = JsonConvert.DeserializeObject<List<ProfileSite>>(response);
+            AllProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
         private async Task LoadAllPagesData()
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
-            AllPageSites = JsonConvert.DeserializeObject<List<PageSite>>(response);
+            AllPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
         }
         public async Task<JsonResult> OnPost()
         {

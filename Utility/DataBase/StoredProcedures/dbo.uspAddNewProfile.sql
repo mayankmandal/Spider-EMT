@@ -12,7 +12,9 @@ GO
 -- =============================================
 ALTER PROCEDURE [dbo].[uspAddNewProfile]
     -- Add the parameters for the stored procedure here
-    @NewProfileName VARCHAR(100)	
+    @NewProfileName VARCHAR(100),
+	@NewCreateUserId INT,
+	@NewUpdateUserId INT
 AS
 BEGIN
     
@@ -24,8 +26,8 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM [dbo].[tblProfile] WITH (NOLOCK) WHERE ProfileName = @NewProfileName)
 			BEGIN
 				-- Insert Profile
-				INSERT INTO [dbo].[tblProfile] (ProfileName)
-				VALUES (@NewProfileName)
+				INSERT INTO [dbo].[tblProfile] (ProfileName, CreateDate, CreateUserId, UpdateDate, UpdateUserId)
+				VALUES (@NewProfileName, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId)
 				-- Retrieve the newly generated ProfileId
 				SET @UserIdentity = SCOPE_IDENTITY(); -- Get the last inserted identity value
 			END

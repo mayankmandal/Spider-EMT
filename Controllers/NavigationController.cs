@@ -5,6 +5,7 @@ using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
+using Spider_EMT.Utility.PasswordHelper;
 
 namespace Spider_EMT.Controller
 {
@@ -79,8 +80,18 @@ namespace Spider_EMT.Controller
         {
             try
             {
+                List<ProfileSiteVM> profileSiteVMs = new List<ProfileSiteVM>();
                 var allProfilesData = await _navigationRepository.GetAllProfilesAsync();
-                return Ok(allProfilesData);
+                foreach(var profileSiteData in allProfilesData)
+                {
+                    ProfileSiteVM profileSite = new ProfileSiteVM
+                    {
+                        ProfileId = profileSiteData.ProfileId,
+                        ProfileName = profileSiteData.ProfileName,
+                    };
+                    profileSiteVMs.Add(profileSite);
+                }
+                return Ok(profileSiteVMs);
             }
             catch (Exception ex)
             {
@@ -95,8 +106,20 @@ namespace Spider_EMT.Controller
         {
             try
             {
+                List<PageSiteVM> pageSiteVMs = new List<PageSiteVM>();
                 var allPagesData = await _navigationRepository.GetAllPagesAsync();
-                return Ok(allPagesData);
+                foreach(var page in allPagesData)
+                {
+                    PageSiteVM pageSiteVM = new PageSiteVM
+                    {
+                        PageId = page.PageId,
+                        isSelected = page.isSelected,
+                        PageDescription = page.PageDescription,
+                        PageUrl = page.PageUrl
+                    };
+                    pageSiteVMs.Add(pageSiteVM);
+                }
+                return Ok(pageSiteVMs);
             }
             catch (Exception ex)
             {
@@ -111,8 +134,19 @@ namespace Spider_EMT.Controller
         {
             try
             {
+                List<PageCategoryVM> pageCategoryVMs = new List<PageCategoryVM>();
                 var allPageCategoryData = await _navigationRepository.GetAllCategoriesAsync();
-                return Ok(allPageCategoryData);
+                foreach(var pageCategoryData in allPageCategoryData)
+                {
+                    PageCategoryVM pageCategoryVM = new PageCategoryVM
+                    {
+                        CategoryName = pageCategoryData.CategoryName,
+                        PageCatId = pageCategoryData.PageCatId,
+                        PageId = pageCategoryData.PageId,
+                    };
+                    pageCategoryVMs.Add(pageCategoryVM);
+                }
+                return Ok(pageCategoryVMs);
             }
             catch (Exception ex)
             {
@@ -130,6 +164,7 @@ namespace Spider_EMT.Controller
                 if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
                 {
                     currentUserData = await _navigationRepository.GetCurrentUserAsync();
+                    currentUserData.UserImgPath = Path.Combine(_configuration["UserProfileImgPath"],currentUserData.UserImgPath);
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
                         AbsoluteExpiration = DateTime.Now.AddSeconds(10),
@@ -324,6 +359,7 @@ namespace Spider_EMT.Controller
                 }
 
                 await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO);
+
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
@@ -362,7 +398,7 @@ namespace Spider_EMT.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateUserProfile([FromBody] ProfileUser profileUsersData)
+        public async Task<IActionResult> CreateUserProfile([FromBody] ProfileUserAPIVM profileUsersData)
         {
             try
             {
@@ -370,8 +406,30 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
+                string salt = PasswordHelper.GenerateSalt();
+                string hashedPassword = PasswordHelper.HashPassword(profileUsersData.Password, salt);
+                ProfileUser profileUser = new ProfileUser
+                {
+                    IdNumber = profileUsersData.IdNumber.ToString(),
+                    FullName = profileUsersData.FullName,
+                    Email = profileUsersData.Email,
+                    Username = profileUsersData.Username,
+                    Userimgpath = profileUsersData.Userimgpath,
+                    MobileNo = profileUsersData.MobileNo.ToString(),
+                    UserId = 0,
+                    PasswordHash = hashedPassword,
+                    PasswordSalt = salt,
+                    ProfileSiteData = new ProfileSite
+                    {
+                        ProfileId = profileUsersData.ProfileSiteData.ProfileId,
+                    },
+                    IsActive = profileUsersData.IsActive,
+                    ChangePassword = profileUsersData.ChangePassword,
+                    IsActiveDirectoryUser = profileUsersData.IsActiveDirectoryUser,
+                };
 
-                await _navigationRepository.CreateUserProfileAsync(profileUsersData);
+                await _navigationRepository.CreateUserProfileAsync(profileUser);
+
                 return Ok();
             }
             catch (Exception ex)

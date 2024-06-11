@@ -19,15 +19,8 @@ namespace Spider_EMT.Pages
         }
         [BindProperty]
         public ProfileUserVM ProfileUsersData { get; set; }
-        public List<ProfileSite>? ProfilesData { get; set; }
-        [BindProperty]
-        public List<string>? UserStatusLst { get; set; }
-        public List<CheckBoxOption> Checkboxes = UserStatusDescription.StatusOptions.Select(option => new CheckBoxOption
-        {
-            IsChecked = false,
-            Text = option.Text,
-            Value = option.Value
-        }).ToList();
+        public string UserProfilePathUrl = string.Empty;
+        public List<ProfileSiteVM>? ProfilesData { get; set; }
         public async Task<IActionResult> OnGet()
         {
             try
@@ -44,7 +37,7 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
-            ProfilesData = JsonConvert.DeserializeObject<List<ProfileSite>>(response);
+            ProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
         public async Task<JsonResult> OnPost()
         {
