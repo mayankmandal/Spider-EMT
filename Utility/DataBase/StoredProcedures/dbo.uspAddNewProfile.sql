@@ -21,7 +21,7 @@ BEGIN
 
     BEGIN TRY
         -- Check is same name Profile already exists
-        IF NOT EXISTS (SELECT 1 FROM [dbo].[tblProfile] WHERE ProfileName = @NewProfileName)
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[tblProfile] WITH (NOLOCK) WHERE ProfileName = @NewProfileName)
 			BEGIN
 				-- Insert Profile
 				INSERT INTO [dbo].[tblProfile] (ProfileName)
