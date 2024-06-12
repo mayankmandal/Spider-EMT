@@ -22,36 +22,6 @@
         public const string SP_UpdateTransactionFees = "dbo.uspUpdateTransactionFees";
         public const string SP_UpdateUser = "dbo.uspUpdateUser";
         public const string SP_UpdateUserSettings = "dbo.uspUpdateUserSettings";
-
-        public static class UserStatusDescription
-        {
-            public class StatusOption
-            {
-                public string Text { get; set; }
-                public string Value { get; set; }
-                public StatusOption(string text, string value)
-                {
-                    Text = text;
-                    Value = value;
-                }
-            }
-
-            public static readonly StatusOption[] StatusOptions = new StatusOption[]
-            {
-                new StatusOption("IsActive", "AC"),
-                new StatusOption("IsActiveDirectoryUser", "AD"),
-                new StatusOption("ChangePassword", "CH")
-            };
-
-            public static List<string> GetStatusTextsFromCsv(string csv)
-            {
-                var values = csv.Split(',');
-                return values.Select(value => StatusOptions.FirstOrDefault(option => option.Value == value)?.Text)
-                        .Where(text => text != null)
-                        .Select(text => text!) // Using null-forgiving operator to indicate that nulls are already filtered out
-                        .ToList();
-            }
-        }
         
         public static class PageCategoryMapStates
         {

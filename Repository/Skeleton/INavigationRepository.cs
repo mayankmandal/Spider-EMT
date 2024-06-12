@@ -6,7 +6,7 @@ namespace Spider_EMT.Repository.Skeleton
     public interface INavigationRepository
     {
         Task<CurrentUser> GetCurrentUserAsync();
-        Task<List<ProfileUser>> GetAllUsersDataAsync();
+        Task<List<ProfileUserAPIVM>> GetAllUsersDataAsync();
         Task<List<ProfileSite>> GetAllProfilesAsync();
         Task<List<PageSite>> GetAllPagesAsync();
         Task<List<PageCategory>> GetAllCategoriesAsync();
@@ -18,7 +18,7 @@ namespace Spider_EMT.Repository.Skeleton
         Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList);
         Task<List<PageSite>> GetCategoryToPagesAsync(int categoryId);
         Task<bool> CreateUserProfileAsync(ProfileUser profileUsersData);
-        Task<bool> UpdateUserProfileAsync(ProfileUser profileUsersData);
+        Task<bool> UpdateUserProfileAsync(ProfileUserAPIVM profileUsersData);
         Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> CreateNewCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
         Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
@@ -26,7 +26,7 @@ namespace Spider_EMT.Repository.Skeleton
         Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO);
         Task<List<ProfileUserAPIVM>> SearchUserDetailsByCriteriaAsync(string criteriaText, string inputText);
         Task<bool> DeleteEntityAsync(int deleteId, string deleteType);
-        Task<UserSettings> GetSettingsDataAsync();
+        Task<ProfileUserAPIVM> GetSettingsDataAsync();
         Task<string> UpdateSettingsDataAsync(UserSettings userSettings);
     }
 }

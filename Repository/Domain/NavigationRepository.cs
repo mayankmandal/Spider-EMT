@@ -55,43 +55,36 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
-        public async Task<List<ProfileUser>> GetAllUsersDataAsync()
+        public async Task<List<ProfileUserAPIVM>> GetAllUsersDataAsync()
         {
             try
             {
-                string commandText = "select u.*, tp.ProfileId,tp.ProfileName from tblUsers u INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId";
+                string commandText = "select tp.ProfileId,tp.ProfileName, u.UserId, u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword from tblUsers u INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
-                List<ProfileUser> users = new List<ProfileUser>();
+                List<ProfileUserAPIVM> users = new List<ProfileUserAPIVM>();
                 if (dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow dataRow in dataTable.Rows)
                     {
-                        ProfileUser profileUser = new ProfileUser
+                        ProfileUserAPIVM profileUser = new ProfileUserAPIVM
                         {
                             UserId = Convert.ToInt32(dataRow["UserId"]),
-                            IdNumber = dataRow["IdNumber"].ToString(),
+                            IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
-                            MobileNo = dataRow["MobileNo"].ToString(),
-                            ProfileSiteData = new ProfileSite
+                            MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                            ProfileSiteData = new ProfileSiteVM
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                                 ProfileName = dataRow["ProfileName"].ToString()
                             },
                             Username = dataRow["Username"].ToString(),
                             Userimgpath = dataRow["Userimgpath"].ToString(),
-                            PasswordHash = dataRow["PasswordHash"].ToString(),
-                            PasswordSalt = dataRow["PasswordSalt"].ToString(),
                             IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
                             IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
                             ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
-                            LastLoginActivity = (DateTime)dataRow["LastLoginActivity"],
-                            CreateDate = (DateTime)dataRow["CreateDate"],
-                            UpdateDate = (DateTime)dataRow["UpdateDate"],
-                            CreateUserId = (int)dataRow["CreateUserId"],
-                            UpdateUserId = (int)dataRow["UpdateUserId"]
                         };
                         users.Add(profileUser);
                     }
@@ -563,7 +556,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> UpdateUserProfileAsync(ProfileUser userProfileData)
+        public async Task<bool> UpdateUserProfileAsync(ProfileUserAPIVM userProfileData)
         {
             try
             {
@@ -576,6 +569,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userProfileData.FullName },
                     new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
                     new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
+                    new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
                     new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
                 };
 
@@ -995,9 +989,10 @@ namespace Spider_EMT.Repository.Domain
                                 ProfileName = dataRow["ProfileName"].ToString()
                             },
                             Username = dataRow["Username"].ToString(),
-                            IsActive = dataRow["IsActive"] == "1"? true:false,
+                            IsActive = dataRow["IsActive"] == "1" ? true : false,
                             IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] == "1" ? true : false,
                             ChangePassword = dataRow["ChangePassword"] == "1" ? true : false,
+                            Userimgpath = dataRow["Userimgpath"].ToString()
                         };
                         profileUserLst.Add(profileUserAPIVM);
                     }
@@ -1039,11 +1034,11 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception($"Error deleting record for {deleteType}.", ex);
             }
         }
-        public async Task<UserSettings> GetSettingsDataAsync()
+        public async Task<ProfileUserAPIVM> GetSettingsDataAsync()
         {
             try
             {
-                UserSettings userSettings = new UserSettings();
+                ProfileUserAPIVM userSettings = new ProfileUserAPIVM();
                 string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email from tblUsers tu where tu.UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
@@ -1051,13 +1046,13 @@ namespace Spider_EMT.Repository.Domain
                 if (dataTable.Rows.Count > 0)
                 {
                     DataRow dataRow = dataTable.Rows[0];
-                    userSettings = new UserSettings
-                    {
+                    userSettings = new ProfileUserAPIVM
+                     {
                         UserId = dataRow["UserId"] != DBNull.Value ? (int)dataRow["UserId"] : 0,
                         FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
-                        EmailAddress = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
                         Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
-                        ProfilePhotoPath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
                     };
                 }
                 return userSettings;

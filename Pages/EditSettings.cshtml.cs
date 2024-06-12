@@ -39,7 +39,7 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetSettingsData");
-            var userSettings = JsonConvert.DeserializeObject<UserSettings>(response);
+            var userSettings = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
 
             if (!string.IsNullOrEmpty(userSettings.Username))
             {
@@ -49,10 +49,10 @@ namespace Spider_EMT.Pages
                     SettingId = userSettings.UserId,
                     SettingName = userSettings.FullName,
                     SettingUsername = userSettings.Username,
-                    SettingEmail = userSettings.EmailAddress,
+                    SettingEmail = userSettings.Email,
                     SettingPhotoFile = null,
                 };
-                UserProfilePathUrl = _configuration["UserProfileImgPath"] + userSettings.ProfilePhotoPath;
+                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"],userSettings.Userimgpath);
             };
         }
 

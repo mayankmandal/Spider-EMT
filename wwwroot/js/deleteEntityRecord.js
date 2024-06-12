@@ -1,20 +1,5 @@
 ﻿var apiResultData = []; // Global variable to store the result set
 
-function mapUserStatus(status) {
-    const statusMap = {
-        'AC': 'IsActive',
-        'AD': 'IsActiveDirectoryUser',
-        'CH': 'ChangePassword'
-    }
-
-    // Split the status string by comma and map each individually
-    const statusArray = status.split(',');
-    const mappedStatusArray = statusArray.map(s => statusMap[s.trim()] || s.trim());
-
-    // Join the mapped statuses back into a string 
-    return mappedStatusArray;
-}
-
 function handleResultItemClick(resultItem) {
     resultItem = $(resultItem);
 
@@ -58,24 +43,7 @@ function displaySelectedItemDetails(item, entityType) {
                 <input type="text" id="profileSelect" class="form-control" value="${item.profileSiteData.profileName}" readonly>
             </div>
             <input type="hidden" id="profileIdHidden" value="${item.profileSiteData.profileId}" readonly>
-            <div id="userStatusCheckboxes" class="mb-3" style="display: flex; justify-content: flex-start; align-items: center;  column-gap:2rem">
-                <label for="ProfileUsersData_UserStatus" class="form-label" style="margin-right: 10px;">User Status</label>
-            </div>
         `);
-
-        var userStatus = mapUserStatus(item.userStatus);
-
-        // Generate checkboxes for each user status value
-        var userStatusCheckboxes = $('#userStatusCheckboxes');
-        userStatus.forEach(status => {
-            var checkbox = `
-            <div>
-                <input class="form-check-input" type="checkbox" disabled checked>
-                <label class="fw-normal">${status}</label>
-            </div>
-            `;
-            userStatusCheckboxes.append(checkbox);
-        });
     } else if (entityType === "Category") {
         detailsForm.html(`
         <div class="mb-3">
@@ -112,6 +80,8 @@ $(document).ready(function () {
             apiUrl = '/api/Navigation/GetAllProfiles';
         } else if (searchCriteria === "User") {
             apiUrl = '/api/Navigation/GetAllUsers';
+        } else {
+            return;
         }
 
         $.ajax({
@@ -140,7 +110,6 @@ $(document).ready(function () {
 
                         var itemDetails = '';
                         if (searchCriteria === "User") {
-                            var userStatus = mapUserStatus(item.userStatus);
                             itemDetails = `
                             <p>User ID: ${item.userId}</p>
                                 <p>Id Number: ${item.idNumber}</p>
@@ -148,7 +117,7 @@ $(document).ready(function () {
                                 <p>Email Address: ${item.email}</p>
                                 <p>Mobile Number: ${item.mobileNo}</p>
                                 <p>Profile Name: ${item.profileSiteData.profileName}</p>
-                                <p>User Status: ${userStatus.join(', ')}</p>
+                                <p>User Name: ${item.username}</p>
                             `;
                         } else if (searchCriteria === "Category") {
                             itemDetails = `

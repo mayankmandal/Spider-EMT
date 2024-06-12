@@ -65,6 +65,10 @@ namespace Spider_EMT.Controller
             try
             {
                 var allUsersData = await _navigationRepository.GetAllUsersDataAsync();
+                foreach(var profileUserAPIVM in allUsersData)
+                {
+                    profileUserAPIVM.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], profileUserAPIVM.Userimgpath);
+                }
                 return Ok(allUsersData);
             }
             catch (Exception ex)
@@ -443,16 +447,16 @@ namespace Spider_EMT.Controller
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] ProfileUser profileUsersData)
+        public async Task<IActionResult> UpdateUserProfile([FromBody] ProfileUserAPIVM profileUserAPIVM)
         {
             try
             {
-                if (profileUsersData == null)
+                if (profileUserAPIVM == null)
                 {
                     return BadRequest();
                 }
 
-                await _navigationRepository.UpdateUserProfileAsync(profileUsersData);
+                await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM);
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
@@ -555,7 +559,7 @@ namespace Spider_EMT.Controller
         }
 
         [HttpGet("SearchUserDetails")]
-        [ProducesResponseType(typeof(IEnumerable<ProfileUser>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<ProfileUserAPIVM>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SearchUserDetails(string criteria, string input)
@@ -568,6 +572,10 @@ namespace Spider_EMT.Controller
                 }
 
                 var profileUsers = await _navigationRepository.SearchUserDetailsByCriteriaAsync(criteria, input);
+                foreach(var userAPIVM in profileUsers)
+                {
+                    userAPIVM.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], userAPIVM.Userimgpath);
+                }
                 return Ok(profileUsers);
             }
             catch (Exception ex)
@@ -599,14 +607,14 @@ namespace Spider_EMT.Controller
         }
 
         [HttpGet("GetSettingsData")]
-        [ProducesResponseType(typeof(UserSettings), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProfileUserAPIVM), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetSettingsData()
         {
             try
             {
-                UserSettings userSettings = await _navigationRepository.GetSettingsDataAsync();
-                return Ok(userSettings);
+                ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetSettingsDataAsync();
+                return Ok(profileUserAPIVM);
             }
             catch (Exception ex)
             {

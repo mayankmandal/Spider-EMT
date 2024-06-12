@@ -95,6 +95,21 @@
                             <span asp-validation-for="SettingsData.SettingEmail" class="text-danger fw-bold"></span>
                         </div>
 
+                        <!-- Username and Password on one line -->
+                        <div class="mb-3">
+                            <label asp-for="SettingsData.Password" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                </div>
+                                <input type="password" asp-for="SettingsData.Password" placeholder="Password" class="form-control" />
+                                <button class="btn btn-secondary" type="button" id="togglePasswordVisibility">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="SettingsData.Password" class="text-danger fw-bold"></span>
+                        </div>
+
                         <div style="display: flex; justify-content:space-around;height:auto;">
                             <div class="row">
                                 <div class="col-2"></div>

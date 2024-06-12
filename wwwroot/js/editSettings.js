@@ -1,4 +1,16 @@
 ﻿$(document).ready(function () {
+    $('#togglePasswordVisibility').click(function () {
+        var passwordField = $('#Settings_Password');
+        var passwordFieldType = passwordField.attr('type');
+
+        if (passwordFieldType === 'password') {
+            passwordField.attr('type', 'text');
+            $('#togglePasswordVisibility i').removeClass('fa-eye-slash').addClass('fa-eye');
+        } else {
+            passwordField.attr('type', 'password');
+            $('#togglePasswordVisibility i').removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
 
     $('#profile-img-file-input').change(function () {
         // Get the selected file
