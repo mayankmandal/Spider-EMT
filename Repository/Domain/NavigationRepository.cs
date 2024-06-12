@@ -227,7 +227,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Get All the Page Categories.", ex);
             }
         }
-        public async Task<ProfileUser> GetCurrentUserDetailsAsync()
+        public async Task<ProfileUserAPIVM> GetCurrentUserDetailsAsync()
         {
             try
             {
@@ -235,32 +235,27 @@ namespace Spider_EMT.Repository.Domain
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
-                ProfileUser profileUser = new ProfileUser();
+                ProfileUserAPIVM profileUser = new ProfileUserAPIVM();
                 if (dataTable.Rows.Count > 0)
                 {
                     DataRow dataRow = dataTable.Rows[0];
-                    profileUser = new ProfileUser
+                    profileUser = new ProfileUserAPIVM
                     {
                         UserId = Convert.ToInt32(dataRow["UserId"]),
-                        IdNumber = dataRow["IdNumber"].ToString(),
+                        IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
-                        MobileNo = dataRow["MobileNo"].ToString(),
-                        ProfileSiteData = new ProfileSite
+                        MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                        ProfileSiteData = new ProfileSiteVM
                         {
                             ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                             ProfileName = dataRow["ProfileName"].ToString()
                         },
                         Username = dataRow["Username"].ToString(),
                         Userimgpath = dataRow["Userimgpath"].ToString(),
-                        PasswordHash = dataRow["PasswordHash"].ToString(),
-                        PasswordSalt = dataRow["PasswordSalt"].ToString(),
                         IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
                         IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
                         ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
-                        LastLoginActivity = (DateTime)dataRow["LastLoginActivity"],
-                        CreateDate = (DateTime)dataRow["CreateDate"],
-                        UpdateDate = (DateTime)dataRow["UpdateDate"],
                         CreateUserId = (int)dataRow["CreateUserId"],
                         UpdateUserId = (int)dataRow["UpdateUserId"]
                     };
@@ -315,7 +310,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
-        public async Task<List<PageSite>> GetCurrentUserPagesAsync()
+        public async Task<List<PageSiteVM>> GetCurrentUserPagesAsync()
         {
             try
             {
@@ -323,16 +318,17 @@ namespace Spider_EMT.Repository.Domain
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
-                List<PageSite> pages = new List<PageSite>();
+                List<PageSiteVM> pages = new List<PageSiteVM>();
                 if (dataTable.Rows.Count > 0)
                 {
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        PageSite page = new PageSite
+                        PageSiteVM page = new PageSiteVM
                         {
                             PageId = (int)row["PageId"],
                             PageDescription = row["PageDescription"].ToString(),
                             PageUrl = row["PageUrl"].ToString(),
+                            isSelected = true
                         };
                         pages.Add(page);
                     }

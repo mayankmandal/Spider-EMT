@@ -31,6 +31,21 @@
                     </div>
                     <div class="card-body" style="font-size:1rem;">
 
+                        <!-- Profile Picture Field -->
+                        <div class="text-center">
+                            <div class="position-relative d-inline-block mx-auto mb-4">
+                                <img src="@Model.CurrentUserDetailsData.Userimgpath" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px;" id="loadedProfilePicture">
+                                <div class="position-absolute bottom-0 end-0 rounded-circle bg-light p-1" style="transform: translate(20%, 20%);">
+                                    <label for="profile-img-file-input" class="rounded-circle bg-gradient-gray p-2" style="cursor: pointer; width: 40px; height: 40px;">
+                                        <i class="ion ion-android-camera" style="font-size: 1.5rem;"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            <h5 class="fs-16 mb-1">@Model.CurrentUserDetailsData.FullName</h5>
+                            <p class="text-muted mb-0">@Model.CurrentUserDetailsData.Email (@Model.CurrentUserDetailsData.Username)</p>
+                            <span asp-validation-for="@Model.CurrentUserDetailsData.Userimgpath" class="text-danger fw-bold"></span>
+                        </div>
+
                         <!-- User ID and ID Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1; margin-right: 10px;">
@@ -89,6 +104,18 @@
                             </div>
                         </div>
 
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label asp-for="CurrentUserDetailsData.Username" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
+                                </div>
+                                <input type="text" asp-for="CurrentUserDetailsData.Username" placeholder="Username" class="form-control" disabled />
+                            </div>
+                            <span asp-validation-for="CurrentUserDetailsData.Username" class="text-danger fw-bold"></span>
+                        </div>
+
                         <!-- Dropdown to Select Profile Name -->
                         <div class="mb-3">
                             <label asp-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="form-label"></label>
@@ -101,6 +128,35 @@
                             <span asp-validation-for="CurrentUserDetailsData.ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
                         </div>
 
+                        <!-- Is Active -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="CurrentUserDetailsData.IsActive" id="isActiveCheckbox" disabled />
+                                <label class="form-check-label" for="isActiveCheckbox">
+                                    Active User
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Is Active Directory User -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="CurrentUserDetailsData.IsActiveDirectoryUser" id="isActiveDirectoryUserCheckbox" disabled />
+                                <label class="form-check-label" for="isActiveDirectoryUserCheckbox">
+                                    Active Directory User
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Change Password -->
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" asp-for="CurrentUserDetailsData.ChangePassword" id="changePasswordCheckbox" disabled />
+                                <label class="form-check-label" for="changePasswordCheckbox">
+                                    Change Password
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

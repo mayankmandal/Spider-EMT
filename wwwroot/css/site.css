@@ -84,3 +84,8 @@ body {
     padding-right:0;
     padding-left:0;
 }
+
+.draggable {
+    position: absolute;
+    cursor: move;
+}

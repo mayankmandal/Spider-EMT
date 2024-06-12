@@ -1,8 +1,8 @@
 ﻿@page
-@model Spider_EMT.Pages.IndexModel
+@model Spider_EMT.Pages.OtherBankATMTopPerformanceModel
 @{
     ViewData["Title"] = "Transaction Overview";
-    TempData["NavigationalPageName"] = "Dashboard";
+    TempData["NavigationalPageName"] = "Other Bank ATM Top Performance";
 }
 
 <div class="container mt-2 mb-2 border rounded" style="align-content:center">
@@ -197,9 +197,6 @@
     </div>
 </div>
 
-
-
-
 <!-- Loading Spinner -->
 <div id="loadingOverlay">
     <div class="loading-spinner">
@@ -267,12 +264,12 @@
     </div>
 </div>
 
-<link href="~/css/index.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/otherBankATMTopPerformance.css" rel="stylesheet" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/index.js" asp-append-version="true"></script>
+    <script src="~/js/otherBankATMTopPerformance.js" asp-append-version="true"></script>
     <script src="~/js/sorting.js" asp-append-version="true"></script>
     <script src="~/js/pagination.js" asp-append-version="true"></script>
     <script src="~/js/terminaldetails.js" asp-append-version="true"></script>

@@ -7,7 +7,11 @@ using Spider_EMT.Repository.Skeleton;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages()
+    .AddRazorPagesOptions(options =>
+    {
+        options.Conventions.AddPageRoute("/Dashboard","");
+    });
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
 builder.Services.AddLazyCache();
@@ -25,7 +29,6 @@ builder.Services.AddTransient<ISiteSelectionRepository>(provider =>
 });
 
 builder.Services.AddTransient<INavigationRepository, NavigationRepository>();
-
 
 var app = builder.Build();
 

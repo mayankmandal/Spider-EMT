@@ -79,9 +79,9 @@
 }
 
 .loading-spinner img {
-    width: 160px; /* Adjust width */
-    height: 160px; /* Adjust height */
-    border-radius: 47%; /* Make image circular */
+    width: 120px; /* Adjust width */
+    height: 120px; /* Adjust height */
+    border-radius: 50%; /* Make image circular */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow effect */
 }
 

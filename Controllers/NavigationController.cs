@@ -183,13 +183,14 @@ namespace Spider_EMT.Controller
         }
 
         [HttpGet("GetCurrentUserDetails")]
-        [ProducesResponseType(typeof(ProfileUser), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProfileUserAPIVM), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUserDetails()
         {
             try
             {
                 var currentUserDetails = await _navigationRepository.GetCurrentUserDetailsAsync();
+                currentUserDetails.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], currentUserDetails.Userimgpath);
                 return Ok(currentUserDetails);
             }
             catch (Exception ex)
@@ -227,13 +228,13 @@ namespace Spider_EMT.Controller
         }
 
         [HttpGet("GetCurrentUserPages")]
-        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PageSiteVM>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUserPages()
         {
             try
             {
-                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out List<PageSite> pageSites))
+                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out List<PageSiteVM> pageSites))
                 {
                     pageSites = await _navigationRepository.GetCurrentUserPagesAsync();
 

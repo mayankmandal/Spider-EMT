@@ -5,11 +5,11 @@ using Spider_EMT.Models.ViewModels;
 
 namespace Spider_EMT.Pages
 {
-    public class IndexModel : PageModel
+    public class OtherBankATMTopPerformanceModel : PageModel
     {
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        public IndexModel(IConfiguration configuration, IHttpClientFactory clientFactory)
+        public OtherBankATMTopPerformanceModel(IConfiguration configuration, IHttpClientFactory clientFactory)
         {
             _configuration = configuration;
             _clientFactory = clientFactory;

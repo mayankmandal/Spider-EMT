@@ -10,9 +10,9 @@ namespace Spider_EMT.Repository.Skeleton
         Task<List<ProfileSite>> GetAllProfilesAsync();
         Task<List<PageSite>> GetAllPagesAsync();
         Task<List<PageCategory>> GetAllCategoriesAsync();
-        Task<ProfileUser> GetCurrentUserDetailsAsync();
+        Task<ProfileUserAPIVM> GetCurrentUserDetailsAsync();
         Task<ProfileSite> GetCurrentUserProfileAsync();
-        Task<List<PageSite>> GetCurrentUserPagesAsync();
+        Task<List<PageSiteVM>> GetCurrentUserPagesAsync();
         Task<List<PageSite>> GetProfilePageDataAsync(string profileId);
         Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync();
         Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList);
