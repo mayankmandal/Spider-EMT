@@ -1,14 +1,25 @@
 ﻿$(document).ready(function () {
-    $('#togglePasswordVisibility').click(function () {
-        var passwordField = $('#Settings_Password');
-        var passwordFieldType = passwordField.attr('type');
-
-        if (passwordFieldType === 'password') {
-            passwordField.attr('type', 'text');
-            $('#togglePasswordVisibility i').removeClass('fa-eye-slash').addClass('fa-eye');
+    $('#togglePasswordVisibility').on('click', function () {
+        let passwordInput = $('input[name="SettingsData_Password"]');
+        let icon = $(this).find('i');
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
         } else {
-            passwordField.attr('type', 'password');
-            $('#togglePasswordVisibility i').removeClass('fa-eye').addClass('fa-eye-slash');
+            passwordInput.attr('type', 'password');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
+
+    $('#toggleReTypePasswordVisibility').on('click', function () {
+        let reTypePasswordInput = $('input[name="SettingsData_ReTypePassword"]');
+        let icon = $(this).find('i');
+        if (reTypePasswordInput.attr('type') === 'password') {
+            reTypePasswordInput.attr('type', 'text');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        } else {
+            reTypePasswordInput.attr('type', 'password');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
         }
     });
 

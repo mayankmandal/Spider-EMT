@@ -556,42 +556,75 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> UpdateUserProfileAsync(ProfileUserAPIVM userProfileData)
+        public async Task<string> UpdateUserProfileAsync(ProfileUserAPIVM userProfileData)
         {
             try
             {
                 int NumberOfRowsAffected = 0;
+
+                ProfileUserAPIVM profileUserExisting = new ProfileUserAPIVM();
+                string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword, u.ProfileId from tblUsers u WHERE u.UserId = {_currentUser.UserId}";
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+                
+                if(dataTable.Rows.Count > 0)
+                {
+                    DataRow dataRow = dataTable.Rows[0];
+                    profileUserExisting = new ProfileUserAPIVM
+                    {
+                        IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                        FullName = dataRow["FullName"].ToString(),
+                        Email = dataRow["Email"].ToString(),
+                        MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                        ProfileSiteData = new ProfileSiteVM
+                        {
+                            ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
+                        },
+                        Username = dataRow["Username"].ToString(),
+                        Userimgpath = dataRow["Userimgpath"].ToString(),
+                        IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
+                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
+                        ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
+                        
+                    };
+                }
+                
                 // User Profile Updation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {
                     new SqlParameter("@UserId", SqlDbType.Int) { Value = userProfileData.UserId },
-                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 20) { Value = userProfileData.IdNumber },
-                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userProfileData.FullName },
-                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email },
-                    new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo },
-                    new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
-                    new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId },
+                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 10) { Value = userProfileData.IdNumber == profileUserExisting.IdNumber ? DBNull.Value: userProfileData.IdNumber },
+                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 200) { Value = userProfileData.FullName == profileUserExisting.FullName ? DBNull.Value: userProfileData.FullName},
+                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userProfileData.Email == profileUserExisting.Email ? DBNull.Value : userProfileData.Email },
+                    new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = userProfileData.MobileNo == profileUserExisting.MobileNo ? DBNull.Value : userProfileData.MobileNo  },
+                    new SqlParameter("@NewProfileId", SqlDbType.Int) { Value = userProfileData.ProfileSiteData.ProfileId == profileUserExisting.ProfileSiteData.ProfileId ? DBNull.Value : userProfileData.ProfileSiteData.ProfileId },
+                    new SqlParameter("@NewUsername", SqlDbType.VarChar, 100) { Value = userProfileData.Username == profileUserExisting.Username ? DBNull.Value : userProfileData.Username },
+                    new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = userProfileData.Userimgpath == profileUserExisting.Userimgpath ? DBNull.Value : userProfileData.Userimgpath  },
+                    new SqlParameter("@NewIsActive", SqlDbType.Bit) { Value = userProfileData.IsActive == profileUserExisting.IsActive ? DBNull.Value : userProfileData.IsActive },
+                    new SqlParameter("@NewIsActiveDirectoryUser", SqlDbType.Bit) { Value = userProfileData.IsActiveDirectoryUser == profileUserExisting.IsActiveDirectoryUser ? DBNull.Value : userProfileData.IsActiveDirectoryUser },
+                    new SqlParameter("@NewChangePassword", SqlDbType.Bit) { Value = userProfileData.ChangePassword == profileUserExisting.ChangePassword ? DBNull.Value : userProfileData.ChangePassword },
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int){ Value = _currentUser.UserId }
                 };
 
                 // Execute the command
                 List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_UpdateUser, CommandType.StoredProcedure, sqlParameters);
                 if (tables.Count > 0)
                 {
-                    DataTable dataTable = tables[0];
+                    dataTable = tables[0];
                     if (dataTable.Rows.Count > 0)
                     {
                         DataRow dataRow = dataTable.Rows[0];
                         NumberOfRowsAffected = (int)dataRow["RowsAffected"];
                         if (NumberOfRowsAffected < 0)
                         {
-                            return false;
+                            return MagicString;
                         }
                     }
                     else
                     {
-                        return false;
+                        return MagicString;
                     }
                 }
+                return profileUserExisting.Userimgpath;
             }
             catch (SqlException sqlEx)
             {
@@ -601,7 +634,6 @@ namespace Spider_EMT.Repository.Domain
             {
                 throw new Exception("Error while adding User Profile.", ex);
             }
-            return true;
         }
         public async Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO)
         {
@@ -1068,21 +1100,23 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Categories.", ex);
             }
         }
-        public async Task<string> UpdateSettingsDataAsync(UserSettings userSettings)
+        public async Task<string> UpdateSettingsDataAsync(ProfileUser userSettings)
         {
             try
             {
                 int NumberOfRowsAffectedUsers = 0;
-                int NumberOfRowsAffectedCurrentUser = 0;
                 string PreviousProfilePhotoPath = MagicString;
                 // User Profile Updation
                 SqlParameter[] sqlParameters = new SqlParameter[]
                 {
                     new SqlParameter("@UserId", SqlDbType.Int) { Value = userSettings.UserId },
-                    new SqlParameter("@NewUsername", SqlDbType.VarChar, 20) { Value = userSettings.Username },
+                    new SqlParameter("@NewUsername", SqlDbType.VarChar, 100) { Value = userSettings.Username },
                     new SqlParameter("@NewFullName", SqlDbType.VarChar, 100) { Value = userSettings.FullName },
-                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userSettings.EmailAddress },
-                    new SqlParameter("@NewProfilePhotoPath", SqlDbType.VarChar, 200) { Value = userSettings.ProfilePhotoPath }
+                    new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = userSettings.Email },
+                    new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = userSettings.Userimgpath },
+                    new SqlParameter("@NewPasswordHash", SqlDbType.VarChar, 255) { Value = userSettings.PasswordHash },
+                    new SqlParameter("@NewPasswordSalt", SqlDbType.VarChar, 255) { Value = userSettings.PasswordSalt },
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.VarChar, 255) { Value = _currentUser.UserId }
                 };
 
                 // Execute the command
@@ -1099,10 +1133,6 @@ namespace Spider_EMT.Repository.Domain
                                 NumberOfRowsAffectedUsers = (int)dataRow["RowsAffectedUsers"];
                             }
 
-                            if (dataTable.Columns.Contains("RowsAffectedCurrentUser"))
-                            {
-                                NumberOfRowsAffectedCurrentUser = (int)dataRow["RowsAffectedCurrentUser"];
-                            }
 
                             if (dataTable.Columns.Contains("OldProfilePhotoPath"))
                             {
@@ -1111,7 +1141,7 @@ namespace Spider_EMT.Repository.Domain
                         }
                     }
 
-                    if (NumberOfRowsAffectedUsers > 0 && NumberOfRowsAffectedCurrentUser > 0)
+                    if (NumberOfRowsAffectedUsers > 0)
                     {
                         if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
                         {

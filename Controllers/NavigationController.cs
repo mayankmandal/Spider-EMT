@@ -6,6 +6,7 @@ using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
 using Spider_EMT.Utility.PasswordHelper;
+using System.Text.RegularExpressions;
 
 namespace Spider_EMT.Controller
 {
@@ -18,6 +19,7 @@ namespace Spider_EMT.Controller
         private ICacheProvider _cacheProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
+        private readonly string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$";
         #endregion
 
         #region Constructor
@@ -411,6 +413,13 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
+
+                // Validate the password
+                if (!string.IsNullOrEmpty(profileUsersData.Password) && !Regex.IsMatch(profileUsersData.Password, passwordPattern))
+                {
+                    return BadRequest("Password must be between 8 and 16 characters, and must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+                }
+
                 string salt = PasswordHelper.GenerateSalt();
                 string hashedPassword = PasswordHelper.HashPassword(profileUsersData.Password, salt);
                 ProfileUser profileUser = new ProfileUser
@@ -456,10 +465,19 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM);
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM);
+
+                // Remove the cached item to force a refresh next time
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+
+                if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                {
+                    string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
+                    bool isSucess = await DeleteFileAsync(oldFilePath);
+                    return Ok(isSucess);
+                }
                 return Ok();
             }
             catch (Exception ex)
@@ -623,20 +641,45 @@ namespace Spider_EMT.Controller
         }
 
         [HttpPost("UpdateSettingsData")]
-        [ProducesResponseType(typeof(UserSettings), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(SettingsAPIVM), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateSettingsData(UserSettings userSettings)
+        public async Task<IActionResult> UpdateSettingsData(SettingsAPIVM userSettings)
         {
             try
             {
-                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(userSettings);
+                // Validate the password
+                if (!string.IsNullOrEmpty(userSettings.SettingsPassword) && (!Regex.IsMatch(userSettings.SettingsPassword, passwordPattern) || userSettings.SettingsPassword != userSettings.SettingsReTypePassword))
+                {
+                    return BadRequest("Password must be between 8 and 16 characters, and must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Also, both passwords must match.");
+                }
+                
+                string salt = null;
+                string hashedPassword = null;
+                if(!string.IsNullOrEmpty(userSettings.SettingsPassword) || !string.IsNullOrEmpty(userSettings.SettingsReTypePassword))
+                {
+                    salt = PasswordHelper.GenerateSalt();
+                    hashedPassword = PasswordHelper.HashPassword(userSettings.SettingsPassword, salt);
+                }
+
+                ProfileUser profileUser = new ProfileUser
+                {
+                    FullName = userSettings.Name,
+                    Email = userSettings.Email,
+                    Username = userSettings.Username,
+                    Userimgpath = userSettings.PhotoFile,
+                    UserId = userSettings.Id,
+                    PasswordHash = hashedPassword == null ? "" : hashedPassword,
+                    PasswordSalt = salt == null ? "" : salt
+                };
+
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(profileUser);
 
                 // Remove the cached item to force a refresh next time
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
 
                 if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
                 {
-                    string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "images\\profiles_picture", PreviousProfilePhotoPath);
+                    string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
                     bool isSucess = await DeleteFileAsync(oldFilePath);
                     return Ok(isSucess);
                 }

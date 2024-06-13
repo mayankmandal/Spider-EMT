@@ -177,35 +177,40 @@
                     </div>
 
                     <div class="card-body" style="font-size:1rem;">
-                        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="categoriesAccordion">
-                            <!-- Populate categories here -->
-                            @foreach (var catagoryData in Model.StructureData)
-                            {
-                                <li class="nav-item" id="category-@categoryCount">
-                                    <a href="#" class="nav-link">
-                                        <i class="fas fa-atom nav-icon"></i>
-                                        <p>
-                                            @catagoryData.CatagoryName
-                                            <i class="right fas fa-angle-left"></i>
-                                        </p>
-                                    </a>
-                                    <ul class="nav nav-treeview ms-2" style="border-left: 1px ridge #DDDFBF;">
-                                        @foreach (var pageSite in catagoryData.Pages)
+                        <nav class="mt-2">
+                            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" id="categoriesAccordion">
+                                <li class="nav-item menu-open">
+                                    <ul class="nav nav-treeview">
+                                        <!-- Populate categories here -->
+                                        @foreach (var catagoryData in Model.StructureData)
                                         {
-                                            <li class="nav-item">
-                                                <a href="@pageSite.PageUrl" class="nav-link">
-                                                    <i class="far ion-paper-airplane nav-icon"></i>
-                                                    <p>@pageSite.PageDescription</p>
+                                            <li class="nav-item" id="category-@categoryCount">
+                                                <a href="#" class="nav-link" target="_self">
+                                                    <i class="fas fa-atom nav-icon"></i>
+                                                    <p>
+                                                        @catagoryData.CatagoryName
+                                                        <i class="fas fa-angle-left right"></i>
+                                                    </p>
                                                 </a>
+                                                <ul class="nav nav-treeview ms-2" style="border-left: 1px ridge #DDDFBF;">
+                                                    @foreach (var pageSite in catagoryData.Pages)
+                                                    {
+                                                        <li class="nav-item">
+                                                            <a href="@pageSite.PageUrl" class="nav-link" target="_self">
+                                                                <i class="far ion-android-open nav-icon"></i>
+                                                                <p>@pageSite.PageDescription</p>
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
                                             </li>
+                                            categoryCount++;
                                         }
                                     </ul>
                                 </li>
-                                categoryCount++;
-                            }
-                        </ul>
+                            </ul>
+                        </nav>
                     </div>
-
                 </div>
 
                 <hr />

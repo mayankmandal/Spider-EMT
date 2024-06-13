@@ -114,7 +114,7 @@ function populateSidebarforCategories(categories) {
         link.className = 'nav-link';
         link.target = '_self';
         link.innerHTML = `
-                <i class="far ion-merge nav-icon"></i>
+                <i class="fas fa-atom nav-icon"></i>
                 <p>${category.catagoryName}<i class="fas fa-angle-left right"></i></p>
             `;
 

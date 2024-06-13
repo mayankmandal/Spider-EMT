@@ -99,10 +99,7 @@
                         <!-- Profile Picture Field -->
                         <div class="text-center">
                             <div class="position-relative d-inline-block mx-auto mb-4">
-                                @if (Model.UserProfilePathUrl != null)
-                                {
-                                    <img src="@Model.UserProfilePathUrl" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px;" id="loadedProfilePicture">
-                                }
+                                <img src="" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px;" id="loadedProfilePicture">
                                 <div class="position-absolute bottom-0 end-0 rounded-circle bg-light p-1" style="transform: translate(20%, 20%);">
                                     <input class="d-none" asp-for="ProfileUsersData.PhotoFile" type="file" id="profile-img-file-input" />
                                     <label for="profile-img-file-input" class="rounded-circle bg-gradient-blue p-2" style="cursor: pointer; width: 40px; height: 40px;">
@@ -172,28 +169,16 @@
                             </div>
                         </div>
 
-                        <!-- Username and Password on one line -->
-                        <div class="mb-3" style="display: flex; justify-content: space-between;">
-                            <div style="flex: 1; margin-right: 10px;">
-                                <label asp-for="ProfileUsersData.Username" class="form-label"></label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" />
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label asp-for="ProfileUsersData.Username" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold"></span>
+                                <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" />
                             </div>
-                            <div style="flex: 1;">
-                                <label asp-for="ProfileUsersData.Password" class="form-label"></label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-eye-slash"></i></span>
-                                    </div>
-                                    <input type="password" asp-for="ProfileUsersData.Password" placeholder="Password" class="form-control" />
-                                </div>
-                                <span asp-validation-for="ProfileUsersData.Password" class="text-danger fw-bold"></span>
-                            </div>
+                            <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Dropdown to Select Profile Name -->

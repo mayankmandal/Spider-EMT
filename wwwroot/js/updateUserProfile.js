@@ -15,7 +15,14 @@ function handleResultItemClick(item, resultItem) {
     $('#ProfileUsersData_MobileNo').val(item.mobileNo);
     $('#profileSelect').val(item.profileSiteData.profileName);
     $('#profileIdHidden').val(item.profileSiteData.profileId);
-    $('#ProfileUsersData_Username').val(item.profileSiteData.username);
+    $('#ProfileUsersData_Username').val(item.username);
+    // Load user image
+    if (item.userimgpath) {
+        $('#loadedProfilePicture').attr('src', item.userimgpath);
+    } else {
+        // Handle case where user image path is empty or null
+        $('#loadedProfilePicture').attr('src', '/images/icons/defaultUserImage.jpg'); // Set src to empty string or placeholder image path
+    }
     /*$('input[name="ProfileUsersData.IsActive"]').prop('checked',item.profileSiteData.isActive === true);
     $('input[name="ProfileUsersData.IsActiveDirectoryUser"]').prop('checked', item.profileSiteData.isActiveDirectoryUser === true);
     $('input[name="ProfileUsersData.ChangePassword"]').prop('checked', item.profileSiteData.changePassword === true);*/
@@ -147,19 +154,28 @@ $(document).ready(function () {
         // Set the hidden fields with ProfileId and ProfileName
         $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
 
+        // Create a FormData object
+        var formData = new FormData(this);
+
+        // Form submission handling
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
-            data: $(this).serialize(),
+            data: formData,
+            processData: false,
+            contentType: false,
             success: function (response) {
+                // Success handling
                 if (response.success) {
+                    fetchUserProfile();
                     toastr.success(response.message);
                 } else {
                     toastr.error(response.message);
                 }
             },
-            error: function (response) {
-                toastr.error(response.message);
+            error: function (xhr, status, error) {
+                // Error Handling
+                toastr.error("An error occurred: " + error);
             }
         });
     });

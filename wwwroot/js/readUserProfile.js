@@ -1,18 +1,36 @@
 ﻿$(document).ready(function () {
-    // Attach click event handler to <a> tag inside <li> elements
-    $("ul#categoriesAccordion li[id^='category-'] a.nav-link").click(function (e) {
-        e.preventDefault(); // Prevent default behavior of anchor tag
+    // Add click event listener to all nav items with the specific class
+    $(document).ready(function () {
+        // Add click event listener to all nav items with the id starting with 'category-'
+        $('[id^="category-"] > a').on('click', function (event) {
+            event.preventDefault(); // Prevent default behavior of the link
+            event.stopPropagation(); // Stop the event from bubbling up
 
-        // Get the categoryCount from the ID of the parent <li> element
-        var categoryCount = $(this).parent().attr('id').split('-')[1];
+            // Get the parent .nav-item of the clicked link
+            var navItem = $(this).parent('.nav-item');
 
-        // Check if the li has the specified classes
-        if ($(this).parent().hasClass("menu-is-opening") && $(this).parent().hasClass("menu-open")) {
-            // Remove the specified classes from the parent <li> element
-            $(this).parent().removeClass("menu-is-opening menu-open");
+            // Toggle class
+            if (navItem.hasClass('menu-is-opening') && navItem.hasClass('menu-open')) {
+                navItem.removeClass('menu-is-opening menu-open');
+            } else {
+                navItem.addClass('menu-is-opening menu-open');
+            }
 
-            // Update child <ul> style to display: none
-            $(this).siblings("ul.nav-treeview").css("display", "none");
-        }
+            // Toggle the style of the corresponding ul element
+            var ulElement = navItem.find('ul.nav-treeview').first();
+            if (ulElement.css('display') === 'block') {
+                ulElement.css('display', 'none');
+            } else {
+                ulElement.css({
+                    'border-left': '1px ridge #DDDFBF',
+                    'display': 'block',
+                    'height': '259.2px',
+                    'padding-top': '0px',
+                    'margin-top': '0px',
+                    'padding-bottom': '0px',
+                    'margin-bottom': '0px'
+                });
+            }
+        });
     });
 });

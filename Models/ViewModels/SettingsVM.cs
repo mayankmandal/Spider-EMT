@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Spider_EMT.Models.ViewModels
 {
-    public class SettingsViewModel
+    public class SettingsVM
     {
         [DisplayName("User Id")]
         public int SettingId { get; set; }
@@ -23,11 +23,17 @@ namespace Spider_EMT.Models.ViewModels
         [DisplayName("User Photo")]
         [MaxFileSize(20 * 1024, ErrorMessage = "Image size cannot exceed 20 KB")]
         public IFormFile SettingPhotoFile { get; set; }
-        [BindNever]
-        [DisplayName("Password")]
+        
+        [DisplayName("New Password")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
         [MaxLength(16, ErrorMessage = "Password must be at most 16 characters long")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
         public string Password {  get; set; } = string.Empty;
+        [DisplayName("ReType New Password")]
+        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
+        [MaxLength(16, ErrorMessage = "Password must be at most 16 characters long")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ReTypePassword {  get; set; } = string.Empty;
     }
 }

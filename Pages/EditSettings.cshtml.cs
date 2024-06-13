@@ -20,7 +20,7 @@ namespace Spider_EMT.Pages
             _webHostEnvironment = webHostEnvironment;
         }
         [BindProperty]
-        public SettingsViewModel SettingsData { get; set; } = new SettingsViewModel();
+        public SettingsVM SettingsData { get; set; } = new SettingsVM();
         public string UserProfilePathUrl = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
@@ -44,7 +44,7 @@ namespace Spider_EMT.Pages
             if (!string.IsNullOrEmpty(userSettings.Username))
             {
                 // Assign values from userSettings to settingsViewModel
-                SettingsData = new SettingsViewModel
+                SettingsData = new SettingsVM
                 {
                     SettingId = userSettings.UserId,
                     SettingName = userSettings.FullName,
@@ -58,6 +58,17 @@ namespace Spider_EMT.Pages
 
         public async Task<JsonResult> OnPostSubmitAsync()
         {
+            if (SettingsData.SettingPhotoFile == null)
+            {
+                ModelState.Remove("ProfileUsersData.PhotoFile");
+            }
+
+            if (SettingsData.Password == null || SettingsData.ReTypePassword == null)
+            {
+                ModelState.Remove("SettingsData.Password");
+                ModelState.Remove("SettingsData.ReTypePassword");
+            }
+
             if (!ModelState.IsValid)
             {
                 return new JsonResult(new { success = false, message = "Model State Validation Failed." });
@@ -67,6 +78,7 @@ namespace Spider_EMT.Pages
                 string uniqueFileName = null;
                 string filePath = null;
                 string uploadFolder = null;
+
                 if (SettingsData.SettingPhotoFile != null)
                 {
                     uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
@@ -80,13 +92,15 @@ namespace Spider_EMT.Pages
                     }
                 }
 
-                UserSettings userSettings = new UserSettings
+                SettingsAPIVM userSettings = new SettingsAPIVM
                 {
-                    UserId = SettingsData.SettingId,
-                    FullName = SettingsData.SettingName,
-                    EmailAddress = SettingsData.SettingEmail,
-                    ProfilePhotoPath = uniqueFileName,
+                    Id = SettingsData.SettingId,
+                    Name = SettingsData.SettingName,
+                    Email = SettingsData.SettingEmail,
+                    PhotoFile = SettingsData.SettingPhotoFile != null ? uniqueFileName : "",
                     Username = SettingsData.SettingUsername,
+                    SettingsPassword = SettingsData.Password,
+                    SettingsReTypePassword = SettingsData.ReTypePassword
                 };
 
                 var client = _clientFactory.CreateClient();

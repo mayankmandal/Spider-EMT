@@ -18,7 +18,7 @@ namespace Spider_EMT.Repository.Skeleton
         Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList);
         Task<List<PageSite>> GetCategoryToPagesAsync(int categoryId);
         Task<bool> CreateUserProfileAsync(ProfileUser profileUsersData);
-        Task<bool> UpdateUserProfileAsync(ProfileUserAPIVM profileUsersData);
+        Task<string> UpdateUserProfileAsync(ProfileUserAPIVM profileUsersData);
         Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO);
         Task<bool> CreateNewCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
         Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO);
@@ -27,6 +27,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<List<ProfileUserAPIVM>> SearchUserDetailsByCriteriaAsync(string criteriaText, string inputText);
         Task<bool> DeleteEntityAsync(int deleteId, string deleteType);
         Task<ProfileUserAPIVM> GetSettingsDataAsync();
-        Task<string> UpdateSettingsDataAsync(UserSettings userSettings);
+        Task<string> UpdateSettingsDataAsync(ProfileUser userSettings);
     }
 }
