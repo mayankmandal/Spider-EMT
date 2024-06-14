@@ -59,8 +59,9 @@
             success: function (response) {
                 // Success handling
                 if (response.success) {
-                    fetchUserProfile();
                     toastr.success(response.message);
+                    // Remove 'valid' and 'is-valid' classes from all elements
+                    $('.valid, .is-valid').removeClass('valid is-valid');
                 } else {
                     toastr.error(response.message);
                 }
