@@ -60,7 +60,7 @@ namespace Spider_EMT.Pages
         {
             if (SettingsData.SettingPhotoFile == null)
             {
-                ModelState.Remove("ProfileUsersData.PhotoFile");
+                ModelState.Remove("SettingsData.SettingPhotoFile");
             }
 
             if (SettingsData.Password == null || SettingsData.ReTypePassword == null)
@@ -99,8 +99,8 @@ namespace Spider_EMT.Pages
                     Email = SettingsData.SettingEmail,
                     PhotoFile = SettingsData.SettingPhotoFile != null ? uniqueFileName : "",
                     Username = SettingsData.SettingUsername,
-                    SettingsPassword = SettingsData.Password,
-                    SettingsReTypePassword = SettingsData.ReTypePassword
+                    SettingsPassword = SettingsData.Password != null ? SettingsData.Password : "",
+                    SettingsReTypePassword = SettingsData.ReTypePassword != null ? SettingsData.ReTypePassword : ""
                 };
 
                 var client = _clientFactory.CreateClient();
@@ -112,11 +112,11 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $" - Profile Updated Successfully" });
+                    return new JsonResult(new { success = true, message = $"{SettingsData.SettingName} - Profile Updated Successfully" });
                 }
                 else
                 {
-                    return new JsonResult(new { success = true, message = $" - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    return new JsonResult(new { success = true, message = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
 
             }
@@ -135,7 +135,7 @@ namespace Spider_EMT.Pages
         }
         private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $" - " + errorMessage + ". Error details: " + ex.Message });
+            return new JsonResult(new { success = false, message = $"{SettingsData.SettingName} - " + errorMessage + ". Error details: " + ex.Message });
         }
     }
 }
