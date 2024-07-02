@@ -37,9 +37,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-atom"></i></span>
                                 </div>
-                                <input asp-for="SelectedPageCategory.CategoryName" placeholder="Category Name" class="form-control" />
+                                <input asp-for="SelectedPageCategory.CategoryName" placeholder="Category Name" class="form-control" data-field="CatagoryName" />
                             </div>
-                            <span asp-validation-for="SelectedPageCategory.CategoryName" class="text-danger fw-bold"></span>
+                            <span asp-validation-for="SelectedPageCategory.CategoryName" class="text-danger fw-bold" id="CatagoryName-validation"></span>
                         </div>
                         <!-- Checkboxes to select pages -->
                         <div class="mb-3">

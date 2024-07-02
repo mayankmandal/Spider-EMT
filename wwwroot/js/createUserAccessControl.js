@@ -41,6 +41,12 @@
             container.append(checkboxDiv);
         });
     }
+    $('#ProfileName').on('blur', function () {
+        var field = $(this).attr('data-field');
+        var value = $(this).val();
+        var validationSpan = $(this).attr('data-field') + '-validation';
+        checkUniqueness(field, value, validationSpan);
+    });
 
     // Event Listener for profile type radio buttons
     $('input[name="profileType"]').change(function () {

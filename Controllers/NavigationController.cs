@@ -691,6 +691,23 @@ namespace Spider_EMT.Controller
             }
         }
 
+        [HttpGet("CheckUniqueness")]
+        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CheckUniqueness(string field, string value)
+        {
+            try
+            {
+                bool isUniqueValue = false;
+                isUniqueValue = await _navigationRepository.CheckUniquenessAsync(field, value);
+                return Ok(new { IsUnique = isUniqueValue });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
         #endregion
     }
 }

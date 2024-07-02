@@ -5,6 +5,7 @@
         public const string MagicString = "";
 
         public const string CategoryType_UncategorizedPages = "Uncategorized Pages";
+        public static readonly string[] validImageExtensions = new string[]{ ".jpg", ".jpeg", ".png" };
 
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";
         public const string SP_AddNewProfile = "dbo.uspAddNewProfile";
@@ -12,6 +13,8 @@
         public const string SP_AddTransactionFees = "dbo.uspAddTransactionFees";
         public const string SP_AddUserPermission = "dbo.uspAddUserPermission";
         public const string SP_AddNewUser = "dbo.uspAddNewUser";
+
+        public const string SP_CheckUniqueness = "dbo.uspCheckUniqueness";
 
         public const string SP_DeleteEntityRecord = "dbo.uspDeleteEntityRecord";
         public const string SP_DeletePageCategoryMap = "dbo.uspDeletePageCategoryMap";
@@ -43,6 +46,19 @@
             Email = 4,
             MobileNo = 5,
             ProfileName = 6
-        }
+        };
+        public enum TableNameCheckUniqueness
+        {
+            User = 1,
+            Profile = 2,
+            PageCatagory = 3
+        };
+        public static class TableNameClassForUniqueness
+        {
+            public static string[] User = { "idnumber", "email", "mobileNo", "username", "userimgpath" };
+            public static string[] Profile = { "profilename" };
+            public static string[] PageCatagory = { "categoryname" };
+        };
+
     }
 }

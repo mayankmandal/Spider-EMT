@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using System.Text;
-using Microsoft.AspNetCore.Hosting;
+using Spider_EMT.Utility;
 
 namespace Spider_EMT.Pages
 {
@@ -81,6 +80,12 @@ namespace Spider_EMT.Pages
 
                 if (SettingsData.SettingPhotoFile != null)
                 {
+                    var fileExtension = Path.GetExtension(SettingsData.SettingPhotoFile.FileName).ToLower();
+                    if (!Constants.validImageExtensions.Contains(fileExtension))
+                    {
+                        return new JsonResult(new { success = false, message = "Invalid file type. Only image files (jpg, jpeg, png, gif) are allowed." });
+                    }
+
                     uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + SettingsData.SettingPhotoFile.FileName;
                     filePath = Path.Combine(uploadFolder, uniqueFileName);
@@ -116,7 +121,7 @@ namespace Spider_EMT.Pages
                 }
                 else
                 {
-                    return new JsonResult(new { success = true, message = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    return new JsonResult(new { success = false, message = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
 
             }

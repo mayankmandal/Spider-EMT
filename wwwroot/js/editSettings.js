@@ -1,4 +1,12 @@
 ﻿$(document).ready(function () {
+
+    $('#SettingsData_SettingUsername, #SettingsData_SettingEmail').on('blur', function () {
+        var field = $(this).attr('data-field');
+        var value = $(this).val();
+        var validationSpan = $(this).attr('data-field') + '-validation';
+        checkUniqueness(field, value, validationSpan);
+    });
+    
     $('#togglePasswordVisibility').on('click', function () {
         let passwordInput = $('input[name="SettingsData_Password"]');
         let icon = $(this).find('i');
@@ -26,9 +34,11 @@
     $('#profile-img-file-input').change(function () {
         // Get the selected file
         var file = this.files[0];
+        var validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        var fileName = file.name.toLowerCase();
+        var fileExtension = fileName.split('.').pop();
 
-        // Check if a file is selected
-        if (file) {
+        if (validExtensions.includes(fileExtension)) {
             // Create a file reader object
             var reader = new FileReader();
 
@@ -40,6 +50,9 @@
 
             // Read the selected file as a data URL
             reader.readAsDataURL(file);
+        } else {
+            toastr.error('Invalid file type. Only image files (jpg, jpeg, png, gif) are allowed.');
+            $(this).val(''); // Clear the input
         }
     });
 

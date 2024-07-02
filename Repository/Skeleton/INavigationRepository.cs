@@ -1,4 +1,5 @@
-﻿using Spider_EMT.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 
 namespace Spider_EMT.Repository.Skeleton
@@ -28,5 +29,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<bool> DeleteEntityAsync(int deleteId, string deleteType);
         Task<ProfileUserAPIVM> GetSettingsDataAsync();
         Task<string> UpdateSettingsDataAsync(ProfileUser userSettings);
+        Task<bool> CheckUniquenessAsync(string field, string value);
     }
 }

@@ -28,6 +28,7 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        
                         <!-- Profile Picture Field -->
                         <div class="text-center">
                             <div class="position-relative d-inline-block mx-auto mb-4">
@@ -66,9 +67,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-address-card"></i></span>
                                 </div>
-                                <input type="text" asp-for="SettingsData.SettingUsername" placeholder="User Name" class="form-control" />
+                                <input type="text" asp-for="SettingsData.SettingUsername" placeholder="User Name" class="form-control" data-field="Username"/>
                             </div>
-                            <span asp-validation-for="SettingsData.SettingUsername" class="text-danger fw-bold"></span>
+                            <span asp-validation-for="SettingsData.SettingUsername" id="Username-validation" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- FullName Field -->
@@ -78,7 +79,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                 </div>
-                                <input type="text" asp-for="SettingsData.SettingName" placeholder="Name" class="form-control" />
+                                <input type="text" asp-for="SettingsData.SettingName" placeholder="Name" class="form-control"/>
                             </div>
                             <span asp-validation-for="SettingsData.SettingName" class="text-danger fw-bold"></span>
                         </div>
@@ -90,15 +91,15 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 </div>
-                                <input type="text" asp-for="SettingsData.SettingEmail" placeholder="Email Address" class="form-control" />
+                                <input type="text" asp-for="SettingsData.SettingEmail" placeholder="Email Address" class="form-control" data-field="Email" />
                             </div>
-                            <span asp-validation-for="SettingsData.SettingEmail" class="text-danger fw-bold"></span>
+                            <span asp-validation-for="SettingsData.SettingEmail" id="Email-validation" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Change Password Section -->
                         <div class="mb-3">
-                            <label class="form-label" style="font-size:1.2rem;">Change Password</label>
-                            <div class="mb-3">
+                            <label class="form-label">Change Password</label>
+                            <div>
                                 <label name="SettingsData.Password" class="form-label"></label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -112,7 +113,7 @@
                                 <span asp-validation-for="SettingsData.Password" class="text-danger fw-bold"></span>
                             </div>
 
-                            <div class="mb-3">
+                            <div>
                                 <label name="SettingsData.ReTypePassword" class="form-label"></label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">

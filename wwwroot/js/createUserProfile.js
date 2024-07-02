@@ -1,10 +1,20 @@
 ﻿$(document).ready(function () {
+
+    $('#ProfileUsersData_Username, #ProfileUsersData_MobileNo, #ProfileUsersData_Email, #ProfileUsersData_IdNumber').on('blur', function () {
+        var field = $(this).attr('data-field');
+        var value = $(this).val();
+        var validationSpan = $(this).attr('data-field') + '-validation';
+        checkUniqueness(field, value, validationSpan);
+    });
+
     $('#profile-img-file-input').change(function () {
         // Get the selected file
         var file = this.files[0];
+        var validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        var fileName = file.name.toLowerCase();
+        var fileExtension = fileName.split('.').pop();
 
-        // Check if a file is selected
-        if (file) {
+        if (validExtensions.includes(fileExtension)) {
             // Create a file reader object
             var reader = new FileReader();
 

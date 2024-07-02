@@ -6,6 +6,7 @@ using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
+using System.Linq;
 using System.Text;
 using static Spider_EMT.Utility.Constants;
 
@@ -60,6 +61,11 @@ namespace Spider_EMT.Pages
                 string uploadFolder = null;
                 if (ProfileUsersData.PhotoFile != null)
                 {
+                    var fileExtension = Path.GetExtension(ProfileUsersData.PhotoFile.FileName).ToLower();
+                    if (!Constants.validImageExtensions.Contains(fileExtension))
+                    {
+                        return new JsonResult(new { success = false, message = "Invalid file type. Only image files (jpg, jpeg, png, gif) are allowed." });
+                    }
                     uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + ProfileUsersData.PhotoFile.FileName;
                     filePath = Path.Combine(uploadFolder, uniqueFileName);

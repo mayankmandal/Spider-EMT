@@ -65,8 +65,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                     </div>
-                                    <input id="ProfileName" placeholder="Profile Name" class="form-control" />
+                                    <input id="ProfileName" placeholder="Profile Name" class="form-control" data-field="ProfileName" />
                                 </div>
+                                <span asp-validation-for="@Model.AllProfilesData.Any()" class="text-danger fw-bold" id="ProfileName-validation"></span>
                             </div>
                         </div>
 

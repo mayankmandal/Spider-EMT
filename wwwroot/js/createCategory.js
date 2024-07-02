@@ -1,4 +1,10 @@
 ﻿$(document).ready(function () {
+    $('#SelectedPageCategory_CategoryName').on('blur', function () {
+        var field = $(this).attr('data-field');
+        var value = $(this).val();
+        var validationSpan = $(this).attr('data-field') + '-validation';
+        checkUniqueness(field, value, validationSpan);
+    });
     function renderPageCheckboxes() {
         var container = $('#pageCheckboxContainer'); // container to append checkboxes
 

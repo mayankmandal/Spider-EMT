@@ -54,9 +54,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                     </div>
-                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" />
+                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" data-field="IdNumber" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold"></span>
+                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" id="IdNumber-validation"></span>
                             </div>
                         </div>
 
@@ -80,9 +80,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                     </div>
-                                    <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" />
+                                    <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" data-field="Email" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold"></span>
+                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" id="Email-validation"></span>
                             </div>
                             <div style="flex: 1;">
                                 <label asp-for="ProfileUsersData.MobileNo" class="form-label"></label>
@@ -90,9 +90,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     </div>
-                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" />
+                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" data-field="MobileNo" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold"></span>
+                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold" id="MobileNo-validation"></span>
                             </div>
                         </div>
 
@@ -104,9 +104,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
                                     </div>
-                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" />
+                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" data-field="Username" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold"></span>
+                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold" id="Username-validation"></span>
                             </div>
                             <div style="flex: 1;">
                                 <label asp-for="ProfileUsersData.Password" class="form-label"></label>

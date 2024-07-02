@@ -1118,7 +1118,7 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 // Log or handle other exceptions
-                throw new Exception("Error in Getting Current User Categories.", ex);
+                throw new Exception("Error in Getting Settings.", ex);
             }
         }
         public async Task<string> UpdateSettingsDataAsync(ProfileUser userSettings)
@@ -1180,11 +1180,65 @@ namespace Spider_EMT.Repository.Domain
             }
             catch (SqlException sqlEx)
             {
-                throw new Exception("Error while adding User Profile - SQL Exception.", sqlEx);
+                throw new Exception("Error while updating Settings - SQL Exception.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while adding User Profile.", ex);
+                throw new Exception("Error while updating Settings.", ex);
+            }
+        }
+
+        public async Task<bool> CheckUniquenessAsync(string field, string value)
+        {
+            try
+            {
+                int isUnique = 0;
+                TableNameCheckUniqueness? tableEnum = null;
+                if (TableNameClassForUniqueness.User.Contains(field.ToLower()))
+                {
+                    tableEnum = TableNameCheckUniqueness.User;
+                }
+                else if (TableNameClassForUniqueness.Profile.Contains(field.ToLower()))
+                {
+                    tableEnum = TableNameCheckUniqueness.Profile;
+                }
+                else if (TableNameClassForUniqueness.PageCatagory.Contains(field.ToLower()))
+                {
+                    tableEnum = TableNameCheckUniqueness.PageCatagory;
+                }
+                if (tableEnum == null)
+                {
+                    throw new ArgumentException("Field does not match any known table.");
+                }
+                // User Profile Creation
+                SqlParameter[] sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@TableId", SqlDbType.Int) { Value = (int)tableEnum },
+                    new SqlParameter("@Field", SqlDbType.VarChar, 50) { Value = field },
+                    new SqlParameter("@Value", SqlDbType.VarChar, 100) { Value = value }
+                };
+
+                // Execute the command
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_CheckUniqueness, CommandType.StoredProcedure, sqlParameters);
+                if (tables.Count > 0)
+                {
+                    DataTable dataTable = tables[0];
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        DataRow dataRow = dataTable.Rows[0];
+                        isUnique = (int)dataRow["IsUnique"];
+                    }
+                    
+                }
+                return isUnique > 0;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error while checking existing username - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while checking existing username.", ex);
             }
         }
     }
