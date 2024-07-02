@@ -103,9 +103,9 @@ namespace Spider_EMT.Repository.Domain
                             },
                             Username = dataRow["Username"].ToString(),
                             Userimgpath = dataRow["Userimgpath"].ToString(),
-                            IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
-                            IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
-                            ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
+                            IsActive = Convert.ToBoolean(dataRow["IsActive"]),
+                            IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
+                            ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
                         };
                         users.Add(profileUser);
                     }
@@ -267,9 +267,9 @@ namespace Spider_EMT.Repository.Domain
                         },
                         Username = dataRow["Username"].ToString(),
                         Userimgpath = dataRow["Userimgpath"].ToString(),
-                        IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
-                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
-                        ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
+                        IsActive = Convert.ToBoolean(dataRow["IsActive"]),
+                        IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
+                        ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
                         CreateUserId = (int)dataRow["CreateUserId"],
                         UpdateUserId = (int)dataRow["UpdateUserId"]
                     };
@@ -602,9 +602,9 @@ namespace Spider_EMT.Repository.Domain
                         },
                         Username = dataRow["Username"].ToString(),
                         Userimgpath = dataRow["Userimgpath"].ToString(),
-                        IsActive = dataRow["IsActive"].ToString() == "1" ? true : false,
-                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"].ToString() == "1" ? true : false,
-                        ChangePassword = dataRow["ChangePassword"].ToString() == "1" ? true : false,
+                        IsActive = Convert.ToBoolean(dataRow["IsActive"]),
+                        IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
+                        ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
                         
                     };
                 }
@@ -1042,9 +1042,9 @@ namespace Spider_EMT.Repository.Domain
                                 ProfileName = dataRow["ProfileName"].ToString()
                             },
                             Username = dataRow["Username"].ToString(),
-                            IsActive = dataRow["IsActive"] == "1" ? true : false,
-                            IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] == "1" ? true : false,
-                            ChangePassword = dataRow["ChangePassword"] == "1" ? true : false,
+                            IsActive = Convert.ToBoolean(dataRow["IsActive"]),
+                            IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
+                            ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
                             Userimgpath = dataRow["Userimgpath"].ToString()
                         };
                         profileUserLst.Add(profileUserAPIVM);

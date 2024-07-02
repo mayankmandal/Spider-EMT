@@ -23,9 +23,10 @@ function handleResultItemClick(item, resultItem) {
         // Handle case where user image path is empty or null
         $('#loadedProfilePicture').attr('src', '/images/icons/defaultUserImage.jpg'); // Set src to empty string or placeholder image path
     }
-    /*$('input[name="ProfileUsersData.IsActive"]').prop('checked',item.profileSiteData.isActive === true);
-    $('input[name="ProfileUsersData.IsActiveDirectoryUser"]').prop('checked', item.profileSiteData.isActiveDirectoryUser === true);
-    $('input[name="ProfileUsersData.ChangePassword"]').prop('checked', item.profileSiteData.changePassword === true);*/
+    // Check checkboxes based on item properties
+    $('input[name="ProfileUsersData.IsActive"]').prop('checked', item.isActive === true);
+    $('input[name="ProfileUsersData.IsActiveDirectoryUser"]').prop('checked', item.isActiveDirectoryUser === true);
+    $('input[name="ProfileUsersData.ChangePassword"]').prop('checked', item.changePassword === true);
 }
 
 $(document).ready(function () {
@@ -167,8 +168,9 @@ $(document).ready(function () {
             success: function (response) {
                 // Success handling
                 if (response.success) {
-                    fetchUserProfile();
                     toastr.success(response.message);
+                    // Remove 'valid' and 'is-valid' classes from all elements
+                    $('.valid, .is-valid').removeClass('valid is-valid');
                 } else {
                     toastr.error(response.message);
                 }
