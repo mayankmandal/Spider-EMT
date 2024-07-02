@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using System.Text;
 

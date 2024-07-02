@@ -1,13 +1,9 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Utility;
 using System.Text;
-using static Spider_EMT.Utility.Constants;
 
 namespace Spider_EMT.Pages
 {

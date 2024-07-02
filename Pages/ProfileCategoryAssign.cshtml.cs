@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
-using Spider_EMT.Repository.Skeleton;
 using System.Text;
 
 namespace Spider_EMT.Pages
