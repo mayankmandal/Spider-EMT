@@ -472,7 +472,7 @@ namespace Spider_EMT.Controller
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
 
-                if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                if (!string.IsNullOrEmpty(profileUserAPIVM.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
                 {
                     string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
                     bool isSucess = await DeleteFileAsync(oldFilePath);
@@ -677,7 +677,7 @@ namespace Spider_EMT.Controller
                 // Remove the cached item to force a refresh next time
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
 
-                if (!string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                if (!string.IsNullOrEmpty(profileUser.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
                 {
                     string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
                     bool isSucess = await DeleteFileAsync(oldFilePath);

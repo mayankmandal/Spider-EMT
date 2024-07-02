@@ -10,14 +10,14 @@
         <div id="updateSettingsSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:50%;">
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
                 <div class="row pb-1 pt-2">
-                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem; font-weight:500">User Settings</div>
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem; font-weight:500">Edit User Settings</div>
                     <div>
                         <hr />
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title fw-bold" style="font-size:1.2rem">Details</div>
+                        <div class="card-title fw-bold" style="font-size:1.2rem">User Details</div>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -28,7 +28,9 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="All" class="text-danger fw-bold"></div>
+
                         <!-- Profile Picture Field -->
                         <div class="text-center">
                             <div class="position-relative d-inline-block mx-auto mb-4">
@@ -98,14 +100,13 @@
 
                         <!-- Change Password Section -->
                         <div class="mb-3">
-                            <label class="form-label">Change Password</label>
                             <div>
-                                <label name="SettingsData.Password" class="form-label"></label>
+                                <label asp-for="SettingsData.Password" class="form-label"></label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     </div>
-                                    <input type="password" name="SettingsData.Password" placeholder="New Password" class="form-control" />
+                                    <input type="password" asp-for="SettingsData.Password" placeholder="New Password" class="form-control" />
                                     <button class="btn btn-secondary" type="button" id="togglePasswordVisibility">
                                         <i class="fas fa-eye-slash"></i>
                                     </button>
@@ -114,12 +115,12 @@
                             </div>
 
                             <div>
-                                <label name="SettingsData.ReTypePassword" class="form-label"></label>
+                                <label asp-for="SettingsData.ReTypePassword" class="form-label"></label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     </div>
-                                    <input type="password" name="SettingsData.ReTypePassword" placeholder="Retype New Password" class="form-control" />
+                                    <input type="password" asp-for="SettingsData.ReTypePassword" placeholder="Retype New Password" class="form-control" />
                                     <button class="btn btn-secondary" type="button" id="toggleReTypePasswordVisibility">
                                         <i class="fas fa-eye-slash"></i>
                                     </button>
