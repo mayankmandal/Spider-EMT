@@ -71,7 +71,7 @@ namespace Spider_EMT.Pages
                         await ProfileUsersData.PhotoFile.CopyToAsync(fileStream);
                     }
                 }
-                
+
                 ProfileUserAPIVM profileUserAPIVM = new ProfileUserAPIVM
                 {
                     UserId = ProfileUsersData.UserId,

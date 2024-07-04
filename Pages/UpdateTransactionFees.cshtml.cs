@@ -38,7 +38,7 @@ namespace Spider_EMT.Pages
         {
             if (!ModelState.IsValid)
             {
-                return new JsonResult(new {success = false, message = "Model State Validation Failed." });
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
 
             try
@@ -74,7 +74,7 @@ namespace Spider_EMT.Pages
                 else
                 {
                     TempData["error"] = $"Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
-                    return new JsonResult(new {success = false, message = TempData["error"] });
+                    return new JsonResult(new { success = false, message = TempData["error"] });
                 }
             }
             catch (HttpRequestException ex)
@@ -93,7 +93,7 @@ namespace Spider_EMT.Pages
         private JsonResult HandleError(Exception ex, string errorMessage)
         {
             TempData["error"] = errorMessage + " Error details: " + ex.Message;
-            return new JsonResult(new {success = false, message = TempData["error"] });
+            return new JsonResult(new { success = false, message = TempData["error"] });
         }
     }
 }

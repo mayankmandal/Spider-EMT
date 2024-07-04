@@ -2,7 +2,7 @@
 {
     public class PageSite
     {
-        public int PageId {  get; set; }
+        public int PageId { get; set; }
         public string PageUrl { get; set; }
         public string PageDescription { get; set; }
         public DateTime CreateDate { get; set; }

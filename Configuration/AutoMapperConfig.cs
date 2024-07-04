@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Spider_EMT.Models;
+﻿using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 
 namespace Spider_EMT.Configuration

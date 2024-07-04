@@ -12,7 +12,7 @@ namespace Spider_EMT.Repository.Domain
     {
         private readonly IConfiguration _configuration;
         private readonly CurrentUser _currentUser;
-        public NavigationRepository(IConfiguration configuration) 
+        public NavigationRepository(IConfiguration configuration)
         {
             _configuration = configuration;
             _currentUser = new CurrentUser
@@ -28,9 +28,9 @@ namespace Spider_EMT.Repository.Domain
                 return DBNull.Value;
             }
             // Handle string case
-            if(typeof(T) == typeof(string))
+            if (typeof(T) == typeof(string))
             {
-                if(string.IsNullOrEmpty(newValue as string) || (newValue as string) == (existingValue as string))
+                if (string.IsNullOrEmpty(newValue as string) || (newValue as string) == (existingValue as string))
                 {
                     return DBNull.Value;
                 }
@@ -586,8 +586,8 @@ namespace Spider_EMT.Repository.Domain
                 ProfileUserAPIVM profileUserExisting = new ProfileUserAPIVM();
                 string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword, u.ProfileId from tblUsers u WHERE u.UserId = {_currentUser.UserId}";
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-                
-                if(dataTable.Rows.Count > 0)
+
+                if (dataTable.Rows.Count > 0)
                 {
                     DataRow dataRow = dataTable.Rows[0];
                     profileUserExisting = new ProfileUserAPIVM
@@ -605,7 +605,7 @@ namespace Spider_EMT.Repository.Domain
                         IsActive = Convert.ToBoolean(dataRow["IsActive"]),
                         IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
                         ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
-                        
+
                     };
                 }
 
@@ -1100,7 +1100,7 @@ namespace Spider_EMT.Repository.Domain
                 {
                     DataRow dataRow = dataTable.Rows[0];
                     userSettings = new ProfileUserAPIVM
-                     {
+                    {
                         UserId = dataRow["UserId"] != DBNull.Value ? (int)dataRow["UserId"] : 0,
                         FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
                         Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
@@ -1228,7 +1228,7 @@ namespace Spider_EMT.Repository.Domain
                         DataRow dataRow = dataTable.Rows[0];
                         isUnique = (int)dataRow["IsUnique"];
                     }
-                    
+
                 }
                 return isUnique > 0;
             }

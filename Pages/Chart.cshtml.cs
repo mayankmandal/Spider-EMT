@@ -16,7 +16,7 @@ namespace Spider_EMT.Pages
         }
         [BindProperty]
         public ChartsViewModel ChartsViewModelData { get; set; }
-        
+
         public IActionResult OnGet()
         {
             if (ChartsViewModelData == null)

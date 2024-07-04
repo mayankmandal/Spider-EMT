@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Spider_EMT.Models.ValidationAttributes;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-
-namespace Spider_EMT.Models.ViewModels
+﻿namespace Spider_EMT.Models.ViewModels
 {
     public class ProfileUserAPIVM
     {

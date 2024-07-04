@@ -9,7 +9,7 @@ namespace Spider_EMT.Models
 
         [Required(ErrorMessage = "Withdrawal Fee Amount is required")]
         [DisplayName("Withdrawal Fee Amount")]
-        [Range(0,100, ErrorMessage = "Withdrawal Fee Amount must be between 0 and 100")]
+        [Range(0, 100, ErrorMessage = "Withdrawal Fee Amount must be between 0 and 100")]
         public decimal CWTxnFee { get; set; }
 
         [Required(ErrorMessage = "Inquiry Fee Amount is required")]

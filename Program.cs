@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages()
     .AddRazorPagesOptions(options =>
     {
-        options.Conventions.AddPageRoute("/Dashboard","");
+        options.Conventions.AddPageRoute("/Dashboard", "");
     });
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();

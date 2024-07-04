@@ -91,7 +91,7 @@ namespace Spider_EMT.Pages
                     FullName = ProfileUsersData.FullName,
                     Password = "",
                     Username = ProfileUsersData.Username,
-                    Userimgpath = ProfileUsersData.PhotoFile != null? uniqueFileName: "",
+                    Userimgpath = ProfileUsersData.PhotoFile != null ? uniqueFileName : "",
                     ProfileSiteData = ProfileUsersData.ProfileSiteData,
                     IsActive = ProfileUsersData.IsActive,
                     IsActiveDirectoryUser = ProfileUsersData.IsActiveDirectoryUser,

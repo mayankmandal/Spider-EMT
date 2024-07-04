@@ -5,7 +5,7 @@
         public const string MagicString = "";
 
         public const string CategoryType_UncategorizedPages = "Uncategorized Pages";
-        public static readonly string[] validImageExtensions = new string[]{ ".jpg", ".jpeg", ".png" };
+        public static readonly string[] validImageExtensions = new string[] { ".jpg", ".jpeg", ".png" };
 
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";
         public const string SP_AddNewProfile = "dbo.uspAddNewProfile";
@@ -25,7 +25,7 @@
         public const string SP_UpdateTransactionFees = "dbo.uspUpdateTransactionFees";
         public const string SP_UpdateUser = "dbo.uspUpdateUser";
         public const string SP_UpdateUserSettings = "dbo.uspUpdateUserSettings";
-        
+
         public static class PageCategoryMapStates
         {
             public static string PageIdOnly = "PI";

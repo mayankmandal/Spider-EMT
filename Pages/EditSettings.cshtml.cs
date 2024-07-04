@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
-using System.Text;
 using Spider_EMT.Utility;
+using System.Text;
 
 namespace Spider_EMT.Pages
 {
@@ -51,7 +51,7 @@ namespace Spider_EMT.Pages
                     SettingEmail = userSettings.Email,
                     SettingPhotoFile = null,
                 };
-                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"],userSettings.Userimgpath);
+                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], userSettings.Userimgpath);
             };
         }
 

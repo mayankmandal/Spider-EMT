@@ -55,7 +55,7 @@ namespace Spider_EMT.Pages
             {
                 await LoadAllProfilesData();
                 await LoadAllPagesData();
-                return new JsonResult(new {success = false, message = "Model State Validation Failed."});
+                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
             try
             {

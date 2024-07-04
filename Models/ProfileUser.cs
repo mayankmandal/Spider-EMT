@@ -1,6 +1,4 @@
-﻿using Spider_EMT.Models.ViewModels;
-
-namespace Spider_EMT.Models
+﻿namespace Spider_EMT.Models
 {
     public class ProfileUser
     {

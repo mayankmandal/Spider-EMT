@@ -41,7 +41,7 @@ namespace Spider_EMT.Controller
                 if (System.IO.File.Exists(filePath))
                 {
                     // Ensure any operations on the file are completed before deletion
-                    using (var stream = new FileStream(filePath,FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose))
+                    using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 4096, FileOptions.DeleteOnClose))
                     {
                         // This will ensure the file is closed properly before deletion
                         stream.Close();
@@ -67,7 +67,7 @@ namespace Spider_EMT.Controller
             try
             {
                 var allUsersData = await _navigationRepository.GetAllUsersDataAsync();
-                foreach(var profileUserAPIVM in allUsersData)
+                foreach (var profileUserAPIVM in allUsersData)
                 {
                     profileUserAPIVM.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], profileUserAPIVM.Userimgpath);
                 }
@@ -88,7 +88,7 @@ namespace Spider_EMT.Controller
             {
                 List<ProfileSiteVM> profileSiteVMs = new List<ProfileSiteVM>();
                 var allProfilesData = await _navigationRepository.GetAllProfilesAsync();
-                foreach(var profileSiteData in allProfilesData)
+                foreach (var profileSiteData in allProfilesData)
                 {
                     ProfileSiteVM profileSite = new ProfileSiteVM
                     {
@@ -114,7 +114,7 @@ namespace Spider_EMT.Controller
             {
                 List<PageSiteVM> pageSiteVMs = new List<PageSiteVM>();
                 var allPagesData = await _navigationRepository.GetAllPagesAsync();
-                foreach(var page in allPagesData)
+                foreach (var page in allPagesData)
                 {
                     PageSiteVM pageSiteVM = new PageSiteVM
                     {
@@ -142,7 +142,7 @@ namespace Spider_EMT.Controller
             {
                 List<PageCategoryVM> pageCategoryVMs = new List<PageCategoryVM>();
                 var allPageCategoryData = await _navigationRepository.GetAllCategoriesAsync();
-                foreach(var pageCategoryData in allPageCategoryData)
+                foreach (var pageCategoryData in allPageCategoryData)
                 {
                     PageCategoryVM pageCategoryVM = new PageCategoryVM
                     {
@@ -170,7 +170,7 @@ namespace Spider_EMT.Controller
                 if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
                 {
                     currentUserData = await _navigationRepository.GetCurrentUserAsync();
-                    currentUserData.UserImgPath = Path.Combine(_configuration["UserProfileImgPath"],currentUserData.UserImgPath);
+                    currentUserData.UserImgPath = Path.Combine(_configuration["UserProfileImgPath"], currentUserData.UserImgPath);
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
                         AbsoluteExpiration = DateTime.Now.AddSeconds(10),
@@ -590,7 +590,7 @@ namespace Spider_EMT.Controller
                 }
 
                 var profileUsers = await _navigationRepository.SearchUserDetailsByCriteriaAsync(criteria, input);
-                foreach(var userAPIVM in profileUsers)
+                foreach (var userAPIVM in profileUsers)
                 {
                     userAPIVM.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], userAPIVM.Userimgpath);
                 }
@@ -652,10 +652,10 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest("Password must be between 8 and 16 characters, and must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Also, both passwords must match.");
                 }
-                
+
                 string salt = null;
                 string hashedPassword = null;
-                if(!string.IsNullOrEmpty(userSettings.SettingsPassword) || !string.IsNullOrEmpty(userSettings.SettingsReTypePassword))
+                if (!string.IsNullOrEmpty(userSettings.SettingsPassword) || !string.IsNullOrEmpty(userSettings.SettingsReTypePassword))
                 {
                     salt = PasswordHelper.GenerateSalt();
                     hashedPassword = PasswordHelper.HashPassword(userSettings.SettingsPassword, salt);

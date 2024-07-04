@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Spider_EMT.Models.ValidationAttributes;
 using System.ComponentModel;
-using Spider_EMT.Models.ValidationAttributes;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace Spider_EMT.Models.ViewModels
 {

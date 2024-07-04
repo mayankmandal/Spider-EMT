@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
-using System.Text;
 using Spider_EMT.Utility;
+using System.Text;
 
 namespace Spider_EMT.Pages
 {
@@ -82,7 +82,7 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new {success = true, message = $"Category Updated Successfully" });
+                    return new JsonResult(new { success = true, message = $"Category Updated Successfully" });
                 }
                 else
                 {
