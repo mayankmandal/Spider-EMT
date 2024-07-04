@@ -29,6 +29,9 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="All" class="text-danger fw-bold"></div>
+
                         <!-- Profile Picture Field -->
                         <div class="text-center">
                             <div class="position-relative d-inline-block mx-auto mb-4">
@@ -71,18 +74,29 @@
                             </div>
                             <span asp-validation-for="ProfileUsersData.FullName" class="text-danger fw-bold"></span>
                         </div>
+                        <!-- Email Field-->
+                        <div class="mb-3">
+                            <label asp-for="ProfileUsersData.Email" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" data-field="Email" />
+                            </div>
+                            <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" id="Email-validation"></span>
+                        </div>
 
-                        <!-- Email and Mobile Number on one line -->
+                        <!-- Username and Mobile Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1; margin-right: 10px;">
-                                <label asp-for="ProfileUsersData.Email" class="form-label"></label>
+                                <label asp-for="ProfileUsersData.Username" class="form-label"></label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
                                     </div>
-                                    <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" data-field="Email" />
+                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" data-field="Username" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" id="Email-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold" id="Username-validation"></span>
                             </div>
                             <div style="flex: 1;">
                                 <label asp-for="ProfileUsersData.MobileNo" class="form-label"></label>
@@ -96,28 +110,34 @@
                             </div>
                         </div>
 
-                        <!-- Username and Password on one line -->
-                        <div class="mb-3" style="display: flex; justify-content: space-between;">
-                            <div style="flex: 1; margin-right: 10px;">
-                                <label asp-for="ProfileUsersData.Username" class="form-label"></label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" data-field="Username" />
+                        <!-- New Password field -->
+                        <div class="mb-3">
+                            <label asp-for="ProfileUsersData.Password" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold" id="Username-validation"></span>
-                            </div>
-                            <div style="flex: 1;">
-                                <label asp-for="ProfileUsersData.Password" class="form-label"></label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    </div>
-                                    <input type="password" asp-for="ProfileUsersData.Password" placeholder="Password" class="form-control" />
+                                <input type="password" asp-for="ProfileUsersData.Password" placeholder="New Password" class="form-control" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fas fa-eye-slash" id="togglePasswordVisibility"></i></span>
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Password" class="text-danger fw-bold"></span>
                             </div>
+                            <span asp-validation-for="ProfileUsersData.Password" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <!-- ReType New Password field -->
+                        <div class="mb-3">
+                            <label asp-for="ProfileUsersData.ReTypePassword" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                </div>
+                                <input type="password" asp-for="ProfileUsersData.ReTypePassword" placeholder="Retype New Password" class="form-control" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fas fa-eye-slash" id="toggleReTypePasswordVisibility"></i></span>
+                                </div>
+                            </div>
+                            <span asp-validation-for="ProfileUsersData.ReTypePassword" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Dropdown to Select Profile Name -->

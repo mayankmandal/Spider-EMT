@@ -7,6 +7,32 @@
         checkUniqueness(field, value, validationSpan);
     });
 
+    $('#togglePasswordVisibility').on('click', function () {
+        var passwordInput = $('#ProfileUsersData_Password');
+        var icon = $(this);
+
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        } else {
+            passwordInput.attr('type', 'password');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
+
+    $('#toggleReTypePasswordVisibility').on('click', function () {
+        var passwordInput = $('#ProfileUsersData_ReTypePassword');
+        var icon = $(this);
+
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        } else {
+            passwordInput.attr('type', 'password');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
+
     $('#profile-img-file-input').change(function () {
         // Get the selected file
         var file = this.files[0];
@@ -51,6 +77,11 @@
                 // Success handling
                 if (response.success) {
                     toastr.success(response.message);
+
+                    // Clear the form content
+                    $('form')[0].reset(); // Reset the form
+                    $('form').find('input, select').val('').removeClass('valid is-valid'); // Clear form fields and remove validation classes
+
                     // Remove 'valid' and 'is-valid' classes from all elements
                     $('.valid, .is-valid').removeClass('valid is-valid');
                 } else {

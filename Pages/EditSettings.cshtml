@@ -107,9 +107,9 @@
                                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     </div>
                                     <input type="password" asp-for="SettingsData.Password" placeholder="New Password" class="form-control" />
-                                    <button class="btn btn-secondary" type="button" id="togglePasswordVisibility">
-                                        <i class="fas fa-eye-slash"></i>
-                                    </button>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-eye-slash" id="togglePasswordVisibility"></i></span>
+                                    </div>
                                 </div>
                                 <span asp-validation-for="SettingsData.Password" class="text-danger fw-bold"></span>
                             </div>
@@ -121,9 +121,9 @@
                                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     </div>
                                     <input type="password" asp-for="SettingsData.ReTypePassword" placeholder="Retype New Password" class="form-control" />
-                                    <button class="btn btn-secondary" type="button" id="toggleReTypePasswordVisibility">
-                                        <i class="fas fa-eye-slash"></i>
-                                    </button>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-eye-slash" id="toggleReTypePasswordVisibility"></i></span>
+                                    </div>
                                 </div>
                                 <span asp-validation-for="SettingsData.ReTypePassword" class="text-danger fw-bold"></span>
                             </div>

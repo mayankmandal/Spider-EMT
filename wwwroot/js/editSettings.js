@@ -1,15 +1,15 @@
 ﻿$(document).ready(function () {
-
     $('#SettingsData_SettingUsername, #SettingsData_SettingEmail').on('blur', function () {
         var field = $(this).attr('data-field');
         var value = $(this).val();
         var validationSpan = $(this).attr('data-field') + '-validation';
         checkUniqueness(field, value, validationSpan);
     });
-    
+
     $('#togglePasswordVisibility').on('click', function () {
-        let passwordInput = $('input[name="SettingsData_Password"]');
-        let icon = $(this).find('i');
+        var passwordInput = $('#SettingsData_Password');
+        var icon = $(this);
+
         if (passwordInput.attr('type') === 'password') {
             passwordInput.attr('type', 'text');
             icon.removeClass('fa-eye-slash').addClass('fa-eye');
@@ -20,13 +20,14 @@
     });
 
     $('#toggleReTypePasswordVisibility').on('click', function () {
-        let reTypePasswordInput = $('input[name="SettingsData_ReTypePassword"]');
-        let icon = $(this).find('i');
-        if (reTypePasswordInput.attr('type') === 'password') {
-            reTypePasswordInput.attr('type', 'text');
+        var passwordInput = $('#SettingsData_ReTypePassword');
+        var icon = $(this);
+
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
             icon.removeClass('fa-eye-slash').addClass('fa-eye');
         } else {
-            reTypePasswordInput.attr('type', 'password');
+            passwordInput.attr('type', 'password');
             icon.removeClass('fa-eye').addClass('fa-eye-slash');
         }
     });

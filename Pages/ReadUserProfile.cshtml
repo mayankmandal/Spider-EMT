@@ -30,6 +30,8 @@
                         </div>
                     </div>
                     <div class="card-body" style="font-size:1rem;">
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="All" class="text-danger fw-bold"></div>
 
                         <!-- Profile Picture Field -->
                         <div class="text-center">
@@ -54,7 +56,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                     </div>
-                                    <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" readonly />
+                                    <input asp-for="CurrentUserDetailsData.UserId" placeholder="User ID" class="form-control" disabled />
                                 </div>
                             </div>
                             <div style="flex: 1;">

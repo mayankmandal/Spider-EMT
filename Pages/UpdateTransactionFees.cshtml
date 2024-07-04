@@ -30,6 +30,9 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <!-- Validation Summary -->
+                            <div asp-validation-summary="All" class="text-danger fw-bold"></div>
+
                             <input hidden asp-for="@Model.TransactionFeeAmounts.TxnFeeId" />
 
                             <div class="mb-3">
