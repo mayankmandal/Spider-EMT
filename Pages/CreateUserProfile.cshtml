@@ -46,10 +46,10 @@
                                     </label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
+                            <br />
                             <span asp-validation-for="ProfileUsersData.PhotoFile" class="text-danger fw-bold"></span>
                         </div>
+                        
                         <!-- User ID and ID Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1;">
@@ -58,9 +58,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                     </div>
-                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" data-field="IdNumber" />
+                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" id="IdNumber-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" ></span>
                             </div>
                         </div>
 
@@ -82,9 +82,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 </div>
-                                <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" data-field="Email" />
+                                <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" />
                             </div>
-                            <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" id="Email-validation"></span>
+                            <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Username and Mobile Number on one line -->
@@ -95,9 +95,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
                                     </div>
-                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" data-field="Username" />
+                                    <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold" id="Username-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold"></span>
                             </div>
                             <div style="flex: 1;">
                                 <label asp-for="ProfileUsersData.MobileNo" class="form-label"></label>
@@ -105,9 +105,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     </div>
-                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" data-field="MobileNo" />
+                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" />
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold" id="MobileNo-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold"></span>
                             </div>
                         </div>
 

@@ -23,7 +23,7 @@ namespace Spider_EMT.Pages
         public SettingsVM SettingsData { get; set; } = new SettingsVM();
         public string UserProfilePathUrl = string.Empty;
 
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGet()
         {
             try
             {

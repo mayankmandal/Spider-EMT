@@ -7,13 +7,6 @@
 }
 $(document).ready(function () {
 
-    $('#ProfileUsersData_Username, #ProfileUsersData_MobileNo, #ProfileUsersData_Email, #ProfileUsersData_IdNumber').on('blur', function () {
-        var field = $(this).attr('data-field');
-        var value = $(this).val();
-        var validationSpan = $(this).attr('data-field') + '-validation';
-        checkUniqueness(field, value, validationSpan);
-    });
-
     $('#togglePasswordVisibility').on('click', function () {
         var passwordInput = $('#ProfileUsersData_Password');
         var icon = $(this);

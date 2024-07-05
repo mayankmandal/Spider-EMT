@@ -691,15 +691,15 @@ namespace Spider_EMT.Controller
             }
         }
 
-        [HttpGet("CheckUniqueness")]
+        [HttpPost("CheckUniqueness")]
         [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CheckUniqueness(string field, string value)
+        public async Task<IActionResult> CheckUniqueness([FromBody] UniquenessCheckRequest uniqueRequest)
         {
             try
             {
                 bool isUniqueValue = false;
-                isUniqueValue = await _navigationRepository.CheckUniquenessAsync(field, value);
+                isUniqueValue = await _navigationRepository.CheckUniquenessAsync(uniqueRequest.Field, uniqueRequest.Value);
                 return Ok(new { IsUnique = isUniqueValue });
             }
             catch (Exception ex)

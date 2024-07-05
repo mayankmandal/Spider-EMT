@@ -92,10 +92,10 @@ namespace Spider_EMT.Repository.Domain
                         ProfileUserAPIVM profileUser = new ProfileUserAPIVM
                         {
                             UserId = Convert.ToInt32(dataRow["UserId"]),
-                            IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                            IdNumber = dataRow["IdNumber"].ToString(),
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
-                            MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                            MobileNo = dataRow["MobileNo"].ToString(),
                             ProfileSiteData = new ProfileSiteVM
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
@@ -256,10 +256,10 @@ namespace Spider_EMT.Repository.Domain
                     profileUser = new ProfileUserAPIVM
                     {
                         UserId = Convert.ToInt32(dataRow["UserId"]),
-                        IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                        IdNumber = dataRow["IdNumber"].ToString(),
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
-                        MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                        MobileNo = dataRow["MobileNo"].ToString(),
                         ProfileSiteData = new ProfileSiteVM
                         {
                             ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
@@ -592,10 +592,10 @@ namespace Spider_EMT.Repository.Domain
                     DataRow dataRow = dataTable.Rows[0];
                     profileUserExisting = new ProfileUserAPIVM
                     {
-                        IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                        IdNumber = dataRow["IdNumber"].ToString(),
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
-                        MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                        MobileNo = dataRow["MobileNo"].ToString(),
                         ProfileSiteData = new ProfileSiteVM
                         {
                             ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
@@ -1032,10 +1032,10 @@ namespace Spider_EMT.Repository.Domain
                         ProfileUserAPIVM profileUserAPIVM = new ProfileUserAPIVM
                         {
                             UserId = Convert.ToInt32(dataRow["UserId"]),
-                            IdNumber = Convert.ToInt64(dataRow["IdNumber"]),
+                            IdNumber = dataRow["IdNumber"].ToString(),
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
-                            MobileNo = Convert.ToInt64(dataRow["MobileNo"]),
+                            MobileNo = dataRow["MobileNo"].ToString(),
                             ProfileSiteData = new ProfileSiteVM
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
@@ -1092,7 +1092,7 @@ namespace Spider_EMT.Repository.Domain
             try
             {
                 ProfileUserAPIVM userSettings = new ProfileUserAPIVM();
-                string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email from tblUsers tu where tu.UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email, tu.IdNumber, tu.MobileNo from tblUsers tu where tu.UserId = {_currentUser.UserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -1106,6 +1106,8 @@ namespace Spider_EMT.Repository.Domain
                         Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
                         Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
                         Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        IdNumber = dataRow["IdNumber"] != DBNull.Value ? dataRow["IdNumber"].ToString() : string.Empty,
+                        MobileNo = dataRow["MobileNo"] != DBNull.Value ? dataRow["MobileNo"].ToString() : string.Empty,
                     };
                 }
                 return userSettings;
@@ -1208,7 +1210,7 @@ namespace Spider_EMT.Repository.Domain
                 }
                 if (tableEnum == null)
                 {
-                    throw new ArgumentException("Field does not match any known table.");
+                    throw new ArgumentException($"Field - {field} does not match any known column.");
                 }
                 // User Profile Creation
                 SqlParameter[] sqlParameters = new SqlParameter[]
@@ -1234,11 +1236,11 @@ namespace Spider_EMT.Repository.Domain
             }
             catch (SqlException sqlEx)
             {
-                throw new Exception("Error while checking existing username - SQL Exception.", sqlEx);
+                throw new Exception($"Error while checking existing {field} - SQL Exception.", sqlEx);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while checking existing username.", ex);
+                throw new Exception($"Error while checking existing {field}.", ex);
             }
         }
     }

@@ -11,8 +11,9 @@ namespace Spider_EMT.Models.ViewModels
 
         [Required(ErrorMessage = "ID Number is required")]
         [DisplayName("Iqama Number")]
-        [Range(1000000000, 9999999999, ErrorMessage = "ID Number must be a 10-digit integer")]
-        public long IdNumber { get; set; }
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "ID Number must be a 10-digit number")]
+        [CheckUniquenessinDB("IdNumber")]
+        public string IdNumber { get; set; }
 
         [Required(ErrorMessage = "Full Name is required")]
         [DisplayName("Full Name")]
@@ -24,12 +25,14 @@ namespace Spider_EMT.Models.ViewModels
         [DisplayName("Email Address")]
         [StringLength(100, ErrorMessage = "Email Address must be 100 characters or fewer")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        [CheckUniquenessinDB("Email")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Mobile Number is required")]
         [DisplayName("Mobile Number")]
-        [Range(1000000000, 9999999999, ErrorMessage = "Mobile Number must be a 10-digit integer")]
-        public long MobileNo { get; set; }
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Mobile Number must be a 10-digit number")]
+        [CheckUniquenessinDB("MobileNo")]
+        public string MobileNo { get; set; }
 
         [Required(ErrorMessage = "Profile Data is required")]
         public ProfileSiteVM ProfileSiteData { get; set; }
@@ -38,6 +41,7 @@ namespace Spider_EMT.Models.ViewModels
         [DisplayName("Username")]
         [StringLength(100, ErrorMessage = "Username must be 100 characters or fewer")]
         [RegularExpression(@"^[a-zA-Z0-9._ ]*$", ErrorMessage = "Username must contain only alphabets, numbers, spaces, period and underscores")]
+        [CheckUniquenessinDB("Username")]
         public string Username { get; set; }
 
         [Required(ErrorMessage = "Please upload a profile picture.")]
@@ -47,14 +51,10 @@ namespace Spider_EMT.Models.ViewModels
         public IFormFile PhotoFile { get; set; }
 
         [DisplayName("New Password")]
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
-        [MaxLength(16, ErrorMessage = "Password must be at most 16 characters long")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Password must be at least 8 characters and at most 16 characters long")]
         public string Password { get; set; }
         [DisplayName("ReType New Password")]
-        [MinLength(8, ErrorMessage = "ReType Password must be at least 8 characters long")]
-        [MaxLength(16, ErrorMessage = "ReType Password must be at most 16 characters long")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "ReType Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Password must be at least 8 characters and at most 16 characters long")]
         [Compare("Password", ErrorMessage = "New Password and ReType New Password do not match.")]
         public string ReTypePassword { get; set; }
 

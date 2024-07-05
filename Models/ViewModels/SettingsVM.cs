@@ -28,14 +28,10 @@ namespace Spider_EMT.Models.ViewModels
         public IFormFile? SettingPhotoFile { get; set; }
 
         [DisplayName("New Password")]
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters long")]
-        [MaxLength(16, ErrorMessage = "Password must be at most 16 characters long")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Password must be at least 8 characters and at most 16 characters long")]
         public string? Password { get; set; }
         [DisplayName("ReType New Password")]
-        [MinLength(8, ErrorMessage = "ReType Password must be at least 8 characters long")]
-        [MaxLength(16, ErrorMessage = "ReType Password must be at most 16 characters long")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "ReType Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$", ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Password must be at least 8 characters and at most 16 characters long")]
         [Compare("Password", ErrorMessage = "New Password and ReType New Password do not match.")]
         public string? ReTypePassword { get; set; }
     }
