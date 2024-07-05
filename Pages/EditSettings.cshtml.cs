@@ -12,6 +12,7 @@ namespace Spider_EMT.Pages
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private ProfileUserAPIVM _userSettings;
         public EditSettingsModel(IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment)
         {
             _configuration = configuration;
@@ -27,6 +28,8 @@ namespace Spider_EMT.Pages
             try
             {
                 await LoadCurrentUserData();
+                    // Store _userSettings in TempData for subsequent requests
+                TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
                 return Page();
             }
             catch (Exception ex)
@@ -38,25 +41,40 @@ namespace Spider_EMT.Pages
         {
             var client = _clientFactory.CreateClient();
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetSettingsData");
-            var userSettings = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
+            _userSettings = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
 
-            if (!string.IsNullOrEmpty(userSettings.Username))
+            if (!string.IsNullOrEmpty(_userSettings.Username))
             {
                 // Assign values from userSettings to settingsViewModel
                 SettingsData = new SettingsVM
                 {
-                    SettingId = userSettings.UserId,
-                    SettingName = userSettings.FullName,
-                    SettingUsername = userSettings.Username,
-                    SettingEmail = userSettings.Email,
+                    SettingId = _userSettings.UserId,
+                    SettingName = _userSettings.FullName,
+                    SettingUsername = _userSettings.Username,
+                    SettingEmail = _userSettings.Email,
                     SettingPhotoFile = null,
                 };
-                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], userSettings.Userimgpath);
+                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _userSettings.Userimgpath);
             };
         }
 
-        public async Task<JsonResult> OnPostSubmitAsync()
+        public async Task<IActionResult> OnPost()
         {
+            // Check if _userSettings is already in TempData
+            if (TempData.ContainsKey("UserSettings"))
+            {
+                _userSettings = JsonConvert.DeserializeObject<ProfileUserAPIVM>(TempData["UserSettings"].ToString());
+                if (_userSettings.Username == SettingsData.SettingUsername)
+                {
+                    ModelState.Remove("SettingsData.SettingUsername");
+                }
+
+                if (_userSettings.Email == SettingsData.SettingEmail)
+                {
+                    ModelState.Remove("SettingsData.SettingEmail");
+                }
+            }
+
             if (SettingsData.SettingPhotoFile == null)
             {
                 ModelState.Remove("SettingsData.SettingPhotoFile");
@@ -70,7 +88,10 @@ namespace Spider_EMT.Pages
 
             if (!ModelState.IsValid)
             {
-                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
+                TempData["error"] = "Model State Validation Failed.";
+                TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
+                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _userSettings.Userimgpath);
+                return Page();
             }
             try
             {
@@ -80,12 +101,6 @@ namespace Spider_EMT.Pages
 
                 if (SettingsData.SettingPhotoFile != null)
                 {
-                    var fileExtension = Path.GetExtension(SettingsData.SettingPhotoFile.FileName).ToLower();
-                    if (!Constants.validImageExtensions.Contains(fileExtension))
-                    {
-                        return new JsonResult(new { success = false, message = "Invalid file type. Only image files (jpg, jpeg, png, gif) are allowed." });
-                    }
-
                     uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + SettingsData.SettingPhotoFile.FileName;
                     filePath = Path.Combine(uploadFolder, uniqueFileName);
@@ -117,11 +132,16 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $"{SettingsData.SettingName} - Profile Updated Successfully" });
+                    TempData["success"] = $"{SettingsData.SettingName} - Profile Updated Successfully";
+                    TempData.Remove("UserSettings");
+                    return RedirectToPage();
                 }
                 else
                 {
-                    return new JsonResult(new { success = false, message = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    TempData["error"] = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                    TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
+                    UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _userSettings.Userimgpath);
+                    return Page();
                 }
 
             }
@@ -138,9 +158,10 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private JsonResult HandleError(Exception ex, string errorMessage)
+        private IActionResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $"{SettingsData.SettingName} - " + errorMessage + ". Error details: " + ex.Message });
+            TempData["error"] = $"{SettingsData.SettingName} - " + errorMessage + ". Error details: " + ex.Message;
+            return Page();
         }
     }
 }

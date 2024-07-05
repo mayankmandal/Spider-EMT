@@ -6,7 +6,7 @@
 }
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
-    <form asp-page-handler="Submit" id="createProfileForm">
+    <form method="post" enctype="multipart/form-data" id="createProfileForm">
         <div id="createProfileSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:60%;">
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column;">
@@ -46,9 +46,10 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                        <div class="mb-3">
                             <span asp-validation-for="ProfileUsersData.PhotoFile" class="text-danger fw-bold"></span>
                         </div>
-
                         <!-- User ID and ID Number on one line -->
                         <div class="mb-3" style="display: flex; justify-content: space-between;">
                             <div style="flex: 1;">

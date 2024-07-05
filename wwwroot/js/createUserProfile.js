@@ -1,4 +1,11 @@
-﻿$(document).ready(function () {
+﻿function prepareFormSubmission() {
+    // Get the selected profile ID
+    var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
+
+    // Set the hidden fields with ProfileId and ProfileName
+    $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
+}
+$(document).ready(function () {
 
     $('#ProfileUsersData_Username, #ProfileUsersData_MobileNo, #ProfileUsersData_Email, #ProfileUsersData_IdNumber').on('blur', function () {
         var field = $(this).attr('data-field');
@@ -36,11 +43,7 @@
     $('#profile-img-file-input').change(function () {
         // Get the selected file
         var file = this.files[0];
-        var validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-        var fileName = file.name.toLowerCase();
-        var fileExtension = fileName.split('.').pop();
-
-        if (validExtensions.includes(fileExtension)) {
+        if (file) {
             // Create a file reader object
             var reader = new FileReader();
 
@@ -53,45 +56,5 @@
             // Read the selected file as a data URL
             reader.readAsDataURL(file);
         }
-    });
-    $('form').submit(function (e) {
-        e.preventDefault();
-
-        // Get the selected profile ID
-        var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
-
-        // Set the hidden fields with ProfileId and ProfileName
-        $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
-
-        // Create a FormData object
-        var formData = new FormData(this);
-
-        // Form submission handling
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                // Success handling
-                if (response.success) {
-                    toastr.success(response.message);
-
-                    // Clear the form content
-                    $('form')[0].reset(); // Reset the form
-                    $('form').find('input, select').val('').removeClass('valid is-valid'); // Clear form fields and remove validation classes
-
-                    // Remove 'valid' and 'is-valid' classes from all elements
-                    $('.valid, .is-valid').removeClass('valid is-valid');
-                } else {
-                    toastr.error(response.message);
-                }
-            },
-            error: function (xhr, status, error) {
-                // Error Handling
-                toastr.error("An error occurred: " + error);
-            }
-        });
     });
 });

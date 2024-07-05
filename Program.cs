@@ -1,6 +1,9 @@
 using AutoMapper;
 using Spider_EMT.Configuration;
+using Spider_EMT.Configuration.IService;
+using Spider_EMT.Configuration.Service;
 using Spider_EMT.DAL;
+using Spider_EMT.Models.ValidationAttributes;
 using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 
@@ -29,6 +32,7 @@ builder.Services.AddTransient<ISiteSelectionRepository>(provider =>
 });
 
 builder.Services.AddTransient<INavigationRepository, NavigationRepository>();
+builder.Services.AddScoped<IUniquenessCheckService, UniquenessCheckService>();
 
 var app = builder.Build();
 

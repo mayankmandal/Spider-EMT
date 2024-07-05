@@ -17,26 +17,6 @@ function getCurrentFormattedDateTime() {
     return formattedDateTime;
 }
 
-function checkUniqueness(field, value, validationSpan) {
-    $.ajax({
-        url: '/api/Navigation/CheckUniqueness',
-        type: 'GET',
-        data: { field: field, value: value },
-        success: function (response) {
-            if (response.isUnique) {
-                $(`#${field}`).removeClass('is-invalid').addClass('is-valid');
-                $(`#${validationSpan}`).text(`${field} is available`).removeClass('text-danger').addClass('text-success');
-            } else {
-                $(`#${field}`).removeClass('is-valid').addClass('is-invalid');
-                $(`#${validationSpan}`).text(`${field} is already taken. Please provide another ${field}`).removeClass('text-success').addClass('text-danger');
-            }
-        },
-        error: function () {
-            $(`#${validationSpan}`).text(`An error occurred while checking the ${field}`);
-        }
-    });
-}
-
 $(document).ready(function () {
     var currentYear = new Date().getFullYear();
     $('#copyright-year').text(currentYear);

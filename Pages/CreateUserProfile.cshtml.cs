@@ -42,12 +42,13 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
             ProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
-        public async Task<JsonResult> OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
-                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
+                TempData["error"] = "Model State Validation Failed.";
+                return Page();
             }
             try
             {
@@ -56,11 +57,6 @@ namespace Spider_EMT.Pages
                 string uploadFolder = null;
                 if (ProfileUsersData.PhotoFile != null)
                 {
-                    var fileExtension = Path.GetExtension(ProfileUsersData.PhotoFile.FileName).ToLower();
-                    if (!Constants.validImageExtensions.Contains(fileExtension))
-                    {
-                        return new JsonResult(new { success = false, message = "Invalid file type. Only image files (jpg, jpeg, png, gif) are allowed." });
-                    }
                     uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + ProfileUsersData.PhotoFile.FileName;
                     filePath = Path.Combine(uploadFolder, uniqueFileName);
@@ -98,12 +94,14 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $"{ProfileUsersData.FullName} - Profile Created Successfully" });
+                    TempData["success"] = $"{ProfileUsersData.FullName} - Profile Created Successfully";
+                    return RedirectToPage();
                 }
                 else
                 {
                     await LoadAllProfilesData();
-                    return new JsonResult(new { success = true, message = $"{ProfileUsersData.FullName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    TempData["error"] = $"{ProfileUsersData.FullName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                    return Page();
                 }
             }
             catch (HttpRequestException ex)
@@ -119,9 +117,10 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private JsonResult HandleError(Exception ex, string errorMessage)
+        private IActionResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $"{ProfileUsersData.FullName} - " + errorMessage + ". Error details: " + ex.Message });
+            TempData["error"] = $"{ProfileUsersData.FullName} - " + errorMessage + ". Error details: " + ex.Message;
+            return Page();
         }
     }
 }

@@ -65,12 +65,6 @@ namespace Spider_EMT.Pages
 
                 if (ProfileUsersData.PhotoFile != null)
                 {
-                    var fileExtension = Path.GetExtension(ProfileUsersData.PhotoFile.FileName).ToLower();
-                    if (!Constants.validImageExtensions.Contains(fileExtension))
-                    {
-                        return new JsonResult(new { success = false, message = "Invalid file type. Only image files (jpg, jpeg, png, gif) are allowed." });
-                    }
-
                     uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
                     uniqueFileName = Guid.NewGuid().ToString() + "_" + ProfileUsersData.PhotoFile.FileName;
                     filePath = Path.Combine(uploadFolder, uniqueFileName);

@@ -9,7 +9,7 @@ namespace Spider_EMT.Models.ValidationAttributes
         {
             _maxFileSize = maxFileSize;
         }
-        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             if (value is IFormFile file)
             {

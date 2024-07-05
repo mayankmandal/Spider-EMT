@@ -42,6 +42,7 @@ namespace Spider_EMT.Models.ViewModels
 
         [Required(ErrorMessage = "Please upload a profile picture.")]
         [DisplayName("User Photo")]
+        [AllowedExtensions(new string[] { ".jpg", ".png", ".jpeg" })]
         [MaxFileSize(20 * 1024, ErrorMessage = "Image size cannot exceed 20 KB")]
         public IFormFile PhotoFile { get; set; }
 

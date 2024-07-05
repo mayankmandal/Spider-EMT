@@ -5,7 +5,6 @@
         public const string MagicString = "";
 
         public const string CategoryType_UncategorizedPages = "Uncategorized Pages";
-        public static readonly string[] validImageExtensions = new string[] { ".jpg", ".jpeg", ".png" };
 
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";
         public const string SP_AddNewProfile = "dbo.uspAddNewProfile";
