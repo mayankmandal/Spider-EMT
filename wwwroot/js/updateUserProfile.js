@@ -1,6 +1,13 @@
 ﻿var apiResultData = []; // Global variable to store the result set
+function prepareFormSubmission() {
+    // Get the selected profile ID
+    var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
 
+    // Set the hidden fields with ProfileId and ProfileName
+    $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
+}
 function handleResultItemClick(item, resultItem) {
+    
     // Deselect all items
     $('.search-result-item').removeClass('selected');
 
@@ -29,22 +36,42 @@ function handleResultItemClick(item, resultItem) {
     $('input[name="ProfileUsersData.ChangePassword"]').prop('checked', item.changePassword === true);
 }
 
-$(document).ready(function () {
-    $('#ProfileUsersData_Username, #ProfileUsersData_MobileNo, #ProfileUsersData_Email, #ProfileUsersData_IdNumber').on('blur', function () {
-        var field = $(this).attr('data-field');
-        var value = $(this).val();
-        var validationSpan = $(this).attr('data-field') + '-validation';
-        checkUniqueness(field, value, validationSpan);
-    });
+function handleResultOnError(item) {
+    // Populate form with selected user data
+    $('#ProfileUsersData_UserId').val(item.UserId);
+    // Load user image
+    if (item.userimgpath) {
+        $('#loadedProfilePicture').attr('src', item.Userimgpath);
+    } else {
+        // Handle case where user image path is empty or null
+        $('#loadedProfilePicture').attr('src', '/images/icons/defaultUserImage.jpg'); // Set src to empty string or placeholder image path
+    }
 
+    /*$('#ProfileUsersData_IdNumber').val(item.IdNumber);
+    $('#ProfileUsersData_FullName').val(item.FullName);
+    $('#ProfileUsersData_Email').val(item.Email);
+    $('#ProfileUsersData_MobileNo').val(item.MobileNo);
+    $('#profileSelect').val(item.profileSiteData.ProfileName);
+    $('#profileIdHidden').val(item.profileSiteData.ProfileId);
+    $('#ProfileUsersData_Username').val(item.Username);
+    
+    // Check checkboxes based on item properties
+    $('input[name="ProfileUsersData.IsActive"]').prop('checked', item.IsActive === true);
+    $('input[name="ProfileUsersData.IsActiveDirectoryUser"]').prop('checked', item.IsActiveDirectoryUser === true);
+    $('input[name="ProfileUsersData.ChangePassword"]').prop('checked', item.ChangePassword === true);*/
+}
+
+$(document).ready(function () {
+    // Check if ProfileUsersData.UserId has a value
+    if (profileUsersDataJson) {
+        handleResultOnError(profileUsersDataJson);
+        $('#updateProfileSection').show();
+    }
     $('#profile-img-file-input').change(function () {
         // Get the selected file
         var file = this.files[0];
-        var validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-        var fileName = file.name.toLowerCase();
-        var fileExtension = fileName.split('.').pop();
 
-        if (validExtensions.includes(fileExtension)) {
+        if (file) {
             // Create a file reader object
             var reader = new FileReader();
 
@@ -59,6 +86,9 @@ $(document).ready(function () {
         }
     });
     $('#searchButton').on('click', function () {
+        $('.validation-summary-errors').empty();
+        $('.field-validation-error').empty();
+
         var searchCriteria = $('#searchCriteria').val();
         var searchInput = $('#searchInput').val();
 
@@ -138,6 +168,8 @@ $(document).ready(function () {
         $('#resultsCount').text('');
         $('#resultsCount').hide();
         $('#updateProfileSection').hide();
+        $('.validation-summary-errors').empty();
+        $('.field-validation-error').empty();
         $('#selectButton').hide();
     })
 
@@ -154,41 +186,6 @@ $(document).ready(function () {
                 scrollTop: $('#updateProfileSection').offset().top
             }, 'fast');
         }
-    });
-    $('form').submit(function (e) {
-        e.preventDefault();
-
-        // Get the selected profile ID
-        var selectedProfileId = $('#profileSelect option:selected').attr('data-profileid');
-
-        // Set the hidden fields with ProfileId and ProfileName
-        $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
-
-        // Create a FormData object
-        var formData = new FormData(this);
-
-        // Form submission handling
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                // Success handling
-                if (response.success) {
-                    toastr.success(response.message);
-                    // Remove 'valid' and 'is-valid' classes from all elements
-                    $('.valid, .is-valid').removeClass('valid is-valid');
-                } else {
-                    toastr.error(response.message);
-                }
-            },
-            error: function (xhr, status, error) {
-                // Error Handling
-                toastr.error("An error occurred: " + error);
-            }
-        });
     });
 });
 

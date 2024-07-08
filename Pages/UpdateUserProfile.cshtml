@@ -1,4 +1,5 @@
 ﻿@page
+@using Newtonsoft.Json
 @model Spider_EMT.Pages.UpdateUserProfileModel
 @{
     ViewData["Title"] = "Update User";
@@ -27,7 +28,6 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div asp-validation-summary="All"></div>
                     <!-- Search Section -->
                     <div class="mb-3 form-group">
                         <label for="searchCriteria" class="form-label">
@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <form id="updateProfileForm" asp-page-handler="Submit">
+    <form id="updateProfileForm" method="post" enctype="multipart/form-data">
         <div id="updateProfileSection" class="container form-control pt-4 pb-2 mt-3" style="height:auto; background-color: #f4f0ec; width:60%;display:none;">
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around; height:auto; flex-direction:column; ">
@@ -111,6 +111,7 @@
                                     </label>
                                 </div>
                             </div>
+                            <br />
                             <span asp-validation-for="ProfileUsersData.PhotoFile" class="text-danger fw-bold"></span>
                         </div>
 
@@ -122,7 +123,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                     </div>
-                                    <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" value="ProfileUsersData.UserId" disabled />
+                                    <input asp-for="ProfileUsersData.UserId" placeholder="User ID" class="form-control" readonly />
                                 </div>
                             </div>
                             <div style="flex: 1;">
@@ -131,9 +132,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                     </div>
-                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control" data-field="IdNumber" />
+                                    <input type="text" asp-for="ProfileUsersData.IdNumber" placeholder="National/Iqama Number" class="form-control"/>
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold" id="IdNumber-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.IdNumber" class="text-danger fw-bold"></span>
                             </div>
                         </div>
 
@@ -157,9 +158,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                     </div>
-                                    <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control" data-field="Email" />
+                                    <input type="email" asp-for="ProfileUsersData.Email" placeholder="Email Address" class="form-control"/>
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold" id="Email-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.Email" class="text-danger fw-bold"></span>
                             </div>
                             <div style="flex: 1;">
                                 <label asp-for="ProfileUsersData.MobileNo" class="form-label"></label>
@@ -167,9 +168,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     </div>
-                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control" data-field="MobileNo" />
+                                    <input type="tel" asp-for="ProfileUsersData.MobileNo" placeholder="Mobile Number" class="form-control"/>
                                 </div>
-                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold" id="MobileNo-validation"></span>
+                                <span asp-validation-for="ProfileUsersData.MobileNo" class="text-danger fw-bold"></span>
                             </div>
                         </div>
 
@@ -180,9 +181,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-user-cog"></i></span>
                                 </div>
-                                <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control" data-field="Username" />
+                                <input type="text" asp-for="ProfileUsersData.Username" placeholder="Username" class="form-control"/>
                             </div>
-                            <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold" id="Username-validation"></span>
+                            <span asp-validation-for="ProfileUsersData.Username" class="text-danger fw-bold"></span>
                         </div>
 
                         <!-- Dropdown to Select Profile Name -->
@@ -240,7 +241,7 @@
                             <div class="row">
                                 <div class="col-2"></div>
                                 <div class="col-3 me-4">
-                                    <button type="submit" class="btn create-btn" style="width:140px;">Update</button>
+                                    <button type="submit" onclick="prepareFormSubmission()" class="btn create-btn" style="width:140px;">Update</button>
                                 </div>
                                 <div class="col-4 ms-3">
                                     <a asp-page="/Dashboard" class="btn btn-secondary" style="width:180px;"> Back to Dashboard</a>
@@ -257,5 +258,14 @@
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        var profileUsersDataJson = null;
+        @if(Model.ProfileUsersData != null)
+        {
+            <text>
+                profileUsersDataJson = @Html.Raw(JsonConvert.SerializeObject(Model.ProfileUsersData));
+            </text>
+        }
+    </script>
     <script src="~/js/updateUserProfile.js" asp-append-version="true"></script>
 }

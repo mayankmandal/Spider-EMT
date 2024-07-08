@@ -56,7 +56,7 @@
         {
             public static string[] User = { "idnumber", "email", "mobileno", "username", "userimgpath" };
             public static string[] Profile = { "profilename" };
-            public static string[] PageCatagory = { "categoryname" };
+            public static string[] PageCatagory = { "catagoryname" };
         };
 
     }

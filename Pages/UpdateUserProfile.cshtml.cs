@@ -12,6 +12,8 @@ namespace Spider_EMT.Pages
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private ProfileUserAPIVM _profileUserData { get; set; }
+
 
         public UpdateUserProfileModel(IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment)
         {
@@ -40,22 +42,51 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
             ProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
-        public async Task<JsonResult> OnPost()
+        public async Task<IActionResult> OnPost()
         {
+            if(ProfileUsersData.UserId != null)
+            {
+                var client = _clientFactory.CreateClient();
+                var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetSettingsData");
+                _profileUserData = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
+
+                if (_profileUserData.Username == ProfileUsersData.Username)
+                {
+                    ModelState.Remove("ProfileUsersData.Username");
+                }
+
+                if (_profileUserData.Email == ProfileUsersData.Email)
+                {
+                    ModelState.Remove("ProfileUsersData.Email");
+                }
+
+                if (_profileUserData.IdNumber == ProfileUsersData.IdNumber)
+                {
+                    ModelState.Remove("ProfileUsersData.IdNumber");
+                }
+
+                if (_profileUserData.MobileNo == ProfileUsersData.MobileNo)
+                {
+                    ModelState.Remove("ProfileUsersData.MobileNo");
+                }
+            }
+
             if (ProfileUsersData.PhotoFile == null)
             {
                 ModelState.Remove("ProfileUsersData.PhotoFile");
             }
 
-            if (ProfileUsersData.Password == null)
+            if (ProfileUsersData.Password == null || ProfileUsersData.ReTypePassword == null)
             {
                 ModelState.Remove("ProfileUsersData.Password");
+                ModelState.Remove("ProfileUsersData.ReTypePassword");
             }
 
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
-                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
+                TempData["error"] = "Model State Validation Failed.";
+                return Page();
             }
             try
             {
@@ -102,12 +133,14 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $"{ProfileUsersData.FullName} - Profile Updated Successfully" });
+                    TempData["success"] = $"{ProfileUsersData.FullName} - Profile Updated Successfully";
+                    return RedirectToPage();
                 }
                 else
                 {
                     await LoadAllProfilesData();
-                    return new JsonResult(new { success = true, message = $"{ProfileUsersData.FullName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    TempData["error"] = $"{ProfileUsersData.FullName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                    return Page();
                 }
             }
             catch (HttpRequestException ex)
@@ -123,9 +156,10 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private JsonResult HandleError(Exception ex, string errorMessage)
+        private IActionResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $"{ProfileUsersData.FullName} - " + errorMessage + ". Error details: " + ex.Message });
+            TempData["error"] = $"{ProfileUsersData.FullName} - " + errorMessage + ". Error details: " + ex.Message;
+            return Page();
         }
     }
 }

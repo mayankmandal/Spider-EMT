@@ -1,10 +1,33 @@
-﻿$(document).ready(function () {
-    $('#SelectedPageCategory_CategoryName').on('blur', function () {
-        var field = $(this).attr('data-field');
-        var value = $(this).val();
-        var validationSpan = $(this).attr('data-field') + '-validation';
-        checkUniqueness(field, value, validationSpan);
+﻿function prepareFormSubmission() {
+    // Initialize the list of selected pages
+    selectedPagesLst = [];
+
+    // Loop through all checkboxes and get their associated data
+    $('input[name="SelectedPages"]').each(function () {
+        var pageId = parseInt($(this).val());
+        var isSelected = $(this).is(':checked'); // Check if the checkbox is selected
+        if (isSelected) {
+            // Find the corresponding data in availablePagesLst
+            var selectedPage = availablePagesLst.find(page => page.pageId === pageId);
+            if (selectedPage) {
+                // Add the selected page to selectedPageLst
+                selectedPagesLst.push({
+                    PageId: selectedPage.pageId,
+                    PageUrl: selectedPage.pageUrl,
+                    PageDescription: selectedPage.pageDescription,
+                    PageCatId: selectedPage.pageCatId,
+                    MenuImgPath: selectedPage.menuImgPath,
+                    isSelected: true
+                });
+            }
+        }
     });
+
+    // Store the selected pages as JSON in a hidden field
+    $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
+
+}
+$(document).ready(function () {
     function renderPageCheckboxes() {
         var container = $('#pageCheckboxContainer'); // container to append checkboxes
 
@@ -39,54 +62,4 @@
 
     // Initial render of the checkboxes without selections
     renderPageCheckboxes();
-
-    // Attach the prepare function to the form submission event
-    $('form').submit(function (e) {
-        e.preventDefault();
-
-        // Initialize the list of selected pages
-        selectedPagesLst = [];
-
-        // Loop through all checkboxes and get their associated data
-        $('input[name="SelectedPages"]').each(function () {
-            var pageId = parseInt($(this).val());
-            var isSelected = $(this).is(':checked'); // Check if the checkbox is selected
-            if (isSelected) {
-                // Find the corresponding data in availablePagesLst
-                var selectedPage = availablePagesLst.find(page => page.pageId === pageId);
-                if (selectedPage) {
-                    // Add the selected page to selectedPageLst
-                    selectedPagesLst.push({
-                        PageId: selectedPage.pageId,
-                        PageUrl: selectedPage.pageUrl,
-                        PageDescription: selectedPage.pageDescription,
-                        PageCatId: selectedPage.pageCatId,
-                        MenuImgPath: selectedPage.menuImgPath,
-                        isSelected: true
-                    });
-                }
-            }
-        });
-
-        // Store the selected pages as JSON in a hidden field
-        $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
-
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function (response) {
-                if (response.success) {
-                    toastr.success(response.message);
-                    // Remove 'valid' and 'is-valid' classes from all elements
-                    $('.valid, .is-valid').removeClass('valid is-valid');
-                } else {
-                    toastr.error(response.message);
-                }
-            },
-            error: function (response) {
-                toastr.error(response.message);
-            }
-        });
-    });
 });

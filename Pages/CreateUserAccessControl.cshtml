@@ -8,8 +8,6 @@
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form id="createUserAccessForm" asp-page-handler="Submit">
         <div id="createAccessSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%">
-            <input type="hidden" id="SelectedProfileId" name="SelectedProfileId" />
-            <input type="hidden" id="SelectedProfileName" name="SelectedProfileName" />
             <input type="hidden" id="SelectedPagesJson" name="SelectedPagesJson" />
 
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;">
@@ -35,43 +33,17 @@
                         <!-- Validation Summary -->
                         <div asp-validation-summary="All" class="text-danger fw-bold"></div>
 
-                        <div class="row ms-2">
-                            <!-- Add radio buttons for Default View and Top View -->
-                            <div class="col-4" id="profileTypeViewContainer">
-                                <label class="mt-2">Changes For: </label><br />
-                                <label><input class="form-check-input" type="radio" name="profileType" value="oldProfile" checked> Select Existing Profile</label><br />
-                                <label><input class="form-check-input" type="radio" name="profileType" value="newProfile"> Create New Profile</label>
-                            </div>
-
-                            <!-- Profile Dropdown -->
-                            <div class="col mb-3" id="profileDropdownDiv" style="display:none;">
-                                <label for="ProfileId" class="form-label">Select Profile</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    </div>
-                                    <select id="ProfileId" class="form-select striped-select" name="ProfileId">
-                                        <option value="" disabled selected>Select a Profile</option>
-                                        @foreach (var profile in Model.AllProfilesData)
-                                        {
-                                            <option value="@profile.ProfileId">@profile.ProfileName</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-
                             <!-- Profile Input-->
                             <div id="profileInputDiv" class="col mb-3" style="display:none;">
-                                <label for="ProfileName" class="form-label">Profile Name</label>
+                                <label asp-for="ProfileSiteData.ProfileName" class="form-label">Profile Name</label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                     </div>
-                                    <input id="ProfileName" placeholder="Profile Name" class="form-control" data-field="ProfileName" />
+                                <input asp-for="ProfileSiteData.ProfileName" placeholder="Profile Name" class="form-control" data-field="ProfileName" />
                                 </div>
-                                <span asp-validation-for="@Model.AllProfilesData.Any()" class="text-danger fw-bold" id="ProfileName-validation"></span>
+                            <span asp-validation-for="ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
                             </div>
-                        </div>
 
                         <hr />
 

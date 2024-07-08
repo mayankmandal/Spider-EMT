@@ -15,19 +15,15 @@ namespace Spider_EMT.Pages
             _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
-        public List<ProfileSiteVM>? AllProfilesData { get; set; }
         public List<PageSiteVM>? AllPageSites { get; set; }
         [BindProperty]
-        public string? SelectedProfileId { get; set; }
-        [BindProperty]
-        public string? SelectedProfileName { get; set; }
+        public ProfileSiteVM ProfileSiteData { get; set; }
         [BindProperty]
         public string? SelectedPagesJson { get; set; }
         public async Task<IActionResult> OnGet()
         {
             try
             {
-                await LoadAllProfilesData();
                 await LoadAllPagesData();
                 return Page();
             }
@@ -35,12 +31,6 @@ namespace Spider_EMT.Pages
             {
                 return HandleError(ex, "Error occurred while loading page data.");
             }
-        }
-        private async Task LoadAllProfilesData()
-        {
-            var client = _clientFactory.CreateClient();
-            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
-            AllProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
         private async Task LoadAllPagesData()
         {
@@ -52,7 +42,6 @@ namespace Spider_EMT.Pages
         {
             if (!ModelState.IsValid)
             {
-                await LoadAllProfilesData();
                 await LoadAllPagesData();
                 return new JsonResult(new { success = false, message = "Model State Validation Failed." });
             }
@@ -62,8 +51,7 @@ namespace Spider_EMT.Pages
                 var selectedPages = JsonConvert.DeserializeObject<List<PageSiteVM>>(SelectedPagesJson);
                 ProfileSiteVM selectedProfileData = new ProfileSiteVM
                 {
-                    ProfileId = JsonConvert.DeserializeObject<int>(SelectedProfileId),
-                    ProfileName = SelectedProfileName
+                    ProfileName = ProfileSiteData.ProfileName
                 };
 
                 ProfilePagesAccessDTO profilePageDTO = new ProfilePagesAccessDTO
@@ -81,13 +69,12 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $"{SelectedProfileName} - Access Control Created Successfully" });
+                    return new JsonResult(new { success = true, message = $"{ProfileSiteData.ProfileName} - Access Control Created Successfully" });
                 }
                 else
                 {
-                    await LoadAllProfilesData();
                     await LoadAllPagesData();
-                    return new JsonResult(new { success = true, message = $"{SelectedProfileName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    return new JsonResult(new { success = true, message = $"{ProfileSiteData.ProfileName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
                 }
             }
             catch (HttpRequestException ex)
@@ -105,7 +92,7 @@ namespace Spider_EMT.Pages
         }
         private JsonResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $"{SelectedProfileName} - " + errorMessage + ". Error details: " + ex.Message });
+            return new JsonResult(new { success = false, message = $"{ProfileSiteData.ProfileName} - " + errorMessage + ". Error details: " + ex.Message });
 
         }
     }
