@@ -25,7 +25,6 @@
 
     // Store the selected pages as JSON in a hidden field
     $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
-
 }
 $(document).ready(function () {
     function renderPageCheckboxes() {

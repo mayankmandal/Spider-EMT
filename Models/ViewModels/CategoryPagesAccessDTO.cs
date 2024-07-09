@@ -2,7 +2,7 @@
 {
     public class CategoryPagesAccessDTO
     {
-        public PageCategoryVM PageCategoryData { get; set; }
+        public PageCategory PageCategoryData { get; set; }
         public List<PageSiteVM> PagesList { get; set; }
     }
 }

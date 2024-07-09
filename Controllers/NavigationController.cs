@@ -707,6 +707,21 @@ namespace Spider_EMT.Controller
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+        [HttpPost("FetchUserRecord")]
+        [ProducesResponseType(typeof(ProfileUserAPIVM), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> FetchUserRecord([FromBody] UserIdRequest request)
+        {
+            try
+            {
+                ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetUserRecordAsync(request.UserId);
+                return Ok(profileUserAPIVM);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
 
         #endregion
     }

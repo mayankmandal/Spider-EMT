@@ -6,7 +6,7 @@
 }
 
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
-    <form id="createUserAccessForm" asp-page-handler="Submit">
+    <form id="createUserAccessForm" method="post">
         <div id="createAccessSection" class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%">
             <input type="hidden" id="SelectedPagesJson" name="SelectedPagesJson" />
 
@@ -33,17 +33,17 @@
                         <!-- Validation Summary -->
                         <div asp-validation-summary="All" class="text-danger fw-bold"></div>
 
-                            <!-- Profile Input-->
-                            <div id="profileInputDiv" class="col mb-3" style="display:none;">
-                                <label asp-for="ProfileSiteData.ProfileName" class="form-label">Profile Name</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
-                                    </div>
-                                <input asp-for="ProfileSiteData.ProfileName" placeholder="Profile Name" class="form-control" data-field="ProfileName" />
+                        <!-- Profile Input-->
+                        <div id="profileInputDiv" class="col mb-3" style="">
+                            <label asp-for="ProfileSiteData.ProfileName" class="form-label">Profile Name</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                 </div>
-                            <span asp-validation-for="ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
+                                <input asp-for="ProfileSiteData.ProfileName" placeholder="Profile Name" class="form-control" />
                             </div>
+                            <span asp-validation-for="ProfileSiteData.ProfileName" class="text-danger fw-bold"></span>
+                        </div>
 
                         <hr />
 
@@ -58,7 +58,7 @@
                             <div class="row">
                                 <div class="col-2"></div>
                                 <div class="col-3 me-4">
-                                    <button type="submit" class="btn create-btn" style="width:140px;">Create</button>
+                                    <button type="submit" onclick="prepareFormSubmission()" class="btn create-btn" style="width:140px;">Create</button>
                                 </div>
                                 <div class="col-4 ms-3">
                                     <a asp-page="/Dashboard" class="btn btn-secondary" style="width:180px;"> Back to Dashboard</a>

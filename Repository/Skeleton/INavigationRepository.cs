@@ -29,5 +29,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<ProfileUserAPIVM> GetSettingsDataAsync();
         Task<string> UpdateSettingsDataAsync(ProfileUser userSettings);
         Task<bool> CheckUniquenessAsync(string field, string value);
+        Task<ProfileUserAPIVM> GetUserRecordAsync(int userId);
     }
 }

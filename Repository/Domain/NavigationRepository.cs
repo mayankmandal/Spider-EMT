@@ -96,7 +96,7 @@ namespace Spider_EMT.Repository.Domain
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
                             MobileNo = dataRow["MobileNo"].ToString(),
-                            ProfileSiteData = new ProfileSiteVM
+                            ProfileSiteData = new ProfileSite
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                                 ProfileName = dataRow["ProfileName"].ToString()
@@ -260,7 +260,7 @@ namespace Spider_EMT.Repository.Domain
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
                         MobileNo = dataRow["MobileNo"].ToString(),
-                        ProfileSiteData = new ProfileSiteVM
+                        ProfileSiteData = new ProfileSite
                         {
                             ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                             ProfileName = dataRow["ProfileName"].ToString()
@@ -596,7 +596,7 @@ namespace Spider_EMT.Repository.Domain
                         FullName = dataRow["FullName"].ToString(),
                         Email = dataRow["Email"].ToString(),
                         MobileNo = dataRow["MobileNo"].ToString(),
-                        ProfileSiteData = new ProfileSiteVM
+                        ProfileSiteData = new ProfileSite
                         {
                             ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                         },
@@ -1036,7 +1036,7 @@ namespace Spider_EMT.Repository.Domain
                             FullName = dataRow["FullName"].ToString(),
                             Email = dataRow["Email"].ToString(),
                             MobileNo = dataRow["MobileNo"].ToString(),
-                            ProfileSiteData = new ProfileSiteVM
+                            ProfileSiteData = new ProfileSite
                             {
                                 ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
                                 ProfileName = dataRow["ProfileName"].ToString()
@@ -1241,6 +1241,52 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 throw new Exception($"Error while checking existing {field}.", ex);
+            }
+        }
+
+        public async Task<ProfileUserAPIVM> GetUserRecordAsync(int newUserId)
+        {
+            try
+            {
+                ProfileUserAPIVM userSettings = new ProfileUserAPIVM();
+                string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email, tu.IdNumber, tu.MobileNo, tu.ProfileId, tp.ProfileName, tu.ChangePassword, tu.IsActive, tu.IsActiveDirectoryUser, tu.ChangePassword from tblUsers tu inner join tblProfile tp on tu.ProfileId = tp.ProfileId where tu.UserId = {newUserId}";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                if (dataTable.Rows.Count > 0)
+                {
+                    DataRow dataRow = dataTable.Rows[0];
+                    ProfileSite ProfileData = new ProfileSite
+                    {
+                        ProfileId = dataRow["ProfileId"] != DBNull.Value ? (int)dataRow["ProfileId"] : 0,
+                        ProfileName = dataRow["ProfileName"] != DBNull.Value ? dataRow["ProfileName"].ToString() : string.Empty
+                    };
+                    userSettings = new ProfileUserAPIVM
+                    {
+                        UserId = dataRow["UserId"] != DBNull.Value ? (int)dataRow["UserId"] : 0,
+                        FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                        Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                        Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        IdNumber = dataRow["IdNumber"] != DBNull.Value ? dataRow["IdNumber"].ToString() : string.Empty,
+                        MobileNo = dataRow["MobileNo"] != DBNull.Value ? dataRow["MobileNo"].ToString() : string.Empty,
+                        ChangePassword = dataRow["ChangePassword"] != DBNull.Value ? Convert.ToBoolean(dataRow["ChangePassword"]) : false,
+                        IsActive = dataRow["IsActive"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActive"]) : false,
+                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]) : false,
+                        ProfileSiteData = ProfileData
+                    };
+                }
+                return userSettings;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Settings.", ex);
             }
         }
     }

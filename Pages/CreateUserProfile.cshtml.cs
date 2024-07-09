@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Utility;
 using System.Text;
@@ -44,6 +45,8 @@ namespace Spider_EMT.Pages
         }
         public async Task<IActionResult> OnPost()
         {
+            ModelState.Remove("ProfileUsersData.ProfileSiteData.ProfileName");
+
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
@@ -67,6 +70,13 @@ namespace Spider_EMT.Pages
                         await ProfileUsersData.PhotoFile.CopyToAsync(fileStream);
                     }
                 }
+                
+
+                ProfileSite ProfileSiteData = new ProfileSite
+                {
+                    ProfileId = ProfileUsersData.ProfileSiteData.ProfileId,
+                    ProfileName = ProfileUsersData.ProfileSiteData.ProfileName,
+                };
 
                 ProfileUserAPIVM profileUserAPIVM = new ProfileUserAPIVM
                 {
@@ -78,7 +88,7 @@ namespace Spider_EMT.Pages
                     Password = ProfileUsersData.Password,
                     Username = ProfileUsersData.Username,
                     Userimgpath = uniqueFileName,
-                    ProfileSiteData = ProfileUsersData.ProfileSiteData,
+                    ProfileSiteData = ProfileSiteData,
                     IsActive = ProfileUsersData.IsActive,
                     IsActiveDirectoryUser = ProfileUsersData.IsActiveDirectoryUser,
                     ChangePassword = ProfileUsersData.ChangePassword,

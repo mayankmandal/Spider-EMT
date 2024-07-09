@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Utility;
 using System.Text;
@@ -61,7 +62,7 @@ namespace Spider_EMT.Pages
             {
                 // Deserialize the Json string into a list of PageSite objects
                 var selectedPages = JsonConvert.DeserializeObject<List<PageSiteVM>>(SelectedPagesJson);
-                PageCategoryVM selectedProfileData = new PageCategoryVM
+                PageCategory selectedProfileData = new PageCategory
                 {
                     PageCatId = Int32.Parse(SelectedPageCategory.CategoryName),
                     CategoryName = Constants.MagicString

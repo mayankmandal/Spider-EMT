@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Utility;
 using System.Text;
@@ -47,8 +48,25 @@ namespace Spider_EMT.Pages
             if(ProfileUsersData.UserId != null)
             {
                 var client = _clientFactory.CreateClient();
-                var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetSettingsData");
-                _profileUserData = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
+                var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/FetchUserRecord";
+                // Create a request with the user ID in the body
+                UserIdRequest requestBody = new UserIdRequest { UserId = ProfileUsersData.UserId };
+                var jsonContent = JsonConvert.SerializeObject(requestBody);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(apiUrl, httpContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    _profileUserData = JsonConvert.DeserializeObject<ProfileUserAPIVM>(responseContent);
+                }
+                else
+                {
+                    await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
+                    ModelState.AddModelError("ProfileUsersData.UserId", $"Error fetching user record for {ProfileUsersData.UserId}. Please ensure the UserId is correct.");
+                    TempData["error"] = $"Model State Validation Failed. Response status: {response.StatusCode} - {response.ReasonPhrase}";
+                    return Page();
+                }
 
                 if (_profileUserData.Username == ProfileUsersData.Username)
                 {
@@ -82,6 +100,8 @@ namespace Spider_EMT.Pages
                 ModelState.Remove("ProfileUsersData.ReTypePassword");
             }
 
+            ModelState.Remove("ProfileUsersData.ProfileSiteData.ProfileName");
+
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
@@ -107,6 +127,12 @@ namespace Spider_EMT.Pages
                     }
                 }
 
+                ProfileSite ProfileSiteData = new ProfileSite
+                {
+                    ProfileId = ProfileUsersData.ProfileSiteData.ProfileId,
+                    ProfileName = ProfileUsersData.ProfileSiteData.ProfileName,
+                };
+
                 ProfileUserAPIVM profileUserAPIVM = new ProfileUserAPIVM
                 {
                     UserId = ProfileUsersData.UserId,
@@ -117,7 +143,7 @@ namespace Spider_EMT.Pages
                     Password = "",
                     Username = ProfileUsersData.Username,
                     Userimgpath = ProfileUsersData.PhotoFile != null ? uniqueFileName : "",
-                    ProfileSiteData = ProfileUsersData.ProfileSiteData,
+                    ProfileSiteData = ProfileSiteData,
                     IsActive = ProfileUsersData.IsActive,
                     IsActiveDirectoryUser = ProfileUsersData.IsActiveDirectoryUser,
                     ChangePassword = ProfileUsersData.ChangePassword,

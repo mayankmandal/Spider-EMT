@@ -21,4 +21,8 @@
         public DateTime UpdateDate { get; set; }
         public int UpdateUserId { get; set; }
     }
+    public class UserIdRequest
+    {
+        public int UserId { get; set; }
+    }
 }

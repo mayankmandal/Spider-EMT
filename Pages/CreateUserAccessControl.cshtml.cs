@@ -38,12 +38,13 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
             AllPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
         }
-        public async Task<JsonResult> OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllPagesData();
-                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
+                TempData["error"] = "Model State Validation Failed.";
+                return Page();
             }
             try
             {
@@ -69,12 +70,14 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $"{ProfileSiteData.ProfileName} - Access Control Created Successfully" });
+                    TempData["success"] = $"{ProfileSiteData.ProfileName} - Access Control Created Successfully";
+                    return RedirectToPage();
                 }
                 else
                 {
                     await LoadAllPagesData();
-                    return new JsonResult(new { success = true, message = $"{ProfileSiteData.ProfileName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    TempData["error"] = $"{ProfileSiteData.ProfileName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                    return Page();
                 }
             }
             catch (HttpRequestException ex)
@@ -90,10 +93,10 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private JsonResult HandleError(Exception ex, string errorMessage)
+        private IActionResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $"{ProfileSiteData.ProfileName} - " + errorMessage + ". Error details: " + ex.Message });
-
+            TempData["error"] = $"{ProfileSiteData.ProfileName} - " + errorMessage + ". Error details: " + ex.Message;
+            return Page();
         }
     }
 }

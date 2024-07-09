@@ -1,15 +1,32 @@
-﻿$(document).ready(function () {
-    // Function to render profile input section
-    function renderProfileInput() {
-        $('#profileInputDiv').show(); // Show the profile input section
-        $('#profileDropdownDiv').hide(); // Hide the profile dropdown section
-    }
+﻿function prepareFormSubmission() {
+    // Initialize the list of selected pages
+    selectedPagesLst = [];
 
-    // Function to render profile dropdown section
-    function renderProfileDropdown() {
-        $('#profileInputDiv').hide(); // Hide the profile input section
-        $('#profileDropdownDiv').show(); // Show the profile dropdown section
-    }
+    // Loop through all checkboxes and get their associated data
+    $('input[name="SelectedPages"]').each(function () {
+        var pageId = parseInt($(this).val());
+        var isSelected = $(this).is(':checked'); // Check if the checkbox is selected
+        if (isSelected) {
+            // Find the corresponding data in availablePagesLst
+            var selectedPage = availablePagesLst.find(page => page.pageId === pageId);
+            if (selectedPage) {
+                // Add the selected page to selectedPageLst
+                selectedPagesLst.push({
+                    PageId: selectedPage.pageId,
+                    PageUrl: selectedPage.pageUrl,
+                    PageDescription: selectedPage.pageDescription,
+                    PageCatId: selectedPage.pageCatId,
+                    MenuImgPath: selectedPage.menuImgPath,
+                    isSelected: true
+                });
+            }
+        }
+    });
+
+    // Store the selected pages as JSON in a hidden field
+    $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
+}
+$(document).ready(function () {
     function renderPageCheckboxes() {
         var container = $('#pageCheckboxContainer'); // container to append checkboxes
 
@@ -41,100 +58,7 @@
             container.append(checkboxDiv);
         });
     }
-    $('#ProfileName').on('blur', function () {
-        var field = $(this).attr('data-field');
-        var value = $(this).val();
-        var validationSpan = $(this).attr('data-field') + '-validation';
-        checkUniqueness(field, value, validationSpan);
-    });
-
-    // Event Listener for profile type radio buttons
-    $('input[name="profileType"]').change(function () {
-        var selectedProfileType = $(this).val();
-        renderPageCheckboxes();
-
-        if (selectedProfileType === 'newProfile') {
-            renderProfileInput(); // Render profile input section for new profile
-        }
-        else {
-            renderProfileDropdown(); // Render profile dropdown section for existing profile
-        }
-    });
-
-    // Initial rendering based on the default selected radio button
-    if ($('input[name="profileType"]:checked').val() === 'newProfile') {
-        renderProfileInput(); // Render profile input section for new profile
-    } else {
-        renderProfileDropdown(); // Render profile dropdown section for existing profile
-    }
 
     // Initial render of the checkboxes without selections
     renderPageCheckboxes();
-
-    // Attach the prepare function to the form submission event
-    $('form').submit(function (e) {
-        e.preventDefault();
-
-        // Initialize the list of selected pages
-        selectedPagesLst = [];
-
-        // Get the selected profile ID and profile name
-        var selectedProfileId, selectedProfileName;
-
-        if ($('input[name="profileType"]:checked').val() === 'oldProfile') {
-            // For existing profile (dropdown)
-            selectedProfileId = $('#ProfileId').val();
-            selectedProfileName = $('#ProfileId option:selected').text();
-        } else {
-            // For new profile (input)
-            selectedProfileId = '0'; // Assuming '0' represents a new profile
-            selectedProfileName = $('#ProfileName').val(); // Get the value from the input field
-        }
-
-        // Set the hidden fields with ProfileId and ProfileName
-        $('#SelectedProfileId').val(selectedProfileId);
-        $('#SelectedProfileName').val(selectedProfileName);
-
-        // Loop through all checkboxes and get their associated data
-        $('input[name="SelectedPages"]').each(function () {
-            var pageId = parseInt($(this).val());
-            var isSelected = $(this).is(':checked'); // Check if the checkbox is selected
-            if (isSelected) {
-                // Find the corresponding data in availablePagesLst
-                var selectedPage = availablePagesLst.find(page => page.pageId === pageId);
-                if (selectedPage) {
-                    // Add the selected page to selectedPageLst
-                    selectedPagesLst.push({
-                        PageId: selectedPage.pageId,
-                        PageUrl: selectedPage.pageUrl,
-                        PageDescription: selectedPage.pageDescription,
-                        PageCatId: selectedPage.pageCatId,
-                        MenuImgPath: selectedPage.menuImgPath,
-                        isSelected: true
-                    });
-                }
-            }
-        });
-
-        // Store the selected pages as JSON in a hidden field
-        $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
-
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function (response) {
-                if (response.success) {
-                    toastr.success(response.message);
-                    // Remove 'valid' and 'is-valid' classes from all elements
-                    $('.valid, .is-valid').removeClass('valid is-valid');
-                } else {
-                    toastr.error(response.message);
-                }
-            },
-            error: function (response) {
-                toastr.error(response.message);
-            }
-        });
-    });
 });

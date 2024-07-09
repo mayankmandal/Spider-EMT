@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using System.Text;
 
@@ -39,18 +40,19 @@ namespace Spider_EMT.Pages
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
             AllPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
         }
-        public async Task<JsonResult> OnPost()
+        public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
             {
                 await LoadAllPagesData();
-                return new JsonResult(new { success = false, message = "Model State Validation Failed." });
+                TempData["error"] = "Model State Validation Failed.";
+                return Page();
             }
             try
             {
                 // Deserialize the Json string into a list of PageSite objects
                 var selectedPages = JsonConvert.DeserializeObject<List<PageSiteVM>>(SelectedPagesJson);
-                PageCategoryVM selectedProfileData = new PageCategoryVM
+                PageCategory selectedProfileData = new PageCategory
                 {
                     CategoryName = SelectedPageCategory.CategoryName
                 };
@@ -70,12 +72,14 @@ namespace Spider_EMT.Pages
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return new JsonResult(new { success = true, message = $"{SelectedPageCategory.CategoryName} - New Category Created Successfully" });
+                    TempData["success"] = $"{SelectedPageCategory.CategoryName} - New Category Created Successfully" ;
+                    return RedirectToPage();
                 }
                 else
                 {
                     await LoadAllPagesData();
-                    return new JsonResult(new { success = true, message = $"{SelectedPageCategory.CategoryName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}" });
+                    TempData["error"] = $"{SelectedPageCategory.CategoryName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                    return Page();
                 }
             }
             catch (HttpRequestException ex)
@@ -91,9 +95,10 @@ namespace Spider_EMT.Pages
                 return HandleError(ex, "An unexpected error occurred.");
             }
         }
-        private JsonResult HandleError(Exception ex, string errorMessage)
+        private IActionResult HandleError(Exception ex, string errorMessage)
         {
-            return new JsonResult(new { success = false, message = $"{SelectedPageCategory.CategoryName} - " + errorMessage + ". Error details: " + ex.Message });
+            TempData["error"] = $"{SelectedPageCategory.CategoryName} - " + errorMessage + ". Error details: " + ex.Message;
+            return Page();
         }
     }
 }
