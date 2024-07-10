@@ -14,8 +14,6 @@ namespace Spider_EMT.Pages
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private ProfileUserAPIVM _profileUserData { get; set; }
-
-
         public UpdateUserProfileModel(IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment)
         {
             _configuration = configuration;
@@ -25,6 +23,7 @@ namespace Spider_EMT.Pages
         [BindProperty]
         public ProfileUserVM ProfileUsersData { get; set; }
         public List<ProfileSiteVM>? ProfilesData { get; set; }
+        public string UserProfilePathUrl = string.Empty;
         public async Task<IActionResult> OnGet()
         {
             try
@@ -45,7 +44,9 @@ namespace Spider_EMT.Pages
         }
         public async Task<IActionResult> OnPost()
         {
-            if(ProfileUsersData.UserId != null)
+            bool isProfilePhotoReUpload = true;
+
+            if (ProfileUsersData.UserId != null)
             {
                 var client = _clientFactory.CreateClient();
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/FetchUserRecord";
@@ -92,6 +93,7 @@ namespace Spider_EMT.Pages
             if (ProfileUsersData.PhotoFile == null)
             {
                 ModelState.Remove("ProfileUsersData.PhotoFile");
+                isProfilePhotoReUpload = false;
             }
 
             if (ProfileUsersData.Password == null || ProfileUsersData.ReTypePassword == null)
@@ -106,6 +108,11 @@ namespace Spider_EMT.Pages
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
                 TempData["error"] = "Model State Validation Failed.";
+                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _profileUserData.Userimgpath);
+                if (isProfilePhotoReUpload)
+                {
+                    ModelState.AddModelError("ProfileUsersData.PhotoFile", "Please upload profile picture again.");
+                }
                 return Page();
             }
             try
@@ -166,6 +173,7 @@ namespace Spider_EMT.Pages
                 {
                     await LoadAllProfilesData();
                     TempData["error"] = $"{ProfileUsersData.FullName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                    UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _profileUserData.Userimgpath);
                     return Page();
                 }
             }

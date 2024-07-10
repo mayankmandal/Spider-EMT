@@ -592,7 +592,14 @@ namespace Spider_EMT.Controller
                 var profileUsers = await _navigationRepository.SearchUserDetailsByCriteriaAsync(criteria, input);
                 foreach (var userAPIVM in profileUsers)
                 {
-                    userAPIVM.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], userAPIVM.Userimgpath);
+                    if(!string.IsNullOrEmpty(userAPIVM.Userimgpath))
+                    {
+                        userAPIVM.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], userAPIVM.Userimgpath);
+                    }
+                    else
+                    {
+                        userAPIVM.Userimgpath = _configuration["DefaultUserImgPath"];
+                    }
                 }
                 return Ok(profileUsers);
             }

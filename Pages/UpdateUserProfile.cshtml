@@ -103,13 +103,16 @@
                         <!-- Profile Picture Field -->
                         <div class="text-center">
                             <div class="position-relative d-inline-block mx-auto mb-4">
-                                <img src="" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px;" id="loadedProfilePicture">
-                                <div class="position-absolute bottom-0 end-0 rounded-circle bg-light p-1" style="transform: translate(20%, 20%);">
-                                    <input class="d-none" asp-for="ProfileUsersData.PhotoFile" type="file" id="profile-img-file-input" />
-                                    <label for="profile-img-file-input" class="rounded-circle bg-gradient-blue p-2" style="cursor: pointer; width: 40px; height: 40px;">
-                                        <i class="ion ion-android-camera" style="font-size: 1.5rem;"></i>
-                                    </label>
-                                </div>
+                                @if (Model.UserProfilePathUrl != null)
+                                {
+                                    <img src="@Model.UserProfilePathUrl" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px;" id="loadedProfilePicture">
+                                    <div class="position-absolute bottom-0 end-0 rounded-circle bg-light p-1" style="transform: translate(20%, 20%);">
+                                        <input class="d-none" asp-for="ProfileUsersData.PhotoFile" type="file" id="profile-img-file-input" />
+                                        <label for="profile-img-file-input" class="rounded-circle bg-gradient-blue p-2" style="cursor: pointer; width: 40px; height: 40px;">
+                                            <i class="ion ion-android-camera" style="font-size: 1.5rem;"></i>
+                                        </label>
+                                    </div>
+                                }
                             </div>
                             <br />
                             <span asp-validation-for="ProfileUsersData.PhotoFile" class="text-danger fw-bold"></span>

@@ -24,12 +24,7 @@ function handleResultItemClick(item, resultItem) {
     $('#profileIdHidden').val(item.profileSiteData.profileId);
     $('#ProfileUsersData_Username').val(item.username);
     // Load user image
-    if (item.userimgpath) {
-        $('#loadedProfilePicture').attr('src', item.userimgpath);
-    } else {
-        // Handle case where user image path is empty or null
-        $('#loadedProfilePicture').attr('src', '/images/icons/defaultUserImage.jpg'); // Set src to empty string or placeholder image path
-    }
+    $('#loadedProfilePicture').attr('src', item.userimgpath);
     // Check checkboxes based on item properties
     $('input[name="ProfileUsersData.IsActive"]').prop('checked', item.isActive === true);
     $('input[name="ProfileUsersData.IsActiveDirectoryUser"]').prop('checked', item.isActiveDirectoryUser === true);
@@ -40,12 +35,7 @@ function handleResultOnError(item) {
     // Populate form with selected user data
     $('#ProfileUsersData_UserId').val(item.UserId);
     // Load user image
-    if (item.userimgpath) {
-        $('#loadedProfilePicture').attr('src', item.Userimgpath);
-    } else {
-        // Handle case where user image path is empty or null
-        $('#loadedProfilePicture').attr('src', '/images/icons/defaultUserImage.jpg'); // Set src to empty string or placeholder image path
-    }
+    $('#loadedProfilePicture').attr('src', item.Userimgpath);
 
     /*$('#ProfileUsersData_IdNumber').val(item.IdNumber);
     $('#ProfileUsersData_FullName').val(item.FullName);
@@ -185,6 +175,23 @@ $(document).ready(function () {
             $('html, body').animate({
                 scrollTop: $('#updateProfileSection').offset().top
             }, 'fast');
+        }
+    });
+    $('#profile-img-file-input').change(function () {
+        // Get the selected file
+        var file = this.files[0];
+        if (file) {
+            // Create a file reader object
+            var reader = new FileReader();
+
+            // Set up the FileReader Onload event
+            reader.onload = function (e) {
+                // Set the SRC attribute of the image element to the data URL of the selected file
+                $('#loadedProfilePicture').attr('src', e.target.result);
+            };
+
+            // Read the selected file as a data URL
+            reader.readAsDataURL(file);
         }
     });
 });

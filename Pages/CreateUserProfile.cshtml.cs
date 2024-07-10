@@ -45,12 +45,18 @@ namespace Spider_EMT.Pages
         }
         public async Task<IActionResult> OnPost()
         {
+            bool isProfilePhotoReUpload = true;
             ModelState.Remove("ProfileUsersData.ProfileSiteData.ProfileName");
 
             if (!ModelState.IsValid)
             {
                 await LoadAllProfilesData(); // Reload ProfilesData if there's a validation error
                 TempData["error"] = "Model State Validation Failed.";
+                UserProfilePathUrl = _configuration["DefaultUserImgPath"];
+                if (isProfilePhotoReUpload)
+                {
+                    ModelState.AddModelError("ProfileUsersData.PhotoFile", "Please upload profile picture again.");
+                }
                 return Page();
             }
             try
@@ -69,6 +75,7 @@ namespace Spider_EMT.Pages
                     {
                         await ProfileUsersData.PhotoFile.CopyToAsync(fileStream);
                     }
+                    isProfilePhotoReUpload = false;
                 }
                 
 

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
@@ -60,6 +61,7 @@ namespace Spider_EMT.Pages
 
         public async Task<IActionResult> OnPost()
         {
+            bool isProfilePhotoReUpload = true;
             // Check if _userSettings is already in TempData
             if (TempData.ContainsKey("UserSettings"))
             {
@@ -78,6 +80,7 @@ namespace Spider_EMT.Pages
             if (SettingsData.SettingPhotoFile == null)
             {
                 ModelState.Remove("SettingsData.SettingPhotoFile");
+                isProfilePhotoReUpload = false;
             }
 
             if (SettingsData.Password == null || SettingsData.ReTypePassword == null)
@@ -91,6 +94,10 @@ namespace Spider_EMT.Pages
                 TempData["error"] = "Model State Validation Failed.";
                 TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
                 UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _userSettings.Userimgpath);
+                if (isProfilePhotoReUpload)
+                {
+                    ModelState.AddModelError("SettingsData.SettingPhotoFile", "Please upload profile picture again.");
+                }
                 return Page();
             }
             try
