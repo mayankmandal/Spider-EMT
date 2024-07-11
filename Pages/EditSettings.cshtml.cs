@@ -26,17 +26,10 @@ namespace Spider_EMT.Pages
 
         public async Task<IActionResult> OnGet()
         {
-            try
-            {
-                await LoadCurrentUserData();
-                    // Store _userSettings in TempData for subsequent requests
-                TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
-                return Page();
-            }
-            catch (Exception ex)
-            {
-                return HandleError(ex, "Error occurred while loading profile data.");
-            }
+            await LoadCurrentUserData();
+            // Store _userSettings in TempData for subsequent requests
+            TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
+            return Page();
         }
         private async Task LoadCurrentUserData()
         {
@@ -100,75 +93,55 @@ namespace Spider_EMT.Pages
                 }
                 return Page();
             }
-            try
+
+            string uniqueFileName = null;
+            string filePath = null;
+            string uploadFolder = null;
+
+            if (SettingsData.SettingPhotoFile != null)
             {
-                string uniqueFileName = null;
-                string filePath = null;
-                string uploadFolder = null;
+                uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + SettingsData.SettingPhotoFile.FileName;
+                filePath = Path.Combine(uploadFolder, uniqueFileName);
 
-                if (SettingsData.SettingPhotoFile != null)
+                // FileStream is properly disposed of after use
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"]);
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + SettingsData.SettingPhotoFile.FileName;
-                    filePath = Path.Combine(uploadFolder, uniqueFileName);
-
-                    // FileStream is properly disposed of after use
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await SettingsData.SettingPhotoFile.CopyToAsync(fileStream);
-                    }
+                    await SettingsData.SettingPhotoFile.CopyToAsync(fileStream);
                 }
-
-                SettingsAPIVM userSettings = new SettingsAPIVM
-                {
-                    Id = SettingsData.SettingId,
-                    Name = SettingsData.SettingName,
-                    Email = SettingsData.SettingEmail,
-                    PhotoFile = SettingsData.SettingPhotoFile != null ? uniqueFileName : "",
-                    Username = SettingsData.SettingUsername,
-                    SettingsPassword = SettingsData.Password != null ? SettingsData.Password : "",
-                    SettingsReTypePassword = SettingsData.ReTypePassword != null ? SettingsData.ReTypePassword : ""
-                };
-
-                var client = _clientFactory.CreateClient();
-                var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateSettingsData";
-                var jsonContent = JsonConvert.SerializeObject(userSettings);
-                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                HttpResponseMessage response;
-                response = await client.PostAsync(apiUrl, httpContent);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["success"] = $"{SettingsData.SettingName} - Profile Updated Successfully";
-                    TempData.Remove("UserSettings");
-                    return RedirectToPage();
-                }
-                else
-                {
-                    TempData["error"] = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
-                    TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
-                    UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _userSettings.Userimgpath);
-                    return Page();
-                }
-
             }
-            catch (HttpRequestException ex)
+
+            SettingsAPIVM userSettings = new SettingsAPIVM
             {
-                return HandleError(ex, "Error occurred during HTTP request.");
-            }
-            catch (JsonException ex)
+                Id = SettingsData.SettingId,
+                Name = SettingsData.SettingName,
+                Email = SettingsData.SettingEmail,
+                PhotoFile = SettingsData.SettingPhotoFile != null ? uniqueFileName : "",
+                Username = SettingsData.SettingUsername,
+                SettingsPassword = SettingsData.Password != null ? SettingsData.Password : "",
+                SettingsReTypePassword = SettingsData.ReTypePassword != null ? SettingsData.ReTypePassword : ""
+            };
+
+            var client = _clientFactory.CreateClient();
+            var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateSettingsData";
+            var jsonContent = JsonConvert.SerializeObject(userSettings);
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage response;
+            response = await client.PostAsync(apiUrl, httpContent);
+
+            if (response.IsSuccessStatusCode)
             {
-                return HandleError(ex, "Error occurred while parsing JSON.");
+                TempData["success"] = $"{SettingsData.SettingName} - Profile Updated Successfully";
+                TempData.Remove("UserSettings");
+                return RedirectToPage();
             }
-            catch (Exception ex)
+            else
             {
-                return HandleError(ex, "An unexpected error occurred.");
+                TempData["error"] = $"{SettingsData.SettingName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase}";
+                TempData["UserSettings"] = JsonConvert.SerializeObject(_userSettings);
+                UserProfilePathUrl = Path.Combine(_configuration["UserProfileImgPath"], _userSettings.Userimgpath);
+                return Page();
             }
-        }
-        private IActionResult HandleError(Exception ex, string errorMessage)
-        {
-            TempData["error"] = $"{SettingsData.SettingName} - " + errorMessage + ". Error details: " + ex.Message;
-            return Page();
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class ProfilePagesAccessDTO
     {
-        public ProfileSiteVM ProfileData { get; set; }
+        public ProfileSite ProfileData { get; set; }
         public List<PageSiteVM> PagesList { get; set; }
     }
 }

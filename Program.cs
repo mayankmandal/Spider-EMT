@@ -3,7 +3,7 @@ using Spider_EMT.Configuration;
 using Spider_EMT.Configuration.IService;
 using Spider_EMT.Configuration.Service;
 using Spider_EMT.DAL;
-using Spider_EMT.Models.ValidationAttributes;
+using Spider_EMT.Middlewares;
 using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 
@@ -32,7 +32,10 @@ builder.Services.AddTransient<ISiteSelectionRepository>(provider =>
 });
 
 builder.Services.AddTransient<INavigationRepository, NavigationRepository>();
+builder.Services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
 builder.Services.AddScoped<IUniquenessCheckService, UniquenessCheckService>();
+
+builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
@@ -43,13 +46,23 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600");
+    }
+});
+
+app.UseResponseCaching();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
-
+app.UseCustomExceptionHandlerMiddleware();
 app.MapRazorPages();
 app.MapControllers();
 

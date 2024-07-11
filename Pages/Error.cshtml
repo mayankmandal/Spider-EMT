@@ -1,0 +1,50 @@
+﻿@page
+@model Spider_EMT.Pages.ErrorModel
+@{
+    ViewData["Title"] = "Error";
+    TempData["NavigationalPageName"] = "Error";
+}
+
+
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <div class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:70%">
+        <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;">
+            <div class="row pb-1 pt-2">
+                <div style="color:#17a2b8; text-align:center; font-size:1.7rem;">Error Page</div>
+                <div>
+                    <hr />
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title fw-bold">Error Details</div>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">An Error Occurred</h4>
+                            <p>There was a issue processing your request. Please contact the system administrator.</p>
+                            <hr />
+                            <p class="mb-0">Error Log ID: @Model.LogId</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="" asp-append-version="true"></script>
+    <script>
+    </script>
+}

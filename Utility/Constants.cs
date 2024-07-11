@@ -19,6 +19,8 @@
         public const string SP_DeletePageCategoryMap = "dbo.uspDeletePageCategoryMap";
         public const string SP_DeleteUserPermission = "dbo.uspDeleteUserPermission";
 
+        public const string SP_InsertNewErrorLog = "dbo.uspInsertNewErrorLog";
+
         public const string SP_SearchUserByTextCriteria = "dbo.uspSearchUserByTextCriteria";
 
         public const string SP_UpdateTransactionFees = "dbo.uspUpdateTransactionFees";
