@@ -1,0 +1,14 @@
+﻿@if(User.Identity.IsAuthenticated)
+{
+    <form method="post" asp-page="/Account/Logout" style="display: inline;">
+        Welcome @User.Identity.Name <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link" role="button">
+            <i class="fas fa-sign-out"></i> Logout
+        </a>
+    </form>
+}
+else
+{
+    <a class="nav-link" asp-page="/Account/Login" role="button">
+        <i class="fas fa-sign-in"></i> Login
+    </a>
+}
