@@ -1,13 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
-using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace Spider_EMT.Pages
 {
+    [Authorize(Policy = "AdminOnly")]
     public class EditSettingsModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -33,7 +35,14 @@ namespace Spider_EMT.Pages
         }
         private async Task LoadCurrentUserData()
         {
-            var client = _clientFactory.CreateClient();
+            var client = _clientFactory.CreateClient("WebAPI");
+            var res = await client.PostAsJsonAsync("Auth", new Credential { Username = "admin", Password = "password" });
+            res.EnsureSuccessStatusCode();
+            string strJwt = await res.Content.ReadAsStringAsync();
+            var token = JsonConvert.DeserializeObject<JwtToken>(strJwt);
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetSettingsData");
             _userSettings = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
 
