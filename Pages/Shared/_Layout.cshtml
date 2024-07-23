@@ -25,14 +25,13 @@
     <link rel="stylesheet" href="~/Spider_EMT.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/bootstrap-datepicker.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/toastr.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/leaflet/leaflet.css" asp-append-version="true" />
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Spider_EMT</title>
 
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed @(ViewData["Title"] == "Login" ? "login-page" : "")">
     <div class="wrapper">
         @* @await Html.PartialAsync("_PreloaderPartial")
 
@@ -88,6 +87,9 @@
                     <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button">
                         <i class="fas fa-th-large"></i>
                     </a>
+                </li>
+                <li class="nav-item">
+                    <partial name="_LoginStatusPartial" />
                 </li>
             </ul>
         </nav>
@@ -186,7 +188,6 @@
         </aside>
 
         <div class="content-wrapper">
-
             @* @await Html.PartialAsync("_MainContentWrapper") *@
             <!-- Content Header (Page header) -->
             <div class="content-header">
@@ -287,12 +288,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/bootstrap-datepicker.min.js" asp-append-version="true"></script>
-    <script src="~/js/chart/highcharts.js" asp-append-version="true"></script>
-    <script src="~/js/chart/exporting.js" asp-append-version="true"></script>
-    <script src="~/js/chart/drilldown.js" asp-append-version="true"></script>
-    <script src="~/js/chart/highcharts-3d.js" asp-append-version="true"></script>
-    <script src="~/js/chart/highcharts-more.js" asp-append-version="true"></script>
-    <script src="~/lib/leaflet/leaflet.js" asp-append-version="true"></script>
+    
     @await RenderSectionAsync("Scripts", required: false)
     @await Html.PartialAsync("_Notification")
 </body>

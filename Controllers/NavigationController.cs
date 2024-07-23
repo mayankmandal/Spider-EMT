@@ -1,4 +1,6 @@
 ﻿using LazyCache;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Spider_EMT.Models;
@@ -62,6 +64,7 @@ namespace Spider_EMT.Controller
         [HttpGet("GetAllUsers")]
         [ProducesResponseType(typeof(IEnumerable<ProfileUser>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        // [AllowAnonymous]
         public async Task<IActionResult> GetAllUsers()
         {
             try

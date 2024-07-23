@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Spider_EMT.Pages
 {
+    // [Authorize]
     public class ErrorModel : PageModel
     {
         [BindProperty(SupportsGet = true)]

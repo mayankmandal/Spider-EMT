@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using System.Text;
 
 namespace Spider_EMT.Pages
 {
+    // [Authorize]
     public class UpdateTransactionFeesModel : PageModel
     {
         private readonly ISiteSelectionRepository _siteSelectionRepository;

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 
 namespace Spider_EMT.Pages
 {
+    // [Authorize]
     public class OtherBankATMTopPerformanceModel : PageModel
     {
         private readonly IConfiguration _configuration;

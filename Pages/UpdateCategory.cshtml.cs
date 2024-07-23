@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
@@ -8,6 +9,7 @@ using System.Text;
 
 namespace Spider_EMT.Pages
 {
+    // [Authorize]
     public class UpdateCategoryModel : PageModel
     {
         private readonly IConfiguration _configuration;

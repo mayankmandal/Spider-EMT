@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ using System.Text;
 
 namespace Spider_EMT.Pages
 {
+    // [Authorize]
     public class CreateCategoryModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -63,7 +65,7 @@ namespace Spider_EMT.Pages
                     PagesList = selectedPages
                 };
 
-                var client = _clientFactory.CreateClient();
+                var client = _clientFactory.CreateClient("WebAPI");
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/CreateNewCategory";
                 var jsonContent = JsonConvert.SerializeObject(categoryPagesAccessDTO);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

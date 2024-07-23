@@ -5,6 +5,12 @@
     TempData["NavigationalPageName"] = "Other Bank ATM Top Performance";
 }
 
+<head>
+    <link rel="stylesheet" href="~/css/otherBankATMTopPerformance.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/leaflet/leaflet.css" asp-append-version="true" />
+</head>
+
 <div class="container mt-2 mb-2 border rounded" style="align-content:center">
     <div class="row ps-2 pt-2 pb-4 border-bottom" style="font-weight: bold; background-color: #f2f1e6; height: 20%; color:#373A40">
         OTHER BANKS ATM TOP PERFORMANCE ON US (@Model.CurrentBankDetailsData.CurrentBankName <img src="@Model.CurrentBankDetailsData.CurrentBankLogoPath" alt="@Model.CurrentBankDetailsData.CurrentBankName" style="max-width: 70px; height:auto;" loading="lazy" />)
@@ -264,9 +270,6 @@
     </div>
 </div>
 
-<link href="~/css/otherBankATMTopPerformance.css" rel="stylesheet" asp-append-version="true" />
-<link rel="stylesheet" href="~/css/pagination.css" asp-append-version="true" />
-
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/otherBankATMTopPerformance.js" asp-append-version="true"></script>
@@ -275,4 +278,5 @@
     <script src="~/js/terminaldetails.js" asp-append-version="true"></script>
     <script src="~/js/downloadcsv.js" asp-append-version="true"></script>
     <script src="~/js/downloadxls.js" asp-append-version="true"></script>
+    <script src="~/lib/leaflet/leaflet.js" asp-append-version="true"></script>
 }
