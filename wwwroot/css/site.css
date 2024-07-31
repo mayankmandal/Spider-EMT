@@ -13,12 +13,6 @@ html {
     min-height: 100%;
 }
 
-.login-page .main-sidebar,
-.login-page .main-footer,
-.login-page .navbar {
-    display: none;
-}
-
 .scrollableProfile {
     max-height: 200px;
     overflow-y: auto;

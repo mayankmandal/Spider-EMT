@@ -10,17 +10,6 @@ namespace Spider_EMT.Repository.Domain
 {
     public class NavigationRepository : INavigationRepository
     {
-        private readonly IConfiguration _configuration;
-        private readonly CurrentUser _currentUser;
-        public NavigationRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-            _currentUser = new CurrentUser
-            {
-                UserId = Int32.Parse(_configuration["RecentUserId"])
-            };
-
-        }
         private object GetDbValue<T>(T newValue, T existingValue)
         {
             if (newValue == null || newValue.Equals(DBNull.Value))
@@ -42,45 +31,12 @@ namespace Spider_EMT.Repository.Domain
             }
             return newValue;
         }
-        public async Task<CurrentUser> GetCurrentUserAsync()
-        {
-            try
-            {
-                string commandText = $"SELECT UserId,Username,Userimgpath FROM tblUsers where UserId = {_currentUser.UserId}";
-
-                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-
-                CurrentUser currentUser = new CurrentUser();
-                if (dataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        currentUser = new CurrentUser
-                        {
-                            UserId = _currentUser.UserId,
-                            UserName = row["Username"].ToString(),
-                            UserImgPath = row["Userimgpath"].ToString()
-                        };
-                    }
-                }
-                return currentUser;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting Current User Profile.", ex);
-            }
-        }
+        
         public async Task<List<ProfileUserAPIVM>> GetAllUsersDataAsync()
         {
             try
             {
-                string commandText = "select tp.ProfileId,tp.ProfileName, u.UserId, u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword from tblUsers u INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId";
+                string commandText = "select tp.Id AS ProfileId,tp.[Name] as ProfileName, u.Id AS UserId, u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword from AspNetUsers u INNER JOIN AspNetUserRoles tup on tup.UserId = u.Id INNER JOIN AspNetRoles tp on tp.Id = tup.RoleId";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -128,7 +84,7 @@ namespace Spider_EMT.Repository.Domain
         {
             try
             {
-                string commandText = "SELECT ProfileId, ProfileName, CreateDate, CreateUserId, UpdateDate, UpdateUserId FROM tblProfile";
+                string commandText = "SELECT Id AS ProfileId, [Name] AS ProfileName, CreateDate, CreateUserId, UpdateDate, UpdateUserId FROM AspNetRoles";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -241,11 +197,11 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Get All the Page Categories.", ex);
             }
         }
-        public async Task<ProfileUserAPIVM> GetCurrentUserDetailsAsync()
+        public async Task<ProfileUserAPIVM> GetCurrentUserDetailsAsync(int CurrentUserId)
         {
             try
             {
-                string commandText = $"select u.*, tp.ProfileId,tp.ProfileName from tblUsers u INNER JOIN tblUserProfile tup on tup.UserId = u.UserId INNER JOIN tblProfile tp on tp.ProfileId = tup.ProfileId WHERE u.UserId = {_currentUser.UserId}";
+                string commandText = $"select u.*, tp.Id AS ProfileId,tp.[Name] AS ProfileName from AspNetUsers u LEFT JOIN AspNetUserRoles tup on tup.UserId = u.Id LEFT JOIN AspNetRoles tp on tp.Id = tup.RoleId WHERE U.Id = {CurrentUserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -255,23 +211,23 @@ namespace Spider_EMT.Repository.Domain
                     DataRow dataRow = dataTable.Rows[0];
                     profileUser = new ProfileUserAPIVM
                     {
-                        UserId = Convert.ToInt32(dataRow["UserId"]),
-                        IdNumber = dataRow["IdNumber"].ToString(),
-                        FullName = dataRow["FullName"].ToString(),
-                        Email = dataRow["Email"].ToString(),
-                        MobileNo = dataRow["MobileNo"].ToString(),
+                        UserId = dataRow["Id"] != DBNull.Value ? Convert.ToInt32(dataRow["Id"]) : 0,
+                        IdNumber = dataRow["IdNumber"] != DBNull.Value ? dataRow["IdNumber"].ToString() : string.Empty,
+                        FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                        Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        MobileNo = dataRow["MobileNo"] != DBNull.Value ? dataRow["MobileNo"].ToString() : string.Empty,
                         ProfileSiteData = new ProfileSite
                         {
-                            ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
-                            ProfileName = dataRow["ProfileName"].ToString()
+                            ProfileId = dataRow["ProfileId"] != DBNull.Value ? Convert.ToInt32(dataRow["ProfileId"]) : 0,
+                            ProfileName = dataRow["ProfileName"] != DBNull.Value ? dataRow["ProfileName"].ToString() : string.Empty
                         },
-                        Username = dataRow["Username"].ToString(),
-                        Userimgpath = dataRow["Userimgpath"].ToString(),
-                        IsActive = Convert.ToBoolean(dataRow["IsActive"]),
-                        IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
-                        ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
-                        CreateUserId = (int)dataRow["CreateUserId"],
-                        UpdateUserId = (int)dataRow["UpdateUserId"]
+                        Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                        Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        IsActive = dataRow["IsActive"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActive"]) : false,
+                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]) : false,
+                        ChangePassword = dataRow["ChangePassword"] != DBNull.Value ? Convert.ToBoolean(dataRow["ChangePassword"]) : false,
+                        CreateUserId = dataRow["CreateUserId"] != DBNull.Value ? Convert.ToInt32(dataRow["CreateUserId"]) : 0,
+                        UpdateUserId = dataRow["UpdateUserId"] != DBNull.Value ? Convert.ToInt32(dataRow["UpdateUserId"]) : 0
                     };
                 }
                 return profileUser;
@@ -287,11 +243,11 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting All Users Data.", ex);
             }
         }
-        public async Task<ProfileSite> GetCurrentUserProfileAsync()
+        public async Task<ProfileSite> GetCurrentUserProfileAsync(int CurrentUserId)
         {
             try
             {
-                string commandText = $"SELECT tp.* FROM tblProfile tp INNER JOIN tblUserProfile tbup on tp.ProfileId = tbup.ProfileId WHERE tbup.UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT tp.Id AS ProfileId, tp.[Name] AS ProfileName, tp.CreateDate, tp.UpdateDate, tp.CreateUserId, tp.UpdateUserId FROM AspNetRoles tp INNER JOIN AspNetUserRoles tbup on tp.Id = tbup.RoleId WHERE tbup.UserId = {CurrentUserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -324,11 +280,11 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
-        public async Task<List<PageSiteVM>> GetCurrentUserPagesAsync()
+        public async Task<List<PageSiteVM>> GetCurrentUserPagesAsync(int CurrentUserId)
         {
             try
             {
-                string commandText = $"SELECT * FROM vwUserPageAccess where UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT * FROM vwUserPageAccess where UserId = {CurrentUserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -401,11 +357,11 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting associated pages for profile.\n", ex);
             }
         }
-        public async Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync()
+        public async Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync(int CurrentUserId)
         {
             try
             {
-                string commandText = $"SELECT * FROM vwUserPagesData where UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT * FROM vwUserPagesData where UserId = {CurrentUserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -488,41 +444,8 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Page to Categories.", ex);
             }
         }
-        public async Task<List<CurrentUserProfileViewModel>> GetCurrentProfilesAsync()
-        {
-            try
-            {
-                string commandText = $"SELECT pro.ProfileId,ProfileName,usrpro.UserId from tblProfile pro INNER JOIN tblUserProfile usrpro on pro.ProfileId = usrpro.ProfileId WHERE usrpro.UserId = {_currentUser.UserId}";
-
-                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-
-                List<CurrentUserProfileViewModel> userProfiles = new List<CurrentUserProfileViewModel>();
-                if (dataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        userProfiles.Add(new CurrentUserProfileViewModel
-                        {
-                            ProfileId = (int)row["ProfileId"],
-                            ProfileName = row["ProfileName"].ToString(),
-                            UserId = (int)row["UserId"],
-                        });
-                    }
-                }
-                return userProfiles;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting Current Profiles.", ex);
-            }
-        }
-        public async Task<bool> CreateUserProfileAsync(ProfileUser userProfileData)
+        
+        public async Task<bool> CreateUserProfileAsync(ProfileUser userProfileData, int CurrentUserId)
         {
             try
             {
@@ -538,13 +461,12 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewUsername", SqlDbType.VarChar, 100) { Value = userProfileData.Username },
                     new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = userProfileData.Userimgpath },
                     new SqlParameter("@NewPasswordHash", SqlDbType.VarChar, 255) { Value = userProfileData.PasswordHash },
-                    new SqlParameter("@NewPasswordSalt", SqlDbType.VarChar, 255) { Value = userProfileData.PasswordSalt },
                     new SqlParameter("@NewIsActive", SqlDbType.Bit) { Value = userProfileData.IsActive ? 1 : 0 },
                     new SqlParameter("@NewIsActiveDirectoryUser", SqlDbType.Bit) { Value = userProfileData.IsActiveDirectoryUser ? 1 : 0  },
                     new SqlParameter("@NewChangePassword", SqlDbType.Bit) { Value = userProfileData.ChangePassword ? 1 : 0 },
                     new SqlParameter("@NewLastLoginActivity", SqlDbType.DateTime) { Value = userProfileData.LastLoginActivity.HasValue ? (object)userProfileData.LastLoginActivity.Value : DBNull.Value }, // Handle nullable DateTime
-                    new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = _currentUser.UserId },
-                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = _currentUser.UserId }
+                    new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = CurrentUserId },
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = CurrentUserId }
                 };
 
                 // Execute the command
@@ -577,14 +499,14 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<string> UpdateUserProfileAsync(ProfileUserAPIVM userProfileData)
+        public async Task<string> UpdateUserProfileAsync(ProfileUserAPIVM userProfileData, int CurrentUserId)
         {
             try
             {
                 int NumberOfRowsAffected = 0;
 
                 ProfileUserAPIVM profileUserExisting = new ProfileUserAPIVM();
-                string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword, u.ProfileId from tblUsers u WHERE u.UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive, u.IsActiveDirectoryUser, u.ChangePassword, UR.RoleId AS ProfileId from AspNetUsers u LEFT JOIN AspNetUserRoles ur ON u.Id = ur.UserId WHERE U.Id = {CurrentUserId}";
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
                 if (dataTable.Rows.Count > 0)
@@ -592,20 +514,20 @@ namespace Spider_EMT.Repository.Domain
                     DataRow dataRow = dataTable.Rows[0];
                     profileUserExisting = new ProfileUserAPIVM
                     {
-                        IdNumber = dataRow["IdNumber"].ToString(),
-                        FullName = dataRow["FullName"].ToString(),
-                        Email = dataRow["Email"].ToString(),
-                        MobileNo = dataRow["MobileNo"].ToString(),
+                        IdNumber = dataRow["IdNumber"] != DBNull.Value ? dataRow["IdNumber"].ToString() : string.Empty,
+                        FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                        Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        MobileNo = dataRow["MobileNo"] != DBNull.Value ? dataRow["MobileNo"].ToString() : string.Empty,
                         ProfileSiteData = new ProfileSite
                         {
-                            ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
+                            ProfileId = dataRow["ProfileId"] != DBNull.Value ? Convert.ToInt32(dataRow["ProfileId"]) : 0,
+                            ProfileName = string.Empty
                         },
-                        Username = dataRow["Username"].ToString(),
-                        Userimgpath = dataRow["Userimgpath"].ToString(),
-                        IsActive = Convert.ToBoolean(dataRow["IsActive"]),
-                        IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
-                        ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
-
+                        Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                        Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        IsActive = dataRow["IsActive"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActive"]) : false,
+                        IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]) : false,
+                        ChangePassword = dataRow["ChangePassword"] != DBNull.Value ? Convert.ToBoolean(dataRow["ChangePassword"]) : false,
                     };
                 }
 
@@ -623,7 +545,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewIsActive", SqlDbType.Bit) { Value = GetDbValue(userProfileData.IsActive, profileUserExisting.IsActive) },
                     new SqlParameter("@NewIsActiveDirectoryUser", SqlDbType.Bit) { Value = GetDbValue(userProfileData.IsActiveDirectoryUser, profileUserExisting.IsActiveDirectoryUser) },
                     new SqlParameter("@NewChangePassword", SqlDbType.Bit) { Value = GetDbValue(userProfileData.ChangePassword, profileUserExisting.ChangePassword) },
-                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = _currentUser.UserId }
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = CurrentUserId }
                 };
 
                 // Execute the command
@@ -656,7 +578,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error while adding User Profile.", ex);
             }
         }
-        public async Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO)
+        public async Task<bool> CreateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO, int CurrentUserId)
         {
             try
             {
@@ -685,8 +607,8 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
-                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
                         };
                         isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                         if (isFailure)
@@ -700,8 +622,8 @@ namespace Spider_EMT.Repository.Domain
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@NewProfileName", SqlDbType.VarChar,50){Value = profilePagesAccessDTO.ProfileData.ProfileName},
-                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
                     };
                     // Execute the command
                     List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_AddNewProfile, CommandType.StoredProcedure, sqlParameters);
@@ -727,8 +649,8 @@ namespace Spider_EMT.Repository.Domain
                             new SqlParameter("@NewProfileId", SqlDbType.Int){Value = UserIdentity},
                             new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                             new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
-                            new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                            new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                            new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                            new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
                         };
                         isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                         if (isFailure)
@@ -748,7 +670,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> UpdateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO)
+        public async Task<bool> UpdateUserAccessAsync(ProfilePagesAccessDTO profilePagesAccessDTO, int CurrentUserId)
         {
             try
             {
@@ -773,8 +695,8 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profilePagesAccessDTO.ProfileData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = DBNull.Value},
-                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId}
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId}
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -835,7 +757,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Page to Categories.", ex);
             }
         }
-        public async Task<bool> CreateNewCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO)
+        public async Task<bool> CreateNewCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO, int CurrentUserId)
         {
             try
             {
@@ -846,8 +768,8 @@ namespace Spider_EMT.Repository.Domain
                 sqlParameters = new SqlParameter[]
                 {
                     new SqlParameter("@NewCategoryName", SqlDbType.VarChar,50){Value = categoryPagesAccessDTO.PageCategoryData.CategoryName},
-                    new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                    new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
                 };
 
                 // Creation of New Category
@@ -888,8 +810,8 @@ namespace Spider_EMT.Repository.Domain
                     {
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
-                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId},
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -909,7 +831,7 @@ namespace Spider_EMT.Repository.Domain
             return true;
         }
 
-        public async Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO)
+        public async Task<bool> UpdateCategoryAsync(CategoryPagesAccessDTO categoryPagesAccessDTO, int CurrentUserId)
         {
             try
             {
@@ -936,8 +858,8 @@ namespace Spider_EMT.Repository.Domain
                     {
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = UserIdentity},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = pageSite.PageId},
-                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = _currentUser.UserId},
-                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = _currentUser.UserId}
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId}
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddPageCategoryMap, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -956,7 +878,7 @@ namespace Spider_EMT.Repository.Domain
             }
             return true;
         }
-        public async Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO)
+        public async Task<bool> AssignProfileCategoriesAsync(ProfileCategoryAccessDTO profileCategoryAccessDTO, int CurrentUserId)
         {
             try
             {
@@ -981,8 +903,8 @@ namespace Spider_EMT.Repository.Domain
                         new SqlParameter("@NewProfileId", SqlDbType.Int){Value = profileCategoryAccessDTO.ProfileSiteData.ProfileId},
                         new SqlParameter("@NewPageId", SqlDbType.Int){Value = DBNull.Value},
                         new SqlParameter("@NewPageCatId", SqlDbType.Int){Value = pageCategory.PageCatId},
-                        new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = _currentUser.UserId },
-                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = _currentUser.UserId }
+                        new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = CurrentUserId },
+                        new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = CurrentUserId }
                     };
                     isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddUserPermission, CommandType.StoredProcedure, sqlParameters);
                     if (isFailure)
@@ -1031,21 +953,21 @@ namespace Spider_EMT.Repository.Domain
                     {
                         ProfileUserAPIVM profileUserAPIVM = new ProfileUserAPIVM
                         {
-                            UserId = Convert.ToInt32(dataRow["UserId"]),
-                            IdNumber = dataRow["IdNumber"].ToString(),
-                            FullName = dataRow["FullName"].ToString(),
-                            Email = dataRow["Email"].ToString(),
-                            MobileNo = dataRow["MobileNo"].ToString(),
+                            UserId = dataRow["Id"] != DBNull.Value ? Convert.ToInt32(dataRow["Id"]) : 0,
+                            IdNumber = dataRow["IdNumber"] != DBNull.Value ? dataRow["IdNumber"].ToString() : string.Empty,
+                            FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                            Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                            MobileNo = dataRow["MobileNo"] != DBNull.Value ? dataRow["MobileNo"].ToString() : string.Empty,
                             ProfileSiteData = new ProfileSite
                             {
-                                ProfileId = Convert.ToInt32(dataRow["ProfileId"]),
-                                ProfileName = dataRow["ProfileName"].ToString()
+                                ProfileId = dataRow["ProfileId"] != DBNull.Value ? Convert.ToInt32(dataRow["Id"]) : 0,
+                                ProfileName = dataRow["ProfileName"] != DBNull.Value ? dataRow["ProfileName"].ToString() : string.Empty
                             },
-                            Username = dataRow["Username"].ToString(),
-                            IsActive = Convert.ToBoolean(dataRow["IsActive"]),
-                            IsActiveDirectoryUser = Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]),
-                            ChangePassword = Convert.ToBoolean(dataRow["ChangePassword"]),
-                            Userimgpath = dataRow["Userimgpath"].ToString()
+                            Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                            IsActive = dataRow["IsActive"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActive"]) : false,
+                            IsActiveDirectoryUser = dataRow["IsActiveDirectoryUser"] != DBNull.Value ? Convert.ToBoolean(dataRow["IsActiveDirectoryUser"]) : false,
+                            ChangePassword = dataRow["ChangePassword"] != DBNull.Value ? Convert.ToBoolean(dataRow["ChangePassword"]) : false,
+                            Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty
                         };
                         profileUserLst.Add(profileUserAPIVM);
                     }
@@ -1087,12 +1009,12 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception($"Error deleting record for {deleteType}.", ex);
             }
         }
-        public async Task<ProfileUserAPIVM> GetSettingsDataAsync()
+        public async Task<ProfileUserAPIVM> GetSettingsDataAsync(int CurrentUserId)
         {
             try
             {
                 ProfileUserAPIVM userSettings = new ProfileUserAPIVM();
-                string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email, tu.IdNumber, tu.MobileNo from tblUsers tu where tu.UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT tu.Id AS UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email, tu.IdNumber, tu.MobileNo from AspNetUsers tu where tu.Id = {CurrentUserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -1123,13 +1045,13 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Settings.", ex);
             }
         }
-        public async Task<string> UpdateSettingsDataAsync(ProfileUser userSettings)
+        public async Task<string> UpdateSettingsDataAsync(ProfileUser userSettings, int CurrentUserId)
         {
             try
             {
                 int NumberOfRowsAffected = 0;
                 ProfileUser profileUserExisting = new ProfileUser();
-                string commandText = $"SELECT u.Username, u.FullName, u.Email, u.Userimgpath, u.PasswordHash, u.PasswordSalt, u.UpdateUserId from tblUsers u WHERE u.UserId = {_currentUser.UserId}";
+                string commandText = $"SELECT u.Username, u.FullName, u.Email, u.Userimgpath, u.PasswordHash, u.UpdateUserId from AspNetUsers u WHERE U.Id = {CurrentUserId}";
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
                 if (dataTable.Rows.Count > 0)
                 {
@@ -1141,7 +1063,6 @@ namespace Spider_EMT.Repository.Domain
                         Email = dataRow["Email"].ToString(),
                         Userimgpath = dataRow["Userimgpath"].ToString(),
                         PasswordHash = dataRow["PasswordHash"].ToString(),
-                        PasswordSalt = dataRow["PasswordSalt"].ToString(),
                         UpdateUserId = Convert.ToInt32(dataRow["UpdateUserId"]),
                     };
                 }
@@ -1155,8 +1076,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewEmailAddress", SqlDbType.VarChar, 100) { Value = GetDbValue(userSettings.Email, profileUserExisting.Email) },
                     new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = GetDbValue(userSettings.Userimgpath, profileUserExisting.Userimgpath) },
                     new SqlParameter("@NewPasswordHash", SqlDbType.VarChar, 255) { Value = GetDbValue(userSettings.PasswordHash, profileUserExisting.PasswordHash) },
-                    new SqlParameter("@NewPasswordSalt", SqlDbType.VarChar, 255) { Value = GetDbValue(userSettings.PasswordSalt, profileUserExisting.PasswordSalt) },
-                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = _currentUser.UserId }
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = CurrentUserId }
                 };
 
                 // Execute the command
@@ -1249,7 +1169,7 @@ namespace Spider_EMT.Repository.Domain
             try
             {
                 ProfileUserAPIVM userSettings = new ProfileUserAPIVM();
-                string commandText = $"SELECT tu.UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email, tu.IdNumber, tu.MobileNo, tu.ProfileId, tp.ProfileName, tu.ChangePassword, tu.IsActive, tu.IsActiveDirectoryUser, tu.ChangePassword from tblUsers tu inner join tblProfile tp on tu.ProfileId = tp.ProfileId where tu.UserId = {newUserId}";
+                string commandText = $"SELECT tu.Id AS UserId, tu.Username, tu.Userimgpath, tu.FullName, tu.Email, tu.IdNumber, tu.MobileNo, tp.Id AS ProfileId, tp.[Name] AS ProfileName, tu.ChangePassword, tu.IsActive, tu.IsActiveDirectoryUser, tu.ChangePassword from AspNetUsers tu LEFT JOIN AspNetUserRoles anur on anur.UserId = tu.Id LEFT JOIN AspNetRoles tp on anur.RoleId = tp.Id where tu.Id = {newUserId}";
 
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
@@ -1287,6 +1207,74 @@ namespace Spider_EMT.Repository.Domain
             {
                 // Log or handle other exceptions
                 throw new Exception("Error in Getting Settings.", ex);
+            }
+        }
+
+        public async Task<string> UpdateUserVerificationAsync(UserVerifyApiVM userVerifyApiVM, int CurrentUserId)
+        {
+            try
+            {
+                int NumberOfRowsAffected = 0;
+
+                ProfileUserAPIVM profileUserExisting = new ProfileUserAPIVM();
+                string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath from AspNetUsers u WHERE U.Id = {CurrentUserId}";
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                if (dataTable.Rows.Count > 0)
+                {
+                    DataRow dataRow = dataTable.Rows[0];
+                    profileUserExisting = new ProfileUserAPIVM
+                    {
+                        IdNumber = dataRow["IdNumber"].ToString(),
+                        FullName = dataRow["FullName"].ToString(),
+                        Email = dataRow["Email"].ToString(),
+                        MobileNo = dataRow["MobileNo"].ToString(),
+                        Username = dataRow["Username"].ToString(),
+                        Userimgpath = dataRow["Userimgpath"].ToString(),
+                    };
+                }
+
+                // User Profile Updation
+                SqlParameter[] sqlParameters = new SqlParameter[]
+                {
+                    new SqlParameter("@UserId", SqlDbType.Int) { Value = CurrentUserId },
+                    new SqlParameter("@NewIdNumber", SqlDbType.VarChar, 10) { Value = GetDbValue(userVerifyApiVM.IdNumber, profileUserExisting.IdNumber) },
+                    new SqlParameter("@NewFullName", SqlDbType.VarChar, 200) { Value = GetDbValue(userVerifyApiVM.FullName, profileUserExisting.FullName) },
+                    new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = GetDbValue(userVerifyApiVM.MobileNo, profileUserExisting.MobileNo) },
+                    new SqlParameter("@NewUsername", SqlDbType.VarChar, 100) { Value = GetDbValue(userVerifyApiVM.Username, profileUserExisting.Username) },
+                    new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = GetDbValue(userVerifyApiVM.Userimgpath, profileUserExisting.Userimgpath) },
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = CurrentUserId },
+                    new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = CurrentUserId }
+                };
+
+                // Execute the command
+                List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_UpdateUserVerificationInitialSetup, CommandType.StoredProcedure, sqlParameters);
+                if (tables.Count > 0)
+                {
+                    dataTable = tables[0];
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        DataRow dataRow = dataTable.Rows[0];
+                        NumberOfRowsAffected = (int)dataRow["RowsAffected"];
+                        if (NumberOfRowsAffected < 0)
+                        {
+                            return MagicString;
+                        }
+                    }
+                    else
+                    {
+                        return MagicString;
+                    }
+                }
+                return profileUserExisting.Userimgpath;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error while adding User Profile - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while adding User Profile.", ex);
             }
         }
     }

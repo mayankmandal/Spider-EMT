@@ -8,7 +8,7 @@ GO
 -- =============================================
 -- Author:      Your Name
 -- Create date: YYYY-MM-DD
--- Description: Check uniqueness in DB table - tblUsers for particular fields
+-- Description: Check uniqueness in DB table - AspNetUsers for particular fields
 -- =============================================
 ALTER PROCEDURE [dbo].[uspCheckUniqueness]
     -- Add the parameters for the stored procedure here
@@ -24,12 +24,12 @@ BEGIN
 	DECLARE @query NVARCHAR(MAX);
 		IF @TableId = 1
 		BEGIN
-			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM tblUsers WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
+			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM AspNetUsers WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
 			EXEC sp_executesql @query, N'@Value VARCHAR(100)', @Value;
 		END
 		ELSE IF @TableId = 2
 		BEGIN
-			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM tblProfile WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
+			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM AspNetRoles WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
 			EXEC sp_executesql @query, N'@Value VARCHAR(100)', @Value;
 		END
 		ELSE IF @TableId = 3

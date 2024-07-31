@@ -149,7 +149,7 @@ namespace Spider_EMT.Pages
                     Email = ProfileUsersData.Email,
                     MobileNo = ProfileUsersData.MobileNo,
                     FullName = ProfileUsersData.FullName,
-                    Password = "",
+                    Password = string.Empty,
                     Username = ProfileUsersData.Username,
                     Userimgpath = ProfileUsersData.PhotoFile != null ? uniqueFileName : "",
                     ProfileSiteData = ProfileSiteData,

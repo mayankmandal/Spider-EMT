@@ -13,7 +13,7 @@ namespace Spider_EMT.Models.ValidationAttributes
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var uniquenessCheckService = (IUniquenessCheckService)validationContext.GetService(typeof(IUniquenessCheckService));
-            var val = value.ToString();
+            var val = value == null? string.Empty : value.ToString();
             if (_field != null)
             {
                 var result = uniquenessCheckService.IsUniqueAsync(_field, val).Result;

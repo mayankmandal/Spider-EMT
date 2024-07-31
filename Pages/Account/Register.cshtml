@@ -6,7 +6,7 @@
 }
 <div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
     <form method="post">
-        <div class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:60%;">
+        <div class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:45rem;">
             <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;">
                 <div class="row pb-1 pt-2">
                     <div style="color:#17a2b8; text-align:center; font-size:1.7rem;">User Registration</div>
@@ -16,7 +16,7 @@
                 </div>
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title fw-bold">User Login</div>
+                        <div class="card-title fw-bold">Please complete your User Registration Gateway Profile</div>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -31,48 +31,67 @@
                         <div asp-validation-summary="All" class="text-danger fw-bold"></div>
 
                         <div class="mb-3">
-                            <label asp-for="RegisterVM.Email" class="form-label" style=""></label>
+                            <label asp-for="RegisterVM.FullName" class="form-label"></label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-atom"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                 </div>
-                                <input type="text" asp-for="RegisterVM.Email" placeholder="Email Address" class="form-control" />
+                                <input type="text" asp-for="RegisterVM.FullName" class="form-control"/>
+                            </div>
+                            <span asp-validation-for="RegisterVM.FullName" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RegisterVM.Email" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="text" asp-for="RegisterVM.Email" class="form-control" />
                             </div>
                             <span asp-validation-for="RegisterVM.Email" class="text-danger fw-bold"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="RegisterVM.Password" class="form-label" style=""></label>
+                            <label asp-for="RegisterVM.ReTypeEmail" class="form-label"></label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa fa-compass"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                                 </div>
-                                <input type="password" asp-for="RegisterVM.Password" placeholder="Password" class="form-control" />
+                                <input type="text" asp-for="RegisterVM.ReTypeEmail" class="form-control" />
+                            </div>
+                            <span asp-validation-for="RegisterVM.ReTypeEmail" class="text-danger fw-bold"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RegisterVM.Password" class="form-label"></label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                                </div>
+                                <input type="password" asp-for="RegisterVM.Password" class="form-control" />
                             </div>
                             <span asp-validation-for="RegisterVM.Password" class="text-danger fw-bold"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="RegisterVM.Department" class="form-label" style=""></label>
+                            <label asp-for="RegisterVM.ReTypePassword" class="form-label"></label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa fa-compass"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-lock"></i></span>
                                 </div>
-                                <input type="text" asp-for="RegisterVM.Department" placeholder="Department" class="form-control" />
+                                <input type="password" asp-for="RegisterVM.ReTypePassword" class="form-control" />
                             </div>
-                            <span asp-validation-for="RegisterVM.Department" class="text-danger fw-bold"></span>
+                            <span asp-validation-for="RegisterVM.ReTypePassword" class="text-danger fw-bold"></span>
                         </div>
 
+                        @* 
+                        <!-- Google ReCaptcha -->
                         <div class="mb-3">
-                            <label asp-for="RegisterVM.Position" class="form-label" style=""></label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa fa-compass"></i></span>
-                                </div>
-                                <input type="text" asp-for="RegisterVM.Position" placeholder="Position" class="form-control" />
-                            </div>
-                            <span asp-validation-for="RegisterVM.Position" class="text-danger fw-bold"></span>
-                        </div>
+                            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" asp-for="ReCaptchaToken" />
+                            <div class="g-recaptcha" data-sitekey="@ViewData["ReCaptchaSiteKey"]"></div>
+                        </div> *@
+                        
 
                         <!-- Buttons for form submission -->
                         <div style="display: flex; justify-content:space-around;height:auto;">
@@ -93,3 +112,14 @@
         </div>
     </form>
 </div>
+
+@* <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+    function prepareFormSubmission() {
+        grecaptcha.ready(function () {
+            grecaptcha.execute('@ViewData["ReCaptchaSiteKey"]', { action: submit }).then(function (token) {
+                document.getElementById('g-recaptcha-response').value = token;
+            })
+        });
+    }
+</script> *@

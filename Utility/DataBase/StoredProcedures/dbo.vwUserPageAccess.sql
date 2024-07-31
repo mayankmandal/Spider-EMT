@@ -9,7 +9,7 @@ SELECT
   tbup.UserId
 FROM tblUserPermission u WITH (NOLOCK) 
 INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = u.PageId
-INNER JOIN tblUserProfile tbup WITH (NOLOCK) on tbup.ProfileId = u.ProfileId 
+INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) on tbup.ProfileId = u.ProfileId 
 
 UNION
 -- For Category's Pages Data
@@ -23,4 +23,4 @@ SELECT
 FROM tblUserPermission u WITH (NOLOCK) 
 INNER JOIN tblPageCategoryMap pc WITH (NOLOCK) ON pc.PageCatId = u.PageCatId
 INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = pc.PageId
-INNER JOIN tblUserProfile tbup WITH (NOLOCK) on tbup.ProfileId = u.ProfileId 
+INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) on tbup.ProfileId = u.ProfileId 

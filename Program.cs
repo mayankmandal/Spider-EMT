@@ -1,8 +1,8 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using Spider_EMT.Configuration;
 using Spider_EMT.Configuration.Authorization.Models;
 using Spider_EMT.Configuration.IService;
@@ -10,10 +10,8 @@ using Spider_EMT.Configuration.Service;
 using Spider_EMT.DAL;
 using Spider_EMT.Data;
 using Spider_EMT.Data.Account;
-using Spider_EMT.Middlewares;
 using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,11 +31,13 @@ app.Run();
 void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     // Add DbContext with SQL Server
-    services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+    services.AddDbContext<ApplicationDbContext>(options => {
+        options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        options.EnableSensitiveDataLogging();
+    });
 
     // Add Identity services with default token providers
-    services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     {
         options.Password.RequiredLength = 8;
         options.Password.RequireLowercase = true;
@@ -87,8 +87,23 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     services.AddRazorPages()
         .AddRazorPagesOptions(options =>
         {
-            options.Conventions.AddPageRoute("/Dashboard", "");
+            options.Conventions.AddPageRoute("/Account/Login","");
         });
+
+    // Register GoogleCloudSettings
+    services.Configure<GoogleReCaptchaSettings>(options =>
+    {
+        options.SiteKey = configuration["GoogleCloud_GoogleReCaptcha_SiteKey"];
+        options.SecretKey = configuration["GoogleCloud_GoogleReCaptcha_SecretKey"];
+    });
+
+    // Register RecaptchaEnterpriseServiceClient
+    services.AddSingleton<RecaptchaEnterpriseServiceClient>(provider =>
+    {
+        var settings = provider.GetRequiredService<IOptions<GoogleReCaptchaSettings>>().Value;
+        // Create client with the configuration or use default settings
+        return RecaptchaEnterpriseServiceClient.Create();
+    });
 
     services.AddControllers();
 
@@ -107,6 +122,10 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     // Add AutoMapper with configuration
     services.AddAutoMapper(typeof(AutoMapperConfig));
 
+    //
+    services.AddHttpContextAccessor();
+    services.AddScoped<ICurrentUserService, CurrentUserService>();
+
     // Add repositories and services
     services.AddTransient<ISiteSelectionRepository>(provider =>
     {
@@ -115,6 +134,10 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
         IMapper mapper = provider.GetRequiredService<IMapper>();
         return new SiteSelectionRepository(ssDataFilePath, mapper);
     });
+    // Register the RoleManager and UserManager services
+    // services.AddScoped<RoleManager<IdentityRole<int>>>();
+    // services.AddScoped<UserManager<ApplicationUser>>();
+
     services.AddSingleton<IEmailService, EmailService>();
     services.AddTransient<INavigationRepository, NavigationRepository>();
     services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
@@ -157,7 +180,7 @@ void Configure(WebApplication app)
     app.UseAuthorization();
 
     // Use custom exception handler middleware
-    app.UseCustomExceptionHandlerMiddleware();
+    // app.UseCustomExceptionHandlerMiddleware();
 
     // Map Razor Pages and controllers
     app.MapRazorPages();

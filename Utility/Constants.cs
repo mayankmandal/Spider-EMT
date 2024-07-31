@@ -26,6 +26,7 @@
         public const string SP_UpdateTransactionFees = "dbo.uspUpdateTransactionFees";
         public const string SP_UpdateUser = "dbo.uspUpdateUser";
         public const string SP_UpdateUserSettings = "dbo.uspUpdateUserSettings";
+        public const string SP_UpdateUserVerificationInitialSetup = "dbo.uspUpdateUserVerificationInitialSetup";
 
         public static class PageCategoryMapStates
         {
@@ -46,7 +47,6 @@
             FullName = 3,
             Email = 4,
             MobileNo = 5,
-            ProfileName = 6
         };
         public enum TableNameCheckUniqueness
         {
@@ -57,7 +57,7 @@
         public static class TableNameClassForUniqueness
         {
             public static string[] User = { "idnumber", "email", "mobileno", "username", "userimgpath" };
-            public static string[] Profile = { "profilename" };
+            public static string[] Profile = { "name" };
             public static string[] PageCatagory = { "catagoryname" };
         };
 

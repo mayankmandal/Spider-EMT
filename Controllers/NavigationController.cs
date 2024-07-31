@@ -1,13 +1,12 @@
 ﻿using LazyCache;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
+using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
-using Spider_EMT.Utility.PasswordHelper;
+using System.Drawing.Printing;
 using System.Text.RegularExpressions;
 
 namespace Spider_EMT.Controller
@@ -18,6 +17,7 @@ namespace Spider_EMT.Controller
     {
         #region Fields
         private readonly INavigationRepository _navigationRepository;
+        private readonly ICurrentUserService _currentUserService;
         private ICacheProvider _cacheProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
@@ -25,9 +25,10 @@ namespace Spider_EMT.Controller
         #endregion
 
         #region Constructor
-        public NavigationController(INavigationRepository navigationRepository, ICacheProvider cacheProvider, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
+        public NavigationController(INavigationRepository navigationRepository, ICurrentUserService currentUserService, ICacheProvider cacheProvider, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
             _navigationRepository = navigationRepository;
+            _currentUserService = currentUserService;
             _cacheProvider = cacheProvider;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
@@ -170,19 +171,14 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserKey, out CurrentUser currentUserData))
+                var currentUserData = await _currentUserService.GetCurrentUserAsync();
+                CurrentUser currentUser = new CurrentUser
                 {
-                    currentUserData = await _navigationRepository.GetCurrentUserAsync();
-                    currentUserData.UserImgPath = Path.Combine(_configuration["UserProfileImgPath"], currentUserData.UserImgPath);
-                    var cacheEntryOption = new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
-                        SlidingExpiration = TimeSpan.FromSeconds(10),
-                        Size = 1024
-                    };
+                    UserId = currentUserData.Id,
+                    UserImgPath = Path.Combine(_configuration["UserProfileImgPath"], currentUserData.Userimgpath == null? string.Empty:currentUserData.Userimgpath),
+                    UserName = currentUserData.UserName,
+                };
 
-                    _cacheProvider.Set(CacheKeys.CurrentUserKey, currentUserData, cacheEntryOption);
-                }
                 return Ok(currentUserData);
             }
             catch (Exception ex)
@@ -198,7 +194,7 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                var currentUserDetails = await _navigationRepository.GetCurrentUserDetailsAsync();
+                var currentUserDetails = await _navigationRepository.GetCurrentUserDetailsAsync(await _currentUserService.GetCurrentUserIdAsync());
                 currentUserDetails.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], currentUserDetails.Userimgpath);
                 return Ok(currentUserDetails);
             }
@@ -217,7 +213,7 @@ namespace Spider_EMT.Controller
             {
                 if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserProfileKey, out ProfileSite currentUserProfile))
                 {
-                    currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync();
+                    currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync(await _currentUserService.GetCurrentUserIdAsync());
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
@@ -245,7 +241,7 @@ namespace Spider_EMT.Controller
             {
                 if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out List<PageSiteVM> pageSites))
                 {
-                    pageSites = await _navigationRepository.GetCurrentUserPagesAsync();
+                    pageSites = await _navigationRepository.GetCurrentUserPagesAsync(await _currentUserService.GetCurrentUserIdAsync());
 
                     var cacheEntryOption = new MemoryCacheEntryOptions
                     {
@@ -289,7 +285,7 @@ namespace Spider_EMT.Controller
             {
                 if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserCategoriesKey, out List<CategoryDisplayViewModel> StructureData))
                 {
-                    List<CategoriesSetDTO> categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync();
+                    List<CategoriesSetDTO> categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync(await _currentUserService.GetCurrentUserIdAsync());
                     var groupedCategories = categoriesSet.GroupBy(cat => string.IsNullOrEmpty(cat.CatagoryName) ? Constants.CategoryType_UncategorizedPages : cat.CatagoryName);
                     StructureData = new List<CategoryDisplayViewModel>();
 
@@ -368,7 +364,7 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO);
+                await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
 
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
@@ -393,7 +389,7 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                await _navigationRepository.UpdateUserAccessAsync(profilePagesAccessDTO);
+                await _navigationRepository.UpdateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
@@ -422,9 +418,8 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest("Password must be between 8 and 16 characters, and must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.");
                 }
+                string hashedPassword = null;
 
-                string salt = PasswordHelper.GenerateSalt();
-                string hashedPassword = PasswordHelper.HashPassword(profileUsersData.Password, salt);
                 ProfileUser profileUser = new ProfileUser
                 {
                     IdNumber = profileUsersData.IdNumber.ToString(),
@@ -435,7 +430,6 @@ namespace Spider_EMT.Controller
                     MobileNo = profileUsersData.MobileNo.ToString(),
                     UserId = 0,
                     PasswordHash = hashedPassword,
-                    PasswordSalt = salt,
                     ProfileSiteData = new ProfileSite
                     {
                         ProfileId = profileUsersData.ProfileSiteData.ProfileId,
@@ -445,7 +439,7 @@ namespace Spider_EMT.Controller
                     IsActiveDirectoryUser = profileUsersData.IsActiveDirectoryUser,
                 };
 
-                await _navigationRepository.CreateUserProfileAsync(profileUser);
+                await _navigationRepository.CreateUserProfileAsync(profileUser, await _currentUserService.GetCurrentUserIdAsync());
 
                 return Ok();
             }
@@ -468,7 +462,7 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM);
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM, await _currentUserService.GetCurrentUserIdAsync());
 
                 // Remove the cached item to force a refresh next time
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
@@ -519,7 +513,7 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                await _navigationRepository.CreateNewCategoryAsync(categoryPagesAccessDTO);
+                await _navigationRepository.CreateNewCategoryAsync(categoryPagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
                 return Ok();
             }
             catch (Exception ex)
@@ -541,7 +535,7 @@ namespace Spider_EMT.Controller
                     return BadRequest();
                 }
 
-                await _navigationRepository.UpdateCategoryAsync(categoryPagesAccessDTO);
+                await _navigationRepository.UpdateCategoryAsync(categoryPagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
                 _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
                 return Ok();
@@ -566,7 +560,7 @@ namespace Spider_EMT.Controller
                 }
 
                 // Method Call for assigning categories to profiles
-                await _navigationRepository.AssignProfileCategoriesAsync(profileCategoryAccessDTO);
+                await _navigationRepository.AssignProfileCategoriesAsync(profileCategoryAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
 
                 // Remove the cached item to force a refresh next time
                 _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
@@ -641,7 +635,7 @@ namespace Spider_EMT.Controller
         {
             try
             {
-                ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetSettingsDataAsync();
+                ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetSettingsDataAsync(await _currentUserService.GetCurrentUserIdAsync());
                 return Ok(profileUserAPIVM);
             }
             catch (Exception ex)
@@ -667,8 +661,7 @@ namespace Spider_EMT.Controller
                 string hashedPassword = null;
                 if (!string.IsNullOrEmpty(userSettings.SettingsPassword) || !string.IsNullOrEmpty(userSettings.SettingsReTypePassword))
                 {
-                    salt = PasswordHelper.GenerateSalt();
-                    hashedPassword = PasswordHelper.HashPassword(userSettings.SettingsPassword, salt);
+                    // hashedPassword = PasswordHelper.HashPassword(userSettings.SettingsPassword, salt);
                 }
 
                 ProfileUser profileUser = new ProfileUser
@@ -679,10 +672,9 @@ namespace Spider_EMT.Controller
                     Userimgpath = userSettings.PhotoFile,
                     UserId = userSettings.Id,
                     PasswordHash = hashedPassword == null ? "" : hashedPassword,
-                    PasswordSalt = salt == null ? "" : salt
                 };
 
-                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(profileUser);
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(profileUser, await _currentUserService.GetCurrentUserIdAsync());
 
                 // Remove the cached item to force a refresh next time
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
@@ -702,7 +694,7 @@ namespace Spider_EMT.Controller
         }
 
         [HttpPost("CheckUniqueness")]
-        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CheckUniqueness([FromBody] UniquenessCheckRequest uniqueRequest)
         {
@@ -726,6 +718,40 @@ namespace Spider_EMT.Controller
             {
                 ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetUserRecordAsync(request.UserId);
                 return Ok(profileUserAPIVM);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("UpdateUserVerification")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateUserVerification([FromBody] UserVerifyApiVM userVerifyApiVM)
+        {
+            try
+            {
+                if (userVerifyApiVM == null)
+                {
+                    return BadRequest();
+                }
+
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserVerificationAsync(userVerifyApiVM, await _currentUserService.GetCurrentUserIdAsync());
+
+                // Remove the cached item to force a refresh next time
+                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+
+                if (!string.IsNullOrEmpty(userVerifyApiVM.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                {
+                    string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
+                    bool isSucess = await DeleteFileAsync(oldFilePath);
+                    return Ok(isSucess);
+                }
+                return Ok();
             }
             catch (Exception ex)
             {

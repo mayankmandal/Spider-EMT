@@ -5,52 +5,86 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRCoder;
 using Spider_EMT.Configuration.Authorization.Models;
 using Spider_EMT.Data.Account;
+using Spider_EMT.Repository.Domain;
+using Spider_EMT.Repository.Skeleton;
 using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace Spider_EMT.Pages.Account
 {
-    [Authorize]
     public class AuthenticatorWithMFASetupModel : PageModel
     {
         private readonly IConfiguration _configuration;
-        private readonly UserManager<ApplicationUser> _userManager;
-        [BindProperty] 
+        private readonly ICurrentUserService _currentUserService;
+        [BindProperty]
         public SetupMFAViewModel setupMFAVM { get; set; }
         [BindProperty]
         public bool Succeeded { get; set; }
-        public AuthenticatorWithMFASetupModel(IConfiguration configuration,UserManager<ApplicationUser> userManager)
+        public AuthenticatorWithMFASetupModel(IConfiguration configuration, ICurrentUserService currentUserService)
         {
             _configuration = configuration;
-            _userManager = userManager;
+            _currentUserService = currentUserService;
             setupMFAVM = new SetupMFAViewModel();
             Succeeded = false;
         }
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(base.User);
-            await _userManager.ResetAuthenticatorKeyAsync(user);
-            var key = await _userManager.GetAuthenticatorKeyAsync(user);
+            var user = await _currentUserService.UserManager.GetUserAsync(base.User);
+            if(user == null)
+            {
+                TempData["error"] = "User not found.";
+                ModelState.AddModelError("AuthenticatorSetup", "User not found.");
+                return RedirectToPage("/Account/Login");
+            }
+            if (!user.EmailConfirmed)
+            {
+                TempData["error"] = "Please confirm your email before setting up two-factor authentication.";
+                return RedirectToPage("/Account/Login");
+            }
+            if (user.TwoFactorEnabled)
+            {
+                return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator");
+            }
+            var key = await _currentUserService.UserManager.GetAuthenticatorKeyAsync(user);
+            if (string.IsNullOrEmpty(key))
+            {
+                await _currentUserService.UserManager.ResetAuthenticatorKeyAsync(user);
+                key = await _currentUserService.UserManager.GetAuthenticatorKeyAsync(user);
+            }
             setupMFAVM.Key = key;
             setupMFAVM.QRCodeBytes = GenerateQRCodeBytes(_configuration["MFAAuthenticatorSetupProvider"],key, user.Email);
+
+            return Page();
         }
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                TempData["error"] = "Invalid input. Please check your data and try again.";
                 return Page();
             }
-            var user = await _userManager.GetUserAsync(base.User);
-            if(await _userManager.VerifyTwoFactorTokenAsync(user, _userManager.Options.Tokens.AuthenticatorTokenProvider, setupMFAVM.SecurityCode))
+            var user = await _currentUserService.UserManager.FindByNameAsync(User.Identity.Name);
+
+            if (user == null)
             {
-                await _userManager.SetTwoFactorEnabledAsync(user, true);
+                TempData["error"] = "User not found.";
+                ModelState.AddModelError("AuthenticatorSetup", "User not found.");
+                return Page();
+            }
+
+            if (await _currentUserService.UserManager.VerifyTwoFactorTokenAsync(user, _currentUserService.UserManager.Options.Tokens.AuthenticatorTokenProvider, setupMFAVM.SecurityCode))
+            {
+                await _currentUserService.UserManager.SetTwoFactorEnabledAsync(user, true);
                 Succeeded = true;
+                TempData["success"] = "Two-factor authentication has been set up successfully.";
+                return RedirectToPage("/Account/UserVerficationSetup");
             }
             else
             {
-                ModelState.AddModelError("AuthenticatorSetup", "Something went wrong with authenticator setup.");
+                TempData["error"] = "Invalid security code. Please try again.";
+                ModelState.AddModelError("AuthenticatorSetup", "Invalid security code. Please try again.");
+                return Page();
             }
-            return Page();
         }
         private Byte[] GenerateQRCodeBytes(string provider, string key, string userEmail)
         {

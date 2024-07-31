@@ -23,11 +23,11 @@ BEGIN
 
     BEGIN TRY
         -- Check is same name Profile already exists
-        IF NOT EXISTS (SELECT 1 FROM [dbo].[tblProfile] WITH (NOLOCK) WHERE ProfileName = @NewProfileName)
+        IF NOT EXISTS (SELECT 1 FROM [dbo].[AspNetRoles] WITH (NOLOCK) WHERE [Name] = @NewProfileName)
 			BEGIN
 				-- Insert Profile
-				INSERT INTO [dbo].[tblProfile] (ProfileName, CreateDate, CreateUserId, UpdateDate, UpdateUserId)
-				VALUES (@NewProfileName, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId)
+				INSERT INTO [dbo].[AspNetRoles] ([Name], NormalizedName, CreateDate, CreateUserId, UpdateDate, UpdateUserId)
+				VALUES (@NewProfileName, @NewProfileName, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId)
 				-- Retrieve the newly generated ProfileId
 				SET @UserIdentity = SCOPE_IDENTITY(); -- Get the last inserted identity value
 			END

@@ -11,7 +11,6 @@
         public string Username { get; set; }
         public string Userimgpath { get; set; }
         public string PasswordHash { get; set; }
-        public string PasswordSalt { get; set; }
         public bool IsActive { get; set; }
         public bool IsActiveDirectoryUser { get; set; }
         public bool ChangePassword { get; set; }

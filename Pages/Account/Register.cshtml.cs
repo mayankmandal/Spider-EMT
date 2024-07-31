@@ -1,34 +1,40 @@
+using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using Spider_EMT.Configuration.IService;
-using Spider_EMT.Configuration.Service;
 using Spider_EMT.Data.Account;
-using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
-using System.Net;
-using System.Net.Mail;
-using System.Security.Claims;
+using Spider_EMT.Repository.Skeleton;
+using System.Diagnostics;
 
 namespace Spider_EMT.Pages.Account
 {
     public class RegisterModel : PageModel
     {
         private readonly IConfiguration _configuration;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IEmailService _emailService;
+        // private readonly RecaptchaEnterpriseServiceClient _recaptchaEnterpriseServiceClient;
+        // private readonly GoogleReCaptchaSettings _googleReCaptchaSettings;
 
-        public RegisterModel(IConfiguration configuration, UserManager<ApplicationUser> userManager, IEmailService emailService)
+        public RegisterModel(IConfiguration configuration, ICurrentUserService currentUserService, IEmailService emailService) //RecaptchaEnterpriseServiceClient recaptchaClient, IOptions<GoogleReCaptchaSettings> googleReCaptchaSettings)
         {
             _configuration = configuration;
-            _userManager = userManager;
+            _currentUserService = currentUserService;
             _emailService = emailService;
+            // _recaptchaEnterpriseServiceClient = recaptchaClient;
+            // _googleReCaptchaSettings = googleReCaptchaSettings.Value;
         }
         [BindProperty]
         public RegisterViewModel RegisterVM { get; set; }
+        // [BindProperty]
+        // public string ReCaptchaToken { get; set; }
 
         public void OnGet()
         {
+            // ViewData["ReCaptchaSiteKey"] = _googleReCaptchaSettings.SiteKey;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -37,23 +43,46 @@ namespace Spider_EMT.Pages.Account
             {
                 return Page();
             }
+
+            // Verify ReCaptcha
+            /*var projectName = _configuration["GoogleCloud_GoogleReCaptcha_ProjectId"];
+            var assessment = await _recaptchaEnterpriseServiceClient.CreateAssessmentAsync(new CreateAssessmentRequest
+            {
+                Assessment = new Assessment
+                {
+                    Event = new Event
+                    {
+                        SiteKey = _googleReCaptchaSettings.SiteKey,
+                        Token = ReCaptchaToken
+                    }
+                },
+                Parent = projectName
+            });
+
+            if (!assessment.TokenProperties.Valid)
+            {
+                ModelState.AddModelError("Register", "ReCaptcha validation failed.");
+                return Page();
+            }*/
+            
             // Create User
             var user = new ApplicationUser
             {
                 Email = RegisterVM.Email,
-                UserName = RegisterVM.Email,
+                FullName = RegisterVM.FullName,
+                UserName = RegisterVM.Email
             };
 
-            var claimDepartment = new Claim("Department", RegisterVM.Department);
-            var claimPosition = new Claim("Position", RegisterVM.Position);
+            // var claimDepartment = new Claim("Department", RegisterVM.Department);
+            // var claimPosition = new Claim("Position", RegisterVM.Position);
 
-            var result = await _userManager.CreateAsync(user, RegisterVM.Password);
+            var result = await _currentUserService.UserManager.CreateAsync(user, RegisterVM.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddClaimAsync(user, claimDepartment);
-                await _userManager.AddClaimAsync(user, claimPosition);
+                // await _userManager.AddClaimAsync(user, claimDepartment);
+                // await _userManager.AddClaimAsync(user, claimPosition);
 
-                var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmationToken = await _currentUserService.UserManager.GenerateEmailConfirmationTokenAsync(user);
                 var confirmationLink = Url.PageLink(pageName: "/Account/ConfirmEmail", values: new { userId = user.Id, token = confirmationToken });
 
                 await _emailService.SendAsync(_configuration["EmailServiceSender"], user.Email, "Please confirm your email", $"Please click on this link to confirm your email address: {confirmationLink}");

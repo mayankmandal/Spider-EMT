@@ -2,32 +2,52 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spider_EMT.Data.Account;
+using Spider_EMT.Repository.Skeleton;
 
 namespace Spider_EMT.Pages.Account
 {
     public class ConfirmEmailModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICurrentUserService _currentUserService;
         [BindProperty]
         public string Message { get; set; }
-        public ConfirmEmailModel(UserManager<ApplicationUser> userManager)
+        public ConfirmEmailModel(ICurrentUserService currentUserService)
         {
-            _userManager = userManager;
+            _currentUserService = currentUserService;
         }
         public async Task<IActionResult> OnGetAsync(string userId, string token)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if(user != null) 
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             {
-                var result = await _userManager.ConfirmEmailAsync(user, token);
-                if (result.Succeeded)
-                {
-                    Message = "Email address is successfully confirm, now you can try to login.";
-                    return Page();
-                }
+                TempData["error"] = "Invalid email confirmation request.";
+                return RedirectToPage("/Account/Login");
             }
-            Message = "Failed to Validate email.";
-            return Page();
+
+            var user = await _currentUserService.UserManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                TempData["error"] = "Invalid user.";
+                return RedirectToPage("/Account/Login");
+            }
+
+            var result = await _currentUserService.UserManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                // Sign out the user after successful email confirmation
+                await _currentUserService.SignInManager.SignOutAsync();
+
+                // Set TempData for success message
+                TempData["success"] = "Email address is successfully confirmed. You can now log in.";
+
+                return RedirectToPage("/Account/Login");
+            }
+            else
+            {
+                // Set TempData for error message
+                TempData["error"] = "Failed to validate email.";
+                return Page();
+            }
         }
     }
 }

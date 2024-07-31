@@ -3,19 +3,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spider_EMT.Data.Account;
+using Spider_EMT.Repository.Skeleton;
 
 namespace Spider_EMT.Pages.Account
 {
     public class LogoutModel : PageModel
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        public LogoutModel(SignInManager<ApplicationUser> signInManager)
+        private readonly ICurrentUserService _currentUserService;
+        public LogoutModel(ICurrentUserService currentUserService)
         {
-            _signInManager = signInManager;
+            _currentUserService = currentUserService;
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            await _signInManager.SignOutAsync();
+            await _currentUserService.SignInManager.SignOutAsync();
             return RedirectToPage("/Account/Login");
         }
     }

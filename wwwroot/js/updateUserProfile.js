@@ -122,7 +122,6 @@ $(document).ready(function () {
                         <p>Email Address: ${item.email}</p>
                         <p>Mobile Number: ${item.mobileNo}</p>
                         <p>Profile Name: ${item.profileSiteData.profileName}</p>
-                        <p>User Name: ${item.username}</p>
                         `;
                         resultItem.html(itemDetails);
 

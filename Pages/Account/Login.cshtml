@@ -31,6 +31,14 @@
                         <!-- Validation Summary -->
                         <div asp-validation-summary="All" class="text-danger fw-bold"></div>
 
+                        <!-- Error Message Div -->
+                        <div class="text-danger fw-bold">
+                            @if (ViewData.ModelState["Login"] != null)
+                            {
+                                <p>@ViewData.ModelState["Login"].Errors.FirstOrDefault()?.ErrorMessage</p>
+                            }
+                        </div>
+
                         <div class="mb-3">
                             <label asp-for="CredentialData.Email" class="form-label" style=""></label>
                             <div class="input-group mb-3">
