@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 
 namespace Spider_EMT.Pages
 {
-    [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class ChartModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -39,6 +41,7 @@ namespace Spider_EMT.Pages
             try
             {
                 var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/SiteSelection/GetBankChartTransactionSummary?" +
                              $"transactionAmountType={Uri.EscapeUriString(ChartsViewModelData.TransactionAmountType)}" +
                              $"&startDate={Uri.EscapeDataString(ChartsViewModelData.FromDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"))}" +

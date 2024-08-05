@@ -280,6 +280,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting Current User Profile.", ex);
             }
         }
+
         public async Task<List<PageSiteVM>> GetCurrentUserPagesAsync(int CurrentUserId)
         {
             try
@@ -317,6 +318,43 @@ namespace Spider_EMT.Repository.Domain
             }
         }
 
+        public async Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync(int CurrentUserId)
+        {
+            try
+            {
+                string commandText = $"SELECT * FROM vwUserPagesData where UserId = {CurrentUserId}";
+
+                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
+
+                List<CategoriesSetDTO> categoriesSet = new List<CategoriesSetDTO>();
+                if (dataTable.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        CategoriesSetDTO category = new CategoriesSetDTO
+                        {
+                            PageCatId = row["PageCatId"] != DBNull.Value ? (int)row["PageCatId"] : 0,
+                            CatagoryName = row["CatagoryName"] != DBNull.Value ? row["CatagoryName"].ToString() : string.Empty,
+                            PageId = row["PageId"] != DBNull.Value ? (int)row["PageId"] : 0,
+                            PageDescription = row["PageDescription"] != DBNull.Value ? row["PageDescription"].ToString() : string.Empty,
+                            PageUrl = row["PageUrl"] != DBNull.Value ? row["PageUrl"].ToString() : string.Empty,
+                        };
+                        categoriesSet.Add(category);
+                    }
+                }
+                return categoriesSet;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log or handle SQL exceptions
+                throw new Exception("Error executing SQL command.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle other exceptions
+                throw new Exception("Error in Getting Current User Categories.", ex);
+            }
+        }
         public async Task<List<PageSite>> GetProfilePageDataAsync(string profileId)
         {
             try
@@ -357,94 +395,7 @@ namespace Spider_EMT.Repository.Domain
                 throw new Exception("Error in Getting associated pages for profile.\n", ex);
             }
         }
-        public async Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync(int CurrentUserId)
-        {
-            try
-            {
-                string commandText = $"SELECT * FROM vwUserPagesData where UserId = {CurrentUserId}";
 
-                DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
-
-                List<CategoriesSetDTO> categoriesSet = new List<CategoriesSetDTO>();
-                if (dataTable.Rows.Count > 0)
-                {
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        CategoriesSetDTO category = new CategoriesSetDTO
-                        {
-                            PageCatId = row["PageCatId"] != DBNull.Value ? (int)row["PageCatId"] : 0,
-                            CatagoryName = row["CatagoryName"] != DBNull.Value ? row["CatagoryName"].ToString() : string.Empty,
-                            PageId = row["PageId"] != DBNull.Value ? (int)row["PageId"] : 0,
-                            PageDescription = row["PageDescription"] != DBNull.Value ? row["PageDescription"].ToString() : string.Empty,
-                            PageUrl = row["PageUrl"] != DBNull.Value ? row["PageUrl"].ToString() : string.Empty,
-                        };
-                        categoriesSet.Add(category);
-                    }
-                }
-                return categoriesSet;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting Current User Categories.", ex);
-            }
-        }
-
-        public async Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList)
-        {
-            try
-            {
-                List<PageCategory> pageCategories = new List<PageCategory>();
-
-                foreach (int pageId in pageList)
-                {
-                    string commandText = "SELECT DISTINCT tpc.PageCatId, tpc.CatagoryName, tpcm.CreateDate, tpcm.CreateUserId, tpcm.UpdateDate, tpcm.UpdateUserId from tblPageCatagory tpc INNER JOIN tblPageCategoryMap tpcm on tpc.PageCatId = tpcm.PageCatId INNER JOIN tblPage tp on tpcm.PageId = tp.PageId WHERE tp.PageId = = @PageId";
-                    SqlParameter[] sqlParameter =
-                    {
-                        new SqlParameter("@PageId", SqlDbType.Int){Value = pageId}
-                    };
-                    DataTable dataTable = SqlDBHelper.ExecuteParameterizedSelectCommand(commandText, CommandType.Text, sqlParameter);
-                    if (dataTable.Rows.Count > 0)
-                    {
-                        foreach (DataRow row in dataTable.Rows)
-                        {
-                            PageCategory pageCategory = new PageCategory
-                            {
-                                CategoryName = row["CatagoryName"].ToString(),
-                                PageCatId = (int)row["PageCatId"],
-                                PageId = pageId,
-                                CreateDate = (DateTime)row["CreateDate"],
-                                CreateUserId = (int)row["CreateUserId"],
-                                UpdateDate = (DateTime)row["UpdateDate"],
-                                UpdateUserId = (int)row["UpdateUserId"],
-                            };
-                            // Check if the page category already exists in the list
-                            if (!pageCategories.Any(pc => pc.PageCatId == pageCategory.PageCatId))
-                            {
-                                pageCategories.Add(pageCategory);
-                            }
-                        }
-                    }
-                }
-                return pageCategories;
-            }
-            catch (SqlException sqlEx)
-            {
-                // Log or handle SQL exceptions
-                throw new Exception("Error executing SQL command.", sqlEx);
-            }
-            catch (Exception ex)
-            {
-                // Log or handle other exceptions
-                throw new Exception("Error in Getting Page to Categories.", ex);
-            }
-        }
-        
         public async Task<bool> CreateUserProfileAsync(ProfileUser userProfileData, int CurrentUserId)
         {
             try
@@ -1058,11 +1009,11 @@ namespace Spider_EMT.Repository.Domain
                     DataRow dataRow = dataTable.Rows[0];
                     profileUserExisting = new ProfileUser
                     {
-                        Username = dataRow["Username"].ToString(),
-                        FullName = dataRow["FullName"].ToString(),
-                        Email = dataRow["Email"].ToString(),
-                        Userimgpath = dataRow["Userimgpath"].ToString(),
-                        PasswordHash = dataRow["PasswordHash"].ToString(),
+                        FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                        Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                        Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        PasswordHash = dataRow["PasswordHash"] != DBNull.Value ? dataRow["PasswordHash"].ToString() : string.Empty,
                         UpdateUserId = Convert.ToInt32(dataRow["UpdateUserId"]),
                     };
                 }

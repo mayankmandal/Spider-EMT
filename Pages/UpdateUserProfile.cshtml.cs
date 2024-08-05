@@ -5,11 +5,12 @@ using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class UpdateUserProfileModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -41,6 +42,7 @@ namespace Spider_EMT.Pages
         private async Task LoadAllProfilesData()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllProfiles");
             ProfilesData = JsonConvert.DeserializeObject<List<ProfileSiteVM>>(response);
         }
@@ -51,6 +53,7 @@ namespace Spider_EMT.Pages
             if (ProfileUsersData.UserId != null)
             {
                 var client = _clientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/FetchUserRecord";
                 // Create a request with the user ID in the body
                 UserIdRequest requestBody = new UserIdRequest { UserId = ProfileUsersData.UserId };
@@ -161,6 +164,7 @@ namespace Spider_EMT.Pages
                 };
 
                 var client = _clientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateUserProfile";
                 var jsonContent = JsonConvert.SerializeObject(profileUserAPIVM);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

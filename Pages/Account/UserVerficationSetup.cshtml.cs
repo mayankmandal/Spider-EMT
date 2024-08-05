@@ -7,9 +7,11 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Spider_EMT.Data.Account;
 using Spider_EMT.Repository.Skeleton;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Spider_EMT.Pages.Account
 {
+    [Authorize(Policy = "PageAccess")]
     public class UserVerficationSetupModel : PageModel
     {
         private readonly IConfiguration _configuration;

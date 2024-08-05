@@ -4,6 +4,9 @@
     {
         public const string MagicString = "";
 
+        public const string JwtCookieName = "_next-session-value";
+        public const string JwtRefreshTokenName = "_next-session-token";
+
         public const string CategoryType_UncategorizedPages = "Uncategorized Pages";
 
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";

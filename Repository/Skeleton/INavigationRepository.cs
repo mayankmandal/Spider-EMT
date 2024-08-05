@@ -15,7 +15,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<List<PageSiteVM>> GetCurrentUserPagesAsync(int CurrentUserId);
         Task<List<PageSite>> GetProfilePageDataAsync(string profileId);
         Task<List<CategoriesSetDTO>> GetCurrentUserCategoriesAsync(int CurrentUserId);
-        Task<List<PageCategory>> GetPageToCategoriesAsync(List<int> pageList);
         Task<List<PageSite>> GetCategoryToPagesAsync(int categoryId);
         Task<bool> CreateUserProfileAsync(ProfileUser profileUsersData, int CurrentUserId);
         Task<string> UpdateUserProfileAsync(ProfileUserAPIVM profileUsersData, int CurrentUserId);

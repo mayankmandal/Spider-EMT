@@ -1,5 +1,6 @@
 using AutoMapper;
 using Google.Cloud.RecaptchaEnterprise.V1;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,10 @@ using Spider_EMT.Data;
 using Spider_EMT.Data.Account;
 using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Spider_EMT.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,16 +60,40 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     {
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.None;
     });
 
     // Add cookie-based authentication
-    services.AddAuthentication("MyCookieAuth").AddCookie("MyCookieAuth", options =>
+    services.AddAuthentication(
+        options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSettings_SecretKey"])),
+        };
+    })
+        /*.AddAuthentication("MyCookieAuth").AddCookie("MyCookieAuth", options =>
     {
         options.Cookie.Name = "MyCookieAuth";
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
-    }).AddFacebook(options =>
+    })*/
+        .AddFacebook(options =>
     {
         options.AppId = configuration["FacebookAppId"];
         options.AppSecret = configuration["FacebookAppSecret"];
@@ -80,7 +109,7 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     // Add authorization policies
     services.AddAuthorization(options =>
     {
-        options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Admin"));
+        options.AddPolicy("PageAccess", policy => policy.Requirements.Add(new PageAccessRequirement()));
     });
 
     // Add Razor Pages with custom page routes
@@ -121,10 +150,13 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
 
     // Add AutoMapper with configuration
     services.AddAutoMapper(typeof(AutoMapperConfig));
-
-    //
+    
     services.AddHttpContextAccessor();
+
     services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+    // Register the PageAccessHandler
+    services.AddScoped<IAuthorizationHandler, PageAccessHandler>();
 
     // Add repositories and services
     services.AddTransient<ISiteSelectionRepository>(provider =>

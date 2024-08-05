@@ -105,6 +105,9 @@ function clearMarkers() {
 function showTerminalData(terminalId) {
     $.ajax({
         url: '/api/SiteSelection/GetTerminalDetails/' + terminalId,
+        headers: {
+            'Authorization': 'Bearer ' + tokenC
+        },
         type: 'GET',
         success: function (result) {
             renderTerminalDetails(result);

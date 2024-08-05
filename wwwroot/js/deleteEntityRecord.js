@@ -87,6 +87,9 @@ $(document).ready(function () {
         $.ajax({
             url: apiUrl,
             type: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             success: function (data) {
                 apiResultData = data;
                 var results = $('#searchResults');
@@ -194,6 +197,9 @@ $(document).ready(function () {
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             data: $(this).serialize(),
             success: function (response) {
                 if (response.success) {

@@ -87,6 +87,9 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/Navigation/GetProfilePageData/',
             data: { profileId: selectedProfileId },
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             method: 'GET',
             success: function (response) {
                 renderPageCheckboxes(response);
@@ -144,6 +147,9 @@ $(document).ready(function () {
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             data: $(this).serialize(),
             success: function (response) {
                 if (response.success) {

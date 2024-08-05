@@ -5,11 +5,12 @@ using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class UpdateCategoryModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -43,15 +44,18 @@ namespace Spider_EMT.Pages
         private async Task LoadAllCategoriesData()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllCategories");
             AllCategories = JsonConvert.DeserializeObject<List<PageCategoryVM>>(response);
         }
         private async Task LoadAllPagesData()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
             AllPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
         }
+        
         public async Task<JsonResult> OnPost()
         {
             if (!ModelState.IsValid)
@@ -77,6 +81,7 @@ namespace Spider_EMT.Pages
                 };
 
                 var client = _clientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateCategory";
                 var jsonContent = JsonConvert.SerializeObject(categoryPagesAccessDTO);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

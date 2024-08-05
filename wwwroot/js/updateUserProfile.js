@@ -93,6 +93,9 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/Navigation/SearchUserDetails',
             type: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             data: {
                 criteria: searchCriteria,
                 input: searchInput

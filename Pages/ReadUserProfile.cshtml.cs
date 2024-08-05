@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class ReadUserProfileModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -37,12 +39,14 @@ namespace Spider_EMT.Pages
         private async Task LoadCurrentProfileUserData()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserDetails");
             CurrentUserDetailsData = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
         }
         private async Task LoadCurrentPageSites()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserPages");
             CurrentPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
             CurrentPageSites = CurrentPageSites.OrderBy(page => page.PageDescription).ToList();
@@ -50,6 +54,7 @@ namespace Spider_EMT.Pages
         private async Task LoadCurrentCategoriesSetDTOs()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserCategories");
             StructureData = JsonConvert.DeserializeObject<List<CategoryDisplayViewModel>>(response);
         }

@@ -1,17 +1,17 @@
-﻿
-
-async function fetchProfiles() {
-    try {
-        const response = await fetch('/api/Navigation/GetCurrentUserProfile');
-        if (!response.ok) {
-            throw new Error(`Http Error! Status : ${response.status}`);
+﻿async function fetchProfiles() {
+    $.ajax({
+        url: '/api/Navigation/GetCurrentUserProfile',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + tokenC
+        },
+        success: function (profile) {
+            populateSidebarforProfiles(profile);
+        },
+        error: function (xhr, status, error) {
+            console.error('Fetch error: ', error);
         }
-        const profile = await response.json();
-        populateSidebarforProfiles(profile);
-    }
-    catch (error) {
-        console.error('Fetch error: ', error);
-    }
+    });
 }
 function populateSidebarforProfiles(profile) {
     const list = document.getElementById('dynamicProfileName');
@@ -40,18 +40,20 @@ function populateSidebarforProfiles(profile) {
 }
 
 async function fetchPages() {
-    try {
-        const response = await fetch('/api/Navigation/GetCurrentUserPages');
-        if (!response.ok) {
-            throw new Error(`Http Error! Status : ${response.status}`);
+    $.ajax({
+        url: '/api/Navigation/GetCurrentUserPages',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + tokenC
+        },
+        success: function (pages) {
+            pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
+            populateSidebarforPages(pages);
+        },
+        error: function (xhr, status, error) {
+            console.error('Fetch error: ', error);
         }
-        const pages = await response.json();
-        pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
-        populateSidebarforPages(pages);
-    }
-    catch (error) {
-        console.error('Fetch error: ', error);
-    }
+    });
 }
 function populateSidebarforPages(pages) {
     const list = document.getElementById('dynamicPagesList');
@@ -81,26 +83,27 @@ function populateSidebarforPages(pages) {
 }
 
 async function fetchCategories() {
-    try {
-        const response = await fetch('/api/Navigation/GetCurrentUserCategories');
-        if (!response.ok) {
-            throw new Error(`Http Error! Status : ${response.status}`);
+    $.ajax({
+        url: '/api/Navigation/GetCurrentUserCategories',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + tokenC
+        },
+        success: function (structureData) {
+            // Sort the pages within each category (if not already sorted by the API)
+            structureData.forEach(category => {
+                category.pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
+            });
+
+            // Sort the categories (if not already sorted by the API)
+            structureData.sort((a, b) => a.catagoryName.localeCompare(b.catagoryName));
+
+            populateSidebarforCategories(structureData);
+        },
+        error: function (xhr, status, error) {
+            console.error('Fetch error: ', error);
         }
-        const structureData = await response.json();
-
-        // Sort the pages within each category (if not already sorted by the API)
-        structureData.forEach(category => {
-            category.pages.sort((a, b) => a.pageDescription.localeCompare(b.pageDescription));
-        });
-
-        // Sort the categories (if not already sorted by the API)
-        structureData.sort((a, b) => a.catagoryName.localeCompare(b.catagoryName));
-
-        populateSidebarforCategories(structureData);
-    }
-    catch (error) {
-        console.error('Fetch error: ', error);
-    }
+    });
 }
 function populateSidebarforCategories(categories) {
     const list = document.getElementById('dynamicCategoriesList');
@@ -150,6 +153,9 @@ async function fetchUserProfile() {
     
     $.ajax({
         url: '/api/Navigation/GetCurrentUser',
+        headers: {
+            'Authorization': 'Bearer ' + tokenC
+        },
         type: 'GET',
         dataType: 'json',
         success: function (profile) {

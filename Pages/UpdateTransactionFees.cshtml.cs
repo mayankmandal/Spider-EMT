@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
+using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class UpdateTransactionFeesModel : PageModel
     {
         private readonly ISiteSelectionRepository _siteSelectionRepository;
@@ -27,13 +30,20 @@ namespace Spider_EMT.Pages
             try
             {
                 // Retrieve the existing transaction fees values
-                TransactionFeeAmounts = await _siteSelectionRepository.GetTransactionFee();
+                await LoadTransactionAmounts();
                 return Page();
             }
             catch (Exception ex)
             {
                 return HandleError(ex, "Error occurred while loading profile data.");
             }
+        }
+        private async Task LoadTransactionAmounts()
+        {
+            var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
+            var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/SiteSelection/GetTransactionFeeAmount");
+            TransactionFeeAmounts = JsonConvert.DeserializeObject<TransactionFee>(response);
         }
 
         public async Task<JsonResult> OnPost()
@@ -46,6 +56,7 @@ namespace Spider_EMT.Pages
             try
             {
                 var client = _clientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/SiteSelection/UpdateTransactionFeeAmount";
                 var jsonContent = JsonConvert.SerializeObject(TransactionFeeAmounts);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

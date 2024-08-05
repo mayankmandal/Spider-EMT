@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Spider_EMT.Models;
 using Spider_EMT.Repository.Skeleton;
 
@@ -6,6 +7,7 @@ namespace Spider_EMT.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ErrorController : ControllerBase
     {
         #region Fields

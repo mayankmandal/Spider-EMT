@@ -35,7 +35,7 @@
     @if (ViewData["Title"] == "Login" || ViewData["Title"] == "Two Factor Authenticator" || ViewData["Title"] == "Logout" || ViewData["Title"] == "Email Confirmation" || ViewData["Title"] == "MFA Setup" || ViewData["Title"] == "Register User" || ViewData["Title"] == "User Verification Setup")
     {
         <partial name="_LoginStatusPartial" />
-
+        @await Html.PartialAsync("_GetToken")
         <!-- Render only the body content for specific pages -->
         @RenderBody()
 
@@ -58,6 +58,7 @@
     else
     {
         <div class="wrapper">
+            @await Html.PartialAsync("_GetToken")
             @* @await Html.PartialAsync("_PreloaderPartial")
 
         <!-- Preloader -->
@@ -227,7 +228,7 @@
                             <div class="col-sm-6">
                                 <ol class="breadcrumb float-sm-right">
                                     <li class="breadcrumb-item">
-                                        <a href="/">Home</a>
+                                        <a href="/Dashboard">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active">
                                         @if (string.Compare(TempData["NavigationalPageName"] as string, "Dashboard") != 0)

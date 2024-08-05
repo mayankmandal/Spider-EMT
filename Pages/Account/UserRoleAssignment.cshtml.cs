@@ -1,19 +1,13 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using Spider_EMT.Data.Account;
 using Spider_EMT.Models.ViewModels;
-using Spider_EMT.Models;
-using System.Text;
-using System.Net.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Spider_EMT.Repository.Skeleton;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Spider_EMT.Pages.Account
 {
+    [Authorize(Policy = "PageAccess")]
     public class UserRoleAssignmentModel : PageModel
     {
         private readonly ICurrentUserService _currentUserService;

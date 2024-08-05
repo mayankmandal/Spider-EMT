@@ -225,6 +225,9 @@ function fetchData(selectedBankId, startDate, endDate) {
             url: (selectedBankId === "All") ? '/api/SiteSelection/GetBankTransactionSummary' :
                 '/api/SiteSelection/GetFilteredBankTransactionSummary',
             type: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             async: false,
             data: {
                 bankId: selectedBankId,

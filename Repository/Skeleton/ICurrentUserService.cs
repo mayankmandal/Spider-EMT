@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Spider_EMT.Data.Account;
+using System.Security.Claims;
 
 namespace Spider_EMT.Repository.Skeleton
 {
@@ -11,5 +12,10 @@ namespace Spider_EMT.Repository.Skeleton
         UserManager<ApplicationUser> UserManager { get; }
         SignInManager<ApplicationUser> SignInManager { get; }
         RoleManager<IdentityRole<int>> RoleManager { get; }
+        string GenerateJSONWebToken(IEnumerable<Claim> claims);
+        void SetJWTCookie(string token);
+        string GetJWTCookie();
+        HttpContext UserContext { get; }
+        Task FetchAndCacheUserPermissions(string AccessTokenValue);
     }
 }

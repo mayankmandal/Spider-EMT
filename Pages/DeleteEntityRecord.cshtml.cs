@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class DeleteEntityRecordModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -39,6 +41,7 @@ namespace Spider_EMT.Pages
             try
             {
                 var client = _clientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/DeleteEntity?deleteId={DeleteEntityViewModelData.EntityId}&deleteType={DeleteEntityViewModelData.EntityType}";
                 HttpResponseMessage response;
                 response = await client.DeleteAsync(apiUrl);

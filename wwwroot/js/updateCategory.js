@@ -52,9 +52,12 @@ $(document).ready(function () {
     // Ajax call to fetch selected pages for the chosen profile
     $('#CategoryIdDiv').change(function () {
         var selectedProfileId = $(this).val();
-
+        
         $.ajax({
             url: '/api/Navigation/GetCategoryToPages/',
+            headers: {
+                Authorization: 'Bearer ' + tokenC
+            },
             data: { categoryId: selectedProfileId },
             method: 'GET',
             success: function (response) {
@@ -109,7 +112,6 @@ $(document).ready(function () {
 
         // Store the selected pages as JSON in a hidden field
         $('#SelectedPagesJson').val(JSON.stringify(selectedPagesLst));
-
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
@@ -123,8 +125,14 @@ $(document).ready(function () {
                     toastr.error(response.message);
                 }
             },
-            error: function (response) {
-                toastr.error(response.message);
+            error: function (xhr, status, error) {
+                console.error("Error response:", xhr);
+                console.error("Status:", status);
+                console.error("Error:", error);
+
+                // Default error message if response.message is not defined
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "An error occurred";
+                toastr.error(errorMessage);
             }
         });
     });

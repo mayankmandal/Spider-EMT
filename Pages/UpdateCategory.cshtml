@@ -83,10 +83,10 @@
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/updateCategory.js" asp-append-version="true"></script>
     <script>
         // Serialize the pages and categories models into JSON objects
         var availablePagesLst = @Html.Raw(Json.Serialize(Model.AllPageSites));
         var selectedPagesLst = [];
     </script>
+    <script src="~/js/updateCategory.js" asp-append-version="true"></script>
 }

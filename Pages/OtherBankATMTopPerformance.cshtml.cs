@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class OtherBankATMTopPerformanceModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -31,6 +33,7 @@ namespace Spider_EMT.Pages
         private async Task LoadBanks()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/SiteSelection/GetBanks");
             Banks = JsonConvert.DeserializeObject<IEnumerable<BankReferenceData>>(response);
         }
@@ -38,12 +41,14 @@ namespace Spider_EMT.Pages
         private async Task LoadTransactionFees()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/SiteSelection/GetTransactionFeeAmount");
             TransactionFeesAmount = JsonConvert.DeserializeObject<TransactionFee>(response);
         }
         private async Task LoadCurrentBankDetails()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/SiteSelection/GetCurrentBankDetails");
             CurrentBankDetailsData = JsonConvert.DeserializeObject<CurrentBankDetails>(response);
         }

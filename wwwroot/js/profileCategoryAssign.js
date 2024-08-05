@@ -50,6 +50,9 @@
         $.ajax({
             url: '/api/Navigation/GetCategoryToPages/',
             data: { categoryId: categoryId },
+            headers: {
+                'Authorization': 'Bearer ' + tokenC
+            },
             method: 'GET',
             success: function (pages) {
                 var categorySection = $('<div>').attr('id', `category-section-${categoryId}`).addClass('form-control pt-4 pb-2 mb-2').css({
@@ -198,8 +201,10 @@
                     toastr.error(response.message);
                 }
             },
-            error: function (response) {
-                toastr.error(response.message);
+            error: function (xhr, status, error) {
+                // Default error message if response.message is not defined
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "An error occurred";
+                toastr.error(errorMessage);
             }
         });
     });

@@ -1,0 +1,16 @@
+﻿@using Spider_EMT.Utility
+@inject IHttpContextAccessor HttpContextAccessor
+@functions{
+    public string GetTokenC(HttpContext context)
+    {
+        // Retrieve the tokenC value (e.g., from a service or session)
+        return JWTCookieHelper.GetJWTCookie(context);
+    }
+}
+
+@{
+    var tokenC = GetTokenC(HttpContextAccessor.HttpContext);
+}
+<script>
+    window.tokenC = '@tokenC';
+</script>

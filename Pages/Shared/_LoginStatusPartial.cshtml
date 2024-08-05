@@ -1,7 +1,8 @@
-﻿@if (User.Identity.IsAuthenticated)
+﻿@inject Spider_EMT.Repository.Skeleton.ICurrentUserService _currentUserService
+@if (_currentUserService.UserContext.User?.Identity?.IsAuthenticated ?? false)
 {
     <form method="post" asp-page="/Account/Logout" style="display: inline;">
-        Welcome @User.Identity.Name (@User.Claims.FirstOrDefault(x => x.Type == "Position")) <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link" role="button">
+        Welcome @_currentUserService.UserContext.User.Identity.Name (@User.Claims.FirstOrDefault(x => x.Type == "Position")) <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link" role="button">
             <i class="fas fa-sign-out"></i> Logout
         </a>
     </form>

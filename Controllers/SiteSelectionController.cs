@@ -9,6 +9,7 @@ namespace Spider_EMT.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SiteSelectionController : ControllerBase
     {
         #region Fields

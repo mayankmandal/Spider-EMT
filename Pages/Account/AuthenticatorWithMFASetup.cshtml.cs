@@ -1,17 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRCoder;
 using Spider_EMT.Configuration.Authorization.Models;
-using Spider_EMT.Data.Account;
-using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace Spider_EMT.Pages.Account
 {
+    [Authorize(Policy = "PageAccess")]
     public class AuthenticatorWithMFASetupModel : PageModel
     {
         private readonly IConfiguration _configuration;

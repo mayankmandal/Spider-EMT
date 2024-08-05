@@ -1,4 +1,5 @@
 using Google.Cloud.RecaptchaEnterprise.V1;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +12,7 @@ using System.Diagnostics;
 
 namespace Spider_EMT.Pages.Account
 {
+    [AllowAnonymous]
     public class RegisterModel : PageModel
     {
         private readonly IConfiguration _configuration;

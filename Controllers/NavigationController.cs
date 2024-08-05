@@ -1,4 +1,5 @@
 ﻿using LazyCache;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Spider_EMT.Models;
@@ -13,6 +14,7 @@ namespace Spider_EMT.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class NavigationController : ControllerBase
     {
         #region Fields
@@ -179,7 +181,7 @@ namespace Spider_EMT.Controller
                     UserName = currentUserData.UserName,
                 };
 
-                return Ok(currentUserData);
+                return Ok(currentUser);
             }
             catch (Exception ex)
             {
@@ -260,22 +262,6 @@ namespace Spider_EMT.Controller
             }
         }
 
-        [HttpGet("GetProfilePageData")]
-        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetProfilePageData(string profileId)
-        {
-            try
-            {
-                var pageSites = await _navigationRepository.GetProfilePageDataAsync(profileId);
-                return Ok(pageSites);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-
         [HttpGet("GetCurrentUserCategories")]
         [ProducesResponseType(typeof(IEnumerable<CategoriesSetDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -329,21 +315,15 @@ namespace Spider_EMT.Controller
             }
         }
 
-        [HttpPost("GetPageToCategories")]
-        [ProducesResponseType(typeof(IEnumerable<PageCategory>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpGet("GetProfilePageData")]
+        [ProducesResponseType(typeof(IEnumerable<PageSite>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetPageToCategories([FromBody] List<int> pageList)
+        public async Task<IActionResult> GetProfilePageData(string profileId)
         {
             try
             {
-                if (pageList == null)
-                {
-                    return BadRequest();
-                }
-
-                var pageCategories = await _navigationRepository.GetPageToCategoriesAsync(pageList);
-                return Ok(pageCategories);
+                var pageSites = await _navigationRepository.GetProfilePageDataAsync(profileId);
+                return Ok(pageSites);
             }
             catch (Exception ex)
             {
@@ -657,11 +637,14 @@ namespace Spider_EMT.Controller
                     return BadRequest("Password must be between 8 and 16 characters, and must contain at least one uppercase letter, one lowercase letter, one digit, and one special character. Also, both passwords must match.");
                 }
 
-                string salt = null;
                 string hashedPassword = null;
                 if (!string.IsNullOrEmpty(userSettings.SettingsPassword) || !string.IsNullOrEmpty(userSettings.SettingsReTypePassword))
                 {
-                    // hashedPassword = PasswordHelper.HashPassword(userSettings.SettingsPassword, salt);
+                    var user = await _currentUserService.UserManager.FindByIdAsync(userSettings.Id.ToString());
+                    if(user != null)
+                    {
+                        hashedPassword =  _currentUserService.UserManager.PasswordHasher.HashPassword(user,userSettings.SettingsPassword);
+                    }
                 }
 
                 ProfileUser profileUser = new ProfileUser
@@ -671,7 +654,7 @@ namespace Spider_EMT.Controller
                     Username = userSettings.Username,
                     Userimgpath = userSettings.PhotoFile,
                     UserId = userSettings.Id,
-                    PasswordHash = hashedPassword == null ? "" : hashedPassword,
+                    PasswordHash = hashedPassword != null ? hashedPassword : string.Empty,
                 };
 
                 string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(profileUser, await _currentUserService.GetCurrentUserIdAsync());

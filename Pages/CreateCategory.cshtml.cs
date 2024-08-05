@@ -1,14 +1,17 @@
-using Microsoft.AspNetCore.Authorization;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
+using Spider_EMT.Utility;
 using System.Text;
+using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Spider_EMT.Pages
 {
-    // [Authorize]
+    [Authorize(Policy = "PageAccess")]
     public class CreateCategoryModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -39,6 +42,7 @@ namespace Spider_EMT.Pages
         private async Task LoadAllPagesData()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetAllPages");
             AllPageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(response);
         }
@@ -66,16 +70,23 @@ namespace Spider_EMT.Pages
                 };
 
                 var client = _clientFactory.CreateClient("WebAPI");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/CreateNewCategory";
                 var jsonContent = JsonConvert.SerializeObject(categoryPagesAccessDTO);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 HttpResponseMessage response;
                 response = await client.PostAsync(apiUrl, httpContent);
 
-                if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.OK)
                 {
                     TempData["success"] = $"{SelectedPageCategory.CategoryName} - New Category Created Successfully" ;
                     return RedirectToPage();
+                }
+                else if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    await LoadAllPagesData();
+                    TempData["error"] = $"{SelectedPageCategory.CategoryName} - Error occurred in response with status: {response.StatusCode} - {response.ReasonPhrase} - Please login again";
+                    return Page();
                 }
                 else
                 {

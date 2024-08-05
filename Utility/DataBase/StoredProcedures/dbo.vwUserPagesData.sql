@@ -12,7 +12,7 @@ WITH CombinedData AS (
 	tbup.UserId
   FROM tblUserPermission u WITH (NOLOCK) 
   INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = u.PageId
-  INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) ON tbup.ProfileId = u.ProfileId 
+  INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) ON tbup.RoleId = u.ProfileId 
   WHERE u.PageCatId IS NULL
 
   UNION  
@@ -31,7 +31,7 @@ WITH CombinedData AS (
   INNER JOIN tblPageCategoryMap pc WITH (NOLOCK) ON pc.PageCatId = u.PageCatId
   INNER JOIN tblPageCatagory tpc WITH (NOLOCK) ON pc.PageCatId = tpc.PageCatId
   INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = pc.PageId
-  INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) ON tbup.ProfileId = u.ProfileId 
+  INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) ON tbup.RoleId = u.ProfileId 
 )
 
 SELECT DISTINCT
