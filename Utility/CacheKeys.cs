@@ -13,7 +13,7 @@ namespace Spider_EMT.Utility
     {
         public static string GetJWTCookie(HttpContext httpContext)
         {
-            return httpContext.Request.Cookies[Constants.JwtCookieName];
+            return httpContext.Session.GetString(Constants.JwtCookieName);
         }
     }
 }

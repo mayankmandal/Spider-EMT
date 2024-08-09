@@ -7,14 +7,19 @@
         public const string JwtCookieName = "_next-session-value";
         public const string JwtRefreshTokenName = "_next-session-token";
 
+        public const string BaseUserRoleName = "Base User Access"; // Needs Attention for Change if required for string value
+
         public const string CategoryType_UncategorizedPages = "Uncategorized Pages";
 
         public const string SP_AddNewCategory = "dbo.uspAddNewCategory";
         public const string SP_AddNewProfile = "dbo.uspAddNewProfile";
+        public const string SP_AddNewUserProfile = "dbo.uspAddNewUserProfile";
         public const string SP_AddPageCategoryMap = "dbo.uspAddPageCategoryMap";
         public const string SP_AddTransactionFees = "dbo.uspAddTransactionFees";
         public const string SP_AddUserPermission = "dbo.uspAddUserPermission";
         public const string SP_AddNewUser = "dbo.uspAddNewUser";
+
+        public const string SP_BaseUserRole = "dbo.uspBaseUserRole";
 
         public const string SP_CheckUniqueness = "dbo.uspCheckUniqueness";
 
@@ -23,6 +28,7 @@
         public const string SP_DeleteUserPermission = "dbo.uspDeleteUserPermission";
 
         public const string SP_InsertNewErrorLog = "dbo.uspInsertNewErrorLog";
+        public const string SP_ProvideRoleAccessToUser = "dbo.uspProvideRoleAccessToUser";
 
         public const string SP_SearchUserByTextCriteria = "dbo.uspSearchUserByTextCriteria";
 
@@ -64,5 +70,21 @@
             public static string[] PageCatagory = { "catagoryname" };
         };
 
+        public static class BaseUserScreenAccess // Needs Attention for Change if required for string value
+        {
+            public const string AccessDenied = "/Account/AccessDenied";
+            public const string AuthenticatorWithMFASetup = "/Account/AuthenticatorWithMFASetup";
+            public const string ConfirmEmail = "/Account/ConfirmEmail";
+            public const string Login = "/Account/Login";
+            public const string LoginTwoFactorWithAuthenticator = "/Account/LoginTwoFactorWithAuthenticator";
+            public const string Logout = "/Account/Logout";
+            public const string Register = "/Account/Register";
+            public const string UserRoleAssignment = "/Account/UserRoleAssignment";
+            public const string UserVerificationSetup = "/Account/UserVerificationSetup";
+            public const string Dashboard = "/Dashboard";
+            public const string ReadUserProfile = "/ReadUserProfile";
+            public const string EditSettings = "/EditSettings";
+            public const string Error = "/Error";
+        };
     }
 }

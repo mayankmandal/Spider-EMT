@@ -1,11 +1,9 @@
-﻿using LazyCache;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
-using System.Net.Http.Headers;
 
 namespace Spider_EMT.Middlewares
 {
@@ -34,7 +32,7 @@ namespace Spider_EMT.Middlewares
                 var accessToken = _currentUserService.GetJWTCookie();
                 if (!string.IsNullOrEmpty(accessToken))
                 {
-                    await _currentUserService.FetchAndCacheUserPermissions(accessToken);
+                     await _currentUserService.FetchAndCacheUserPermissions(accessToken);
                     _cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out pages);
                 }
             }
@@ -46,15 +44,24 @@ namespace Spider_EMT.Middlewares
             }
             else
             {
-                // Fail the authorization
-                context.Fail();
-
-                // Redirect to Access Denied Page
-                if (_currentUserService.UserContext.User.Identity.IsAuthenticated)
+                HandleAccessDenied(context, currentPage);
+            }
+        }
+        private void HandleAccessDenied(AuthorizationHandlerContext context, string currentPage = null)
+        {
+            context.Fail();
+            if (_currentUserService.UserContext.User.Identity.IsAuthenticated)
+            {
+                var accessDeniedUrl = "/Account/AccessDenied";
+                if (!string.IsNullOrEmpty(currentPage))
                 {
-                    var accessDeniedUrl = $"/Account/AccessDenied?returnUrl={currentPage}";
-                    _currentUserService.UserContext.Response.Redirect(accessDeniedUrl);
+                    accessDeniedUrl += $"?returnUrl={currentPage}";
                 }
+                _currentUserService.UserContext.Response.Redirect(accessDeniedUrl);
+            }
+            else
+            {
+                _currentUserService.UserContext.Response.Redirect("/Account/Login");
             }
         }
     }

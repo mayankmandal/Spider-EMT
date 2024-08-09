@@ -570,27 +570,21 @@ namespace Spider_EMT.Repository.Domain
                 }
                 else
                 {
+                    SqlParameter userIdentityParam = new SqlParameter("@UserIdentity", SqlDbType.Int) {Direction = ParameterDirection.Output};
                     sqlParameters = new SqlParameter[]
                     {
                         new SqlParameter("@NewProfileName", SqlDbType.VarChar,50){Value = profilePagesAccessDTO.ProfileData.ProfileName},
                         new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
                         new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
+                        userIdentityParam
                     };
                     // Execute the command
-                    List<DataTable> tables = SqlDBHelper.ExecuteParameterizedNonQuery(SP_AddNewProfile, CommandType.StoredProcedure, sqlParameters);
-                    if (tables.Count > 0)
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddNewProfile, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure || userIdentityParam.Value == DBNull.Value)
                     {
-                        DataTable dataTable = tables[0];
-                        if (dataTable.Rows.Count > 0)
-                        {
-                            DataRow dataRow = dataTable.Rows[0];
-                            UserIdentity = (int)dataRow["UserIdentity"];
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        return false;
                     }
+                    UserIdentity = (int)userIdentityParam.Value;
 
                     // User Profile Access Allotment
                     foreach (PageSiteVM pageSite in profilePagesAccessDTO.PagesList)
@@ -1226,6 +1220,56 @@ namespace Spider_EMT.Repository.Domain
             catch (Exception ex)
             {
                 throw new Exception("Error while adding User Profile.", ex);
+            }
+        }
+
+        public async Task<bool> CreateBaseUserAccessAsync(string baseUserRoleName, int CurrentUserId)
+        {
+            try
+            {
+                int RoleId = -1;
+                string commandText = "SELECT Id AS RoleId FROM AspNetRoles WHERE [NAME] = @RoleName";
+
+                SqlParameter[] sqlParameter =
+                {
+                        new SqlParameter("@RoleName", SqlDbType.VarChar, 100){Value = baseUserRoleName}
+                    };
+                DataTable dataTable = SqlDBHelper.ExecuteParameterizedSelectCommand(commandText, CommandType.Text, sqlParameter);
+                if (dataTable.Rows.Count > 0)
+                {
+                    DataRow dataRow = dataTable.Rows[0];
+                    RoleId = Convert.ToInt32(dataRow["RoleId"]);
+                }
+
+                if(RoleId != -1)
+                {
+                    SqlParameter[] sqlParameters;
+                    bool isFailure;
+
+                    sqlParameters = new SqlParameter[]
+                    {
+                    new SqlParameter("@ProfileId", SqlDbType.Int){Value = RoleId},
+                    new SqlParameter("@UserId", SqlDbType.Int){Value = CurrentUserId},
+                    new SqlParameter("@NewCreateUserId", SqlDbType.Int){Value = CurrentUserId},
+                    new SqlParameter("@NewUpdateUserId", SqlDbType.Int){Value = CurrentUserId},
+                    };
+                    // Execute the command
+                    isFailure = SqlDBHelper.ExecuteNonQuery(SP_AddNewUserProfile, CommandType.StoredProcedure, sqlParameters);
+                    if (isFailure)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw new Exception("Error adding relationship between new user & base role - SQL Exception.", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding relationship between new user & base role", ex);
             }
         }
     }

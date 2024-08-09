@@ -1,4 +1,3 @@
-using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -75,15 +74,9 @@ namespace Spider_EMT.Pages.Account
                 UserName = RegisterVM.Email
             };
 
-            // var claimDepartment = new Claim("Department", RegisterVM.Department);
-            // var claimPosition = new Claim("Position", RegisterVM.Position);
-
             var result = await _currentUserService.UserManager.CreateAsync(user, RegisterVM.Password);
             if (result.Succeeded)
             {
-                // await _userManager.AddClaimAsync(user, claimDepartment);
-                // await _userManager.AddClaimAsync(user, claimPosition);
-
                 var confirmationToken = await _currentUserService.UserManager.GenerateEmailConfirmationTokenAsync(user);
                 var confirmationLink = Url.PageLink(pageName: "/Account/ConfirmEmail", values: new { userId = user.Id, token = confirmationToken });
 

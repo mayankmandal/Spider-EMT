@@ -1,5 +1,4 @@
-﻿using LazyCache;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -23,38 +22,60 @@ namespace Spider_EMT.Repository.Domain
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
-        private readonly System.Net.Http.IHttpClientFactory _clientFactory;
+        private readonly IHttpClientFactory _clientFactory;
 
         private const string CurrentUserKey = "CurrentUser";
+        private const string CurrentUserClaimsKey = "CurrentUserClaims";
 
-        public CurrentUserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole<int>> roleManager, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, IConfiguration configuration, System.Net.Http.IHttpClientFactory httpClientFactory)
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole<int>> roleManager, IHttpClientFactory httpClientFactory)
         {
-            _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
+            _configuration = configuration;
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-            _configuration = configuration;
             _clientFactory = httpClientFactory;
         }
+
         public HttpContext UserContext => _httpContextAccessor.HttpContext;
         public UserManager<ApplicationUser> UserManager => _userManager;
         public SignInManager<ApplicationUser> SignInManager => _signInManager;
         public RoleManager<IdentityRole<int>> RoleManager => _roleManager;
 
-        public async Task<ApplicationUser> GetCurrentUserAsync()
+        public async Task<ApplicationUser> GetCurrentUserAsync(ApplicationUser? user = null)
         {
             if (!_memoryCache.TryGetValue(CurrentUserKey, out ApplicationUser currentUser))
             {
-                currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-                if (currentUser != null)
+                if (user == null)
+                {
+                    var token = GetJWTCookie();
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        var principal = GetPrincipalFromToken(token);
+                        var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                        if (!string.IsNullOrEmpty(emailClaim))
+                        {
+                            currentUser = await _userManager.FindByEmailAsync(emailClaim);
+                            if (currentUser != null)
+                            {
+                                var cacheEntryOptions = new MemoryCacheEntryOptions
+                                {
+                                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                                };
+                                _memoryCache.Set(CurrentUserKey, currentUser, cacheEntryOptions);
+                            }
+                        }
+                    }
+                }
+                else
                 {
                     var cacheEntryOptions = new MemoryCacheEntryOptions
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                     };
-                    _memoryCache.Set(CurrentUserKey, currentUser, cacheEntryOptions);
+                    _memoryCache.Set(CurrentUserKey, user, cacheEntryOptions);
+                    currentUser = user;
                 }
             }
             return currentUser;
@@ -73,15 +94,36 @@ namespace Spider_EMT.Repository.Domain
         // Method to refresh the cache on demand
         public async Task RefreshCurrentUserAsync()
         {
-            var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
-            if (currentUser != null)
+            _memoryCache.Remove(CurrentUserKey);
+            await GetCurrentUserAsync();
+        }
+
+        public async Task<UserRoleInfo> GetCurrentUserRolesAsync()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user == null)
             {
-                var cacheEntryOptions = new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                };
-                _memoryCache.Set(CurrentUserKey, currentUser, cacheEntryOptions);
+                throw new InvalidOperationException("User is not authenticated");
             }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            if(roles == null || roles.Count == 0)
+            {
+                throw new InvalidOperationException("User does not have a role assigned");
+            }
+
+            var roleName = roles.First();
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+            {
+                throw new InvalidOperationException("Role not found");
+            }
+
+            return new UserRoleInfo
+            {
+                RoleId = role.Id,
+                RoleName = role.Name,
+            };
         }
 
         public string GenerateJSONWebToken(IEnumerable<Claim> claimsLst)
@@ -97,26 +139,34 @@ namespace Spider_EMT.Repository.Domain
                 signingCredentials: credentials,
                 claims: claimsLst
             );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwtToken;
         }
 
         public void SetJWTCookie(string token)
         {
-            var cookieOptions = new CookieOptions
+            if (_httpContextAccessor.HttpContext != null)
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.Now.AddHours(3),
-                Path = "/"
-            };
-            _httpContextAccessor.HttpContext.Response.Cookies.Append(Constants.JwtCookieName, token, cookieOptions);
+                var session = _httpContextAccessor.HttpContext.Session;
+                session.SetString(Constants.JwtCookieName, token);  // Store token in session
+            }
+            else
+            {
+                throw new InvalidOperationException("HttpContext is null. Cannot set JWT cookie.");
+            }
         }
 
         public string GetJWTCookie()
         {
-            return _httpContextAccessor.HttpContext.Request.Cookies[Constants.JwtCookieName];
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                var session = _httpContextAccessor.HttpContext.Session;
+                return session.GetString(Constants.JwtCookieName);  // Retrieve token from session
+            }
+            else
+            {
+                throw new InvalidOperationException("HttpContext is null. Cannot get JWT cookie.");
+            }
         }
 
         public async Task FetchAndCacheUserPermissions(string AccessTokenValue)
@@ -145,6 +195,36 @@ namespace Spider_EMT.Repository.Domain
             });
         }
 
+        public async Task<IList<Claim>> GetCurrentUserClaimsAsync(ApplicationUser user)
+        {
+            if (!_memoryCache.TryGetValue(CurrentUserClaimsKey, out IList<Claim> claims))
+            {
+                if (user != null)
+                {
+                    claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Email, user.Email)
+                    };
+
+                    var roles = await _userManager.GetRolesAsync(user);
+                    foreach(var role in roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                    };
+                    _memoryCache.Set(CurrentUserClaimsKey, claims, cacheEntryOptions);
+
+                    await GetCurrentUserAsync(user);
+                }
+            }
+            return claims;
+        }
+
         private string CreateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -163,6 +243,27 @@ namespace Spider_EMT.Repository.Domain
                 Expires = DateTime.Now.AddDays(7),
             };
             _httpContextAccessor.HttpContext.Response.Cookies.Append(Constants.JwtRefreshTokenName, refreshToken, cookieOptions);
+        }
+
+        private ClaimsPrincipal GetPrincipalFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JwtSettings_SecretKey"]))
+            };
+
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken securityToken);
+            var jwtToken = securityToken as JwtSecurityToken;
+            if(jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+            return principal;
         }
     }
 }

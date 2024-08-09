@@ -1,5 +1,4 @@
 using AutoMapper;
-using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +37,7 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     // Add DbContext with SQL Server
     services.AddDbContext<ApplicationDbContext>(options => {
         options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+        options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         options.EnableSensitiveDataLogging();
     });
 
@@ -62,7 +62,7 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SameSite = SameSiteMode.Lax;
     });
 
     // Add cookie-based authentication
@@ -86,13 +86,6 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSettings_SecretKey"])),
         };
     })
-        /*.AddAuthentication("MyCookieAuth").AddCookie("MyCookieAuth", options =>
-    {
-        options.Cookie.Name = "MyCookieAuth";
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
-    })*/
         .AddFacebook(options =>
     {
         options.AppId = configuration["FacebookAppId"];
@@ -126,20 +119,19 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
         options.SecretKey = configuration["GoogleCloud_GoogleReCaptcha_SecretKey"];
     });
 
-    // Register RecaptchaEnterpriseServiceClient
-    services.AddSingleton<RecaptchaEnterpriseServiceClient>(provider =>
-    {
-        var settings = provider.GetRequiredService<IOptions<GoogleReCaptchaSettings>>().Value;
-        // Create client with the configuration or use default settings
-        return RecaptchaEnterpriseServiceClient.Create();
-    });
-
     services.AddControllers();
 
     // Add HTTP client services
     services.AddHttpClient("WebAPI",client =>
     {
         client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
+    });
+
+    services.AddSession(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.IdleTimeout = TimeSpan.FromHours(8);
+        options.Cookie.IsEssential = true;
     });
 
     // Add memory cache services
@@ -151,27 +143,24 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     // Add AutoMapper with configuration
     services.AddAutoMapper(typeof(AutoMapperConfig));
     
-    services.AddHttpContextAccessor();
-
     services.AddScoped<ICurrentUserService, CurrentUserService>();
 
     // Register the PageAccessHandler
     services.AddScoped<IAuthorizationHandler, PageAccessHandler>();
 
+    services.AddHttpContextAccessor();
+
     // Add repositories and services
-    services.AddTransient<ISiteSelectionRepository>(provider =>
+    services.AddScoped<ISiteSelectionRepository>(provider =>
     {
         IConfiguration config = provider.GetRequiredService<IConfiguration>();
         string ssDataFilePath = config["ss_data_path"];
         IMapper mapper = provider.GetRequiredService<IMapper>();
         return new SiteSelectionRepository(ssDataFilePath, mapper);
     });
-    // Register the RoleManager and UserManager services
-    // services.AddScoped<RoleManager<IdentityRole<int>>>();
-    // services.AddScoped<UserManager<ApplicationUser>>();
 
-    services.AddSingleton<IEmailService, EmailService>();
-    services.AddTransient<INavigationRepository, NavigationRepository>();
+    services.AddScoped<IEmailService, EmailService>();
+    services.AddScoped<INavigationRepository, NavigationRepository>();
     services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
     services.AddScoped<IUniquenessCheckService, UniquenessCheckService>();
 
@@ -203,6 +192,8 @@ void Configure(WebApplication app)
     // Use HTTPS redirection and static files middleware
     app.UseHttpsRedirection();
     app.UseStaticFiles();
+
+    app.UseSession();
 
     // Configure routing
     app.UseRouting();

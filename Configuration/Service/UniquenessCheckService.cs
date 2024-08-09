@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Spider_EMT.Configuration.IService;
 using Spider_EMT.Models;
 using Spider_EMT.Utility;
@@ -24,13 +23,24 @@ namespace Spider_EMT.Configuration.Service
         {
             JwtToken = JWTCookieHelper.GetJWTCookie(_httpContextAccessor.HttpContext);
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JwtToken);
+
+            if(!string.IsNullOrEmpty(JwtToken)) 
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JwtToken);
+            }
+
             var requestPayload = new UniquenessCheckRequest { Field = field, Value = value };
             var content = new StringContent(JsonConvert.SerializeObject(requestPayload), Encoding.UTF8, "application/json");
             var response = await client.PostAsync($"{_configuration["ApiBaseUrl"]}/Navigation/CheckUniqueness", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle unsuccessful response or log error
+                throw new HttpRequestException($"Request failed with status code {response.StatusCode}");
+            }
             var responseContent = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
-            return result.IsUnique;
+            return result == null ? false : result.IsUnique;
         }
         private class ApiResponse
         {

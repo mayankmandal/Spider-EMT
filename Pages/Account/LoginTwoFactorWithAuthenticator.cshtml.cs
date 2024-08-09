@@ -17,10 +17,28 @@ namespace Spider_EMT.Pages.Account
             AuthenticatorMFAData = new AuthenticatorMFAViewModel();
             _currentUserService = currentUserService;
         }
-        public void OnGet(bool rememberMe)
+        public async Task<IActionResult> OnGetAsync(bool rememberMe)
         {
+            var user = await _currentUserService.GetCurrentUserAsync();
+            if (user == null)
+            {
+                TempData["error"] = "User not found.";
+                ModelState.AddModelError("AuthenticatorSetup", "User not found.");
+                return RedirectToPage("/Account/Login");
+            }
+            if (!user.EmailConfirmed)
+            {
+                TempData["error"] = "Please confirm your email before setting up two-factor authentication.";
+                return RedirectToPage("/Account/Login");
+            }
+            if (user.EmailConfirmed && !user.TwoFactorEnabled)
+            {
+                return RedirectToPage("/Account/AuthenticatorWithMFASetup");
+            }
+
             AuthenticatorMFAData.SecurityCode = string.Empty;
             AuthenticatorMFAData.RememberMe = rememberMe;
+            return Page();
         }
         public async Task<IActionResult> OnPostAsync()
         {
@@ -30,25 +48,43 @@ namespace Spider_EMT.Pages.Account
                 return Page();
             }
 
+            var user = await _currentUserService.GetCurrentUserAsync();
+            if (user == null)
+            {
+                TempData["error"] = "User not found.";
+                ModelState.AddModelError("AuthenticatorSetup", "User not found.");
+                return RedirectToPage("/Account/Login");
+            }
+            if (!user.EmailConfirmed)
+            {
+                TempData["error"] = "Please confirm your email before setting up two-factor authentication.";
+                return RedirectToPage("/Account/Login");
+            }
+            if (user.EmailConfirmed && !user.TwoFactorEnabled)
+            {
+                return RedirectToPage("/Account/AuthenticatorWithMFASetup");
+            }
+
             var result = await _currentUserService.SignInManager.TwoFactorAuthenticatorSignInAsync(AuthenticatorMFAData.SecurityCode, AuthenticatorMFAData.RememberMe, false);
 
             if (result.Succeeded)
             {
-                /*var user = await _userManager.FindByNameAsync(User.Identity.Name);
-                if (user == null)
-                {
-                    TempData["error"] = "User not found.";
-                    ModelState.AddModelError("Authenticator2FA", "User not found.");
-                    return Page();
-                }
-
-                if ((bool)!user.UserVerificationSetupEnabled)
+                _currentUserService.RefreshCurrentUserAsync();
+                if (user.UserVerificationSetupEnabled != true)
                 {
                     TempData["success"] = "Please complete your user verification setup.";
                     return RedirectToPage("/Account/UserVerificationSetup");
-                }*/
-                TempData["success"] = "Login successful.";
-                return RedirectToPage("/Dashboard");
+                }
+                else if(user.UserVerificationSetupEnabled == true && user.RoleAssignmentEnabled == false)
+                {
+                    TempData["success"] = "Firstly User need to be assigned with Appropriate Role for further accessibility";
+                    return RedirectToPage("/Account/UserRoleAssignment");
+                }
+                else if(user.UserVerificationSetupEnabled == true && user.RoleAssignmentEnabled == true)
+                {
+                    TempData["success"] = "Login successful.";
+                    return RedirectToPage("/Dashboard");
+                }
             }
             else
             {
@@ -62,8 +98,8 @@ namespace Spider_EMT.Pages.Account
                     TempData["error"] = "Failed to login.";
                     ModelState.AddModelError("Authenticator2FA", "Failed to Login.");
                 }
-                return Page();
             }
+            return Page();
         }
     }
 }

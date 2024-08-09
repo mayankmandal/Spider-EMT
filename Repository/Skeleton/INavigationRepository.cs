@@ -30,5 +30,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<bool> CheckUniquenessAsync(string field, string value);
         Task<ProfileUserAPIVM> GetUserRecordAsync(int userId);
         Task<string> UpdateUserVerificationAsync(UserVerifyApiVM userVerifyApiVM, int CurrentUserId);
+        Task<bool> CreateBaseUserAccessAsync(string baseUserRoleName, int CurrentUserId);
     }
 }

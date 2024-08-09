@@ -1,5 +1,5 @@
 ﻿@page
-@model Spider_EMT.Pages.Account.UserVerficationSetupModel
+@model Spider_EMT.Pages.Account.UserVerificationSetupModel
 @{
     ViewData["Title"] = "User Verification Setup";
     TempData["NavigationalPageName"] = "Create User";
@@ -115,7 +115,7 @@
                             <div class="row">
                                 <div class="col-2"></div>
                                 <div class="col-3 me-4">
-                                    <button type="submit" onclick="prepareFormSubmission()" class="btn create-btn" style="width:140px;">Save</button>
+                                    <button type="submit" class="btn create-btn" style="width:140px;">Save</button>
                                 </div>
                                 <div class="col-4 ms-3">
                                     <a asp-page="/Dashboard" class="btn btn-secondary" style="width:180px;"> Back to Dashboard</a>
@@ -132,5 +132,5 @@
 
 @section scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/createUserProfile.js" asp-append-version="true"></script>
+    <script src="~/js/userVerificationSetup.js" asp-append-version="true"></script>
 }

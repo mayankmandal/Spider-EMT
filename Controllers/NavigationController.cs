@@ -8,7 +8,9 @@ using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
 using System.Drawing.Printing;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using static Spider_EMT.Utility.Constants;
 
 namespace Spider_EMT.Controller
 {
@@ -343,12 +345,12 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-
-                await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
+                bool isSuccess = false;
+                isSuccess = await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
 
                 _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
                 _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
-                return Ok();
+                return Ok(isSuccess);
             }
             catch (Exception ex)
             {
@@ -441,21 +443,65 @@ namespace Spider_EMT.Controller
                 {
                     return BadRequest();
                 }
-
-                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM, await _currentUserService.GetCurrentUserIdAsync());
-
-                // Remove the cached item to force a refresh next time
-                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
-
-                if (!string.IsNullOrEmpty(profileUserAPIVM.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                bool isSuccess = false;
+                var user = await _currentUserService.GetCurrentUserAsync();
+                var userRole = await _currentUserService.GetCurrentUserRolesAsync();
+                if (user.RoleAssignmentEnabled == false && userRole.RoleName == BaseUserRoleName && profileUserAPIVM.ProfileSiteData.ProfileName != userRole.RoleName)
                 {
-                    string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
-                    bool isSucess = await DeleteFileAsync(oldFilePath);
-                    return Ok(isSucess);
+                    var allPagesData = await _navigationRepository.GetAllPagesAsync();
+                    List<PageSiteVM> pageSiteVMs = new List<PageSiteVM>();
+                    // Get all constant values from the BaseUserScreenAccess static class
+                    var baseUserScreenAccessType = typeof(BaseUserScreenAccess);
+                    var constants = baseUserScreenAccessType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                        .Where(f => f.IsLiteral && !f.IsInitOnly)
+                        .Select(f => f.GetValue(null) as string)
+                        .ToList();
+                    foreach (var page in allPagesData)
+                    {
+                        PageSiteVM pageSiteVM = new PageSiteVM
+                        {
+                            PageId = page.PageId,
+                            isSelected = page.isSelected,
+                            PageDescription = page.PageDescription,
+                            PageUrl = page.PageUrl
+                        };
+
+                        // Check if the PageDescription is in any of the constant values
+                        if (constants.Contains(pageSiteVM.PageUrl))
+                        {
+                            pageSiteVMs.Add(pageSiteVM);
+                        }
+                    }
+
+                    ProfilePagesAccessDTO profilePagesAccessDTO = new ProfilePagesAccessDTO
+                    {
+                        PagesList = pageSiteVMs,
+                        ProfileData = profileUserAPIVM.ProfileSiteData
+                    };
+
+                    isSuccess = await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
                 }
-                return Ok();
+                if (isSuccess)
+                {
+                    string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM, await _currentUserService.GetCurrentUserIdAsync());
+
+                    // Remove the cached item to force a refresh next time
+                    _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                    _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                    _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+
+                    if (!string.IsNullOrEmpty(profileUserAPIVM.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
+                    {
+                        string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, _configuration["UserProfileImgPath"], PreviousProfilePhotoPath);
+                        bool isSucess = await DeleteFileAsync(oldFilePath);
+                        return Ok(isSucess);
+                    }
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             catch (Exception ex)
             {
@@ -640,7 +686,7 @@ namespace Spider_EMT.Controller
                 string hashedPassword = null;
                 if (!string.IsNullOrEmpty(userSettings.SettingsPassword) || !string.IsNullOrEmpty(userSettings.SettingsReTypePassword))
                 {
-                    var user = await _currentUserService.UserManager.FindByIdAsync(userSettings.Id.ToString());
+                    var user = await _currentUserService.GetCurrentUserAsync();
                     if(user != null)
                     {
                         hashedPassword =  _currentUserService.UserManager.PasswordHasher.HashPassword(user,userSettings.SettingsPassword);
@@ -677,6 +723,7 @@ namespace Spider_EMT.Controller
         }
 
         [HttpPost("CheckUniqueness")]
+        [AllowAnonymous] // Allow access without authentication
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CheckUniqueness([FromBody] UniquenessCheckRequest uniqueRequest)
@@ -735,6 +782,27 @@ namespace Spider_EMT.Controller
                     return Ok(isSucess);
                 }
                 return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("CreateBaseUserAccess")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateBaseUserAccess()
+        {
+            try
+            {
+                bool isSuccess = false;
+                isSuccess = await _navigationRepository.CreateBaseUserAccessAsync(BaseUserRoleName, await _currentUserService.GetCurrentUserIdAsync());
+
+                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                return Ok(isSuccess);
             }
             catch (Exception ex)
             {

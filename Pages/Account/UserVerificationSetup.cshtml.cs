@@ -2,24 +2,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
-using Spider_EMT.Models;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
-using Spider_EMT.Data.Account;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Spider_EMT.Pages.Account
 {
     [Authorize(Policy = "PageAccess")]
-    public class UserVerficationSetupModel : PageModel
+    public class UserVerificationSetupModel : PageModel
     {
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ICurrentUserService _currentUserService;
 
-        public UserVerficationSetupModel(IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment, ICurrentUserService currentUserService)
+        public UserVerificationSetupModel(IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment, ICurrentUserService currentUserService)
         {
             _configuration = configuration;
             _clientFactory = httpClientFactory;
@@ -29,11 +28,20 @@ namespace Spider_EMT.Pages.Account
         [BindProperty]
         public UserVerficationViewModel UserVerficationData { get; set; }
         public string UserProfilePathUrl = string.Empty;
-        public async Task<IActionResult> OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
             try
             {
-                var user = await _currentUserService.UserManager.GetUserAsync(base.User);
+                var user = await _currentUserService.GetCurrentUserAsync();
+                if (user == null || !user.EmailConfirmed || !user.TwoFactorEnabled)
+                {
+                    TempData["error"] = $"Invalid attempt. Please check your input and try again.";
+                    return RedirectToPage("/Account/Login");
+                }
+                if (user.UserVerificationSetupEnabled == true)
+                {
+                    return RedirectToPage("/Account/UserRoleAssignment");
+                }
                 if (user != null)
                 {
                     UserVerficationData = new UserVerficationViewModel()
@@ -77,8 +85,20 @@ namespace Spider_EMT.Pages.Account
                 }
                 return Page();
             }
+
             try
             {
+                var user = await _currentUserService.GetCurrentUserAsync();
+                if (user == null || !user.EmailConfirmed || !user.TwoFactorEnabled)
+                {
+                    TempData["error"] = $"Invalid attempt. Please check your input and try again.";
+                    return RedirectToPage("/Account/Login");
+                }
+                if (user.UserVerificationSetupEnabled == true)
+                {
+                    return RedirectToPage("/Account/UserRoleAssignment");
+                }
+
                 string uniqueFileName = null;
                 string filePath = null;
                 string uploadFolder = null;
@@ -110,6 +130,7 @@ namespace Spider_EMT.Pages.Account
                 };
 
                 var client = _clientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
                 var apiUrl = $"{_configuration["ApiBaseUrl"]}/Navigation/UpdateUserVerification";
                 var jsonContent = JsonConvert.SerializeObject(profileUserAPIVM);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -117,8 +138,9 @@ namespace Spider_EMT.Pages.Account
 
                 if (response.IsSuccessStatusCode)
                 {
+                    _currentUserService.RefreshCurrentUserAsync();
                     TempData["success"] = $"{UserVerficationData.FullName} - Profile Created Successfully";
-                    return RedirectToPage();
+                    return RedirectToPage("/Account/UserRoleAssignment");
                 }
                 else
                 {

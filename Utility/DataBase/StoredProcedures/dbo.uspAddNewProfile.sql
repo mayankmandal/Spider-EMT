@@ -14,12 +14,12 @@ ALTER PROCEDURE [dbo].[uspAddNewProfile]
     -- Add the parameters for the stored procedure here
     @NewProfileName VARCHAR(100),
 	@NewCreateUserId INT,
-	@NewUpdateUserId INT
+	@NewUpdateUserId INT,
+	@UserIdentity INT OUTPUT -- Output parameter to return the new ProfileId
 AS
 BEGIN
     
     SET NOCOUNT ON;
-	DECLARE @UserIdentity INT; -- Declare variable to store ProfileId
 
     BEGIN TRY
         -- Check is same name Profile already exists
@@ -28,13 +28,14 @@ BEGIN
 				-- Insert Profile
 				INSERT INTO [dbo].[AspNetRoles] ([Name], NormalizedName, CreateDate, CreateUserId, UpdateDate, UpdateUserId)
 				VALUES (@NewProfileName, @NewProfileName, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId)
+
 				-- Retrieve the newly generated ProfileId
 				SET @UserIdentity = SCOPE_IDENTITY(); -- Get the last inserted identity value
 			END
         ELSE
         BEGIN
             -- ProfileId does not exist, return an error code
-            SELECT -1 AS RowsAffected;
+            SELECT -1 AS RowsAffected; -- Indicate that the profile already exists
         END
     END TRY
     BEGIN CATCH
@@ -50,15 +51,4 @@ BEGIN
         -- Set the output parameter to NULL in case of error
         SET @UserIdentity = NULL;
     END CATCH;
-	-- Check if @NewCategoryId is initialized and return the appropriate message
-	IF @UserIdentity IS NOT NULL
-	BEGIN
-		-- If @NewCategoryId is not Null , return the ProfileId
-		SELECT @UserIdentity AS UserIdentity;
-	END
-	ELSE
-	BEGIN
-		-- If NewCategoryId is NULL, return error
-		SELECT 'Error' AS ErrorMessage;
-	END
 END

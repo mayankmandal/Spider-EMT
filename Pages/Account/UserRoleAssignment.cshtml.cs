@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Microsoft.AspNetCore.Authorization;
+using Spider_EMT.Utility;
+using System.Net.Http.Headers;
 
 namespace Spider_EMT.Pages.Account
 {
@@ -13,14 +15,12 @@ namespace Spider_EMT.Pages.Account
         private readonly ICurrentUserService _currentUserService;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private ProfileUserAPIVM CurrentUserDetailsData { get; set; }
-        public UserRoleAssignmentModel(ICurrentUserService currentUserService, IConfiguration configuration, IHttpClientFactory httpClientFactory, IWebHostEnvironment webHostEnvironment)
+        public UserRoleAssignmentModel(ICurrentUserService currentUserService, IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             _currentUserService = currentUserService;
             _configuration = configuration;
             _clientFactory = httpClientFactory;
-            _webHostEnvironment = webHostEnvironment;
         }
         [BindProperty]
         public UserRoleAssignmentVM UserRoleAssignmentVMData { get; set; }
@@ -29,7 +29,23 @@ namespace Spider_EMT.Pages.Account
         {
             try
             {
-                var user = await _currentUserService.UserManager.GetUserAsync(base.User);
+                await _currentUserService.RefreshCurrentUserAsync();
+                var user = await _currentUserService.GetCurrentUserAsync();
+
+                if (user == null ||
+                    user.EmailConfirmed != true ||
+                    user.TwoFactorEnabled != true ||
+                    user.UserVerificationSetupEnabled != true)
+                {
+                    TempData["error"] = $"Invalid login attempt. Please check your input and try again.";
+                    return RedirectToPage("/Account/Login");
+                }
+                if (user.RoleAssignmentEnabled == true)
+                {
+                    TempData["success"] = $"{user.FullName} logged in successfully.";
+                    return RedirectToPage("/Dashboard");
+                }
+
                 await LoadCurrentProfileUserData();
 
                 UserRoleAssignmentVMData = new UserRoleAssignmentVM
@@ -62,26 +78,26 @@ namespace Spider_EMT.Pages.Account
 
             try
             {
-                // Validate the selected profile ID
-                /*var profileId = UserRoleAssignmentVMData.ProfileSiteData.ProfileId;
-                if (string.IsNullOrEmpty(profileId))
+                await _currentUserService.RefreshCurrentUserAsync();
+                var user = await _currentUserService.GetCurrentUserAsync();
+
+                if (user == null ||
+                user.EmailConfirmed != true ||
+                user.TwoFactorEnabled != true ||
+                user.UserVerificationSetupEnabled != true)
                 {
-                    ModelState.AddModelError("UserRoleAssignmentVMData.ProfileSiteData.ProfileName", "Please select a valid profile.");
-                    ProfilesData = await FetchProfilesAsync();
-                    return Page();
+                    TempData["error"] = $"Invalid login attempt. Please check your input and try again.";
+                    return RedirectToPage("/Account/Login");
                 }
 
-                // Logic to assign the profile to the user (could involve calling an API, updating the database, etc.)
-                var result = await AssignProfileToUserAsync(profileId);
-                if (!result)
+                if (user.RoleAssignmentEnabled == true)
                 {
-                    ModelState.AddModelError(string.Empty, "Error assigning profile to user.");
-                    ProfilesData = await FetchProfilesAsync();
-                    return Page();
-                }*/
-
-                TempData["success"] = "Profile assigned successfully.";
-                return RedirectToPage("/Dashboard");
+                    _currentUserService.RefreshCurrentUserAsync();
+                    TempData["success"] = $"{user.FullName} logged in successfully.";
+                    return RedirectToPage("/Dashboard");
+                }
+                TempData["error"] = $"Proper Role is not yet Assigned. Contact the administrator.";
+                return Page();
             }
             catch (Exception ex)
             {
@@ -97,6 +113,7 @@ namespace Spider_EMT.Pages.Account
         private async Task LoadCurrentProfileUserData()
         {
             var client = _clientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));
             var response = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserDetails");
             CurrentUserDetailsData = JsonConvert.DeserializeObject<ProfileUserAPIVM>(response);
         }
