@@ -54,7 +54,7 @@
                             <label asp-for="CredentialData.Password" class="form-label" style=""></label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa fa-compass"></i></span>
+                                    <span class="input-group-text"><i class="fa fa-lock"></i></span>
                                 </div>
                                 <input type="password" asp-for="CredentialData.Password" placeholder="Password" class="form-control" />
                             </div>
@@ -81,6 +81,14 @@
                                 </div>
                                 <div class="col-3"></div>
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <p>
+                                <a id="forgot-password" asp-page="./ForgotPassword">Forgot Your Password</a>
+                                <br />
+                                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend Email Confirmation</a>
+                            </p>
                         </div>
 
                         <div class="mb-3">
@@ -113,3 +121,6 @@
     </form>
 </div>
 
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -6,6 +6,10 @@
 
         public const string JwtCookieName = "_next-session-value";
         public const string JwtRefreshTokenName = "_next-session-token";
+        public const string JwtAMRTokenName = "_next-amr-value";
+
+        public const string Page_LoginTwoFactorWithAuthenticator = "/Account/LoginTwoFactorWithAuthenticator";
+        public const string Page_AuthenticatorWithMFASetup = "/Account/AuthenticatorWithMFASetup";
 
         public const string BaseUserRoleName = "Base User Access"; // Needs Attention for Change if required for string value
 

@@ -1,14 +1,15 @@
-﻿using LazyCache;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
 using Spider_EMT.Models;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Domain;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
+using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using static Spider_EMT.Utility.Constants;
 
@@ -20,20 +21,20 @@ namespace Spider_EMT.Controller
     public class NavigationController : ControllerBase
     {
         #region Fields
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly INavigationRepository _navigationRepository;
         private readonly ICurrentUserService _currentUserService;
-        private ICacheProvider _cacheProvider;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,16}$";
         #endregion
 
-        #region Constructor
-        public NavigationController(INavigationRepository navigationRepository, ICurrentUserService currentUserService, ICacheProvider cacheProvider, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
+        #region ,
+        public NavigationController(IHttpContextAccessor httpContextAccessor, INavigationRepository navigationRepository, ICurrentUserService currentUserService, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
+            _httpContextAccessor = httpContextAccessor;
             _navigationRepository = navigationRepository;
             _currentUserService = currentUserService;
-            _cacheProvider = cacheProvider;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
         }
@@ -170,12 +171,23 @@ namespace Spider_EMT.Controller
 
         [HttpGet("GetCurrentUser")]
         [ProducesResponseType(typeof(CurrentUser), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUser()
         {
             try
             {
-                var currentUserData = await _currentUserService.GetCurrentUserAsync();
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var currentUserData = await _currentUserService.GetCurrentUserAsync(jwtToken);
+
+                if (currentUserData == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 CurrentUser currentUser = new CurrentUser
                 {
                     UserId = currentUserData.Id,
@@ -193,12 +205,23 @@ namespace Spider_EMT.Controller
 
         [HttpGet("GetCurrentUserDetails")]
         [ProducesResponseType(typeof(ProfileUserAPIVM), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUserDetails()
         {
             try
             {
-                var currentUserDetails = await _navigationRepository.GetCurrentUserDetailsAsync(await _currentUserService.GetCurrentUserIdAsync());
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
+                var currentUserDetails = await _navigationRepository.GetCurrentUserDetailsAsync(userId);
                 currentUserDetails.Userimgpath = Path.Combine(_configuration["UserProfileImgPath"], currentUserDetails.Userimgpath);
                 return Ok(currentUserDetails);
             }
@@ -210,23 +233,31 @@ namespace Spider_EMT.Controller
 
         [HttpGet("GetCurrentUserProfile")]
         [ProducesResponseType(typeof(ProfileSite), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUserProfile()
         {
             try
             {
-                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserProfileKey, out ProfileSite currentUserProfile))
+                ProfileSite currentUserProfile = null;
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
                 {
-                    currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync(await _currentUserService.GetCurrentUserIdAsync());
-
-                    var cacheEntryOption = new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
-                        SlidingExpiration = TimeSpan.FromSeconds(10),
-                        Size = 1024
-                    };
-
-                    _cacheProvider.Set(CacheKeys.CurrentUserProfileKey, currentUserProfile, cacheEntryOption);
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
+                if (!_httpContextAccessor.HttpContext.Session.TryGetValue(SessionKeys.CurrentUserProfileKey, out byte[] currentUserProfileData))
+                {
+                    currentUserProfile = await _navigationRepository.GetCurrentUserProfileAsync(userId);
+                    _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserProfileKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(currentUserProfile)));
+                }
+                else
+                {
+                    currentUserProfile = JsonConvert.DeserializeObject<ProfileSite>(Encoding.UTF8.GetString(currentUserProfileData));
                 }
                 return Ok(currentUserProfile);
             }
@@ -238,23 +269,33 @@ namespace Spider_EMT.Controller
 
         [HttpGet("GetCurrentUserPages")]
         [ProducesResponseType(typeof(IEnumerable<PageSiteVM>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUserPages()
         {
             try
             {
-                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out List<PageSiteVM> pageSites))
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ","");
+                if (string.IsNullOrEmpty(jwtToken))
                 {
-                    pageSites = await _navigationRepository.GetCurrentUserPagesAsync(await _currentUserService.GetCurrentUserIdAsync());
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
+                List<PageSiteVM> pageSites = null;
 
-                    var cacheEntryOption = new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
-                        SlidingExpiration = TimeSpan.FromSeconds(10),
-                        Size = 1024
-                    };
+                if (!_httpContextAccessor.HttpContext.Session.TryGetValue(SessionKeys.CurrentUserPagesKey, out byte[] pageSitesData))
+                {
+                    pageSites = await _navigationRepository.GetCurrentUserPagesAsync(userId);
 
-                    _cacheProvider.Set(CacheKeys.CurrentUserPagesKey, pageSites, cacheEntryOption);
+                    _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserPagesKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(pageSites)));
+                }
+                else
+                {
+                    pageSites = JsonConvert.DeserializeObject<List<PageSiteVM>>(Encoding.UTF8.GetString(pageSitesData));
                 }
                 return Ok(pageSites);
             }
@@ -266,14 +307,26 @@ namespace Spider_EMT.Controller
 
         [HttpGet("GetCurrentUserCategories")]
         [ProducesResponseType(typeof(IEnumerable<CategoriesSetDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCurrentUserCategories()
         {
             try
             {
-                if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserCategoriesKey, out List<CategoryDisplayViewModel> StructureData))
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
                 {
-                    List<CategoriesSetDTO> categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync(await _currentUserService.GetCurrentUserIdAsync());
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
+                List<CategoryDisplayViewModel> StructureData;
+                if (!_httpContextAccessor.HttpContext.Session.TryGetValue(SessionKeys.CurrentUserCategoriesKey, out byte[] structureDataBytes))
+                {
+                    List<CategoriesSetDTO> categoriesSet = await _navigationRepository.GetCurrentUserCategoriesAsync(userId);
                     var groupedCategories = categoriesSet.GroupBy(cat => string.IsNullOrEmpty(cat.CatagoryName) ? Constants.CategoryType_UncategorizedPages : cat.CatagoryName);
                     StructureData = new List<CategoryDisplayViewModel>();
 
@@ -300,14 +353,11 @@ namespace Spider_EMT.Controller
                     // Sort the categories
                     StructureData = StructureData.OrderBy(cat => cat.CatagoryName).ToList();
 
-                    var cacheEntryOption = new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpiration = DateTime.Now.AddSeconds(10),
-                        SlidingExpiration = TimeSpan.FromSeconds(10),
-                        Size = 1024
-                    };
-
-                    _cacheProvider.Set(CacheKeys.CurrentUserCategoriesKey, StructureData, cacheEntryOption);
+                    _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserCategoriesKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(StructureData)));
+                }
+                else
+                {
+                    StructureData = JsonConvert.DeserializeObject<List<CategoryDisplayViewModel>>(Encoding.UTF8.GetString(structureDataBytes));
                 }
                 return Ok(StructureData);
             }
@@ -336,20 +386,33 @@ namespace Spider_EMT.Controller
         [HttpPost("CreateUserAccess")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUserAccess([FromBody] ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (profilePagesAccessDTO == null)
                 {
                     return BadRequest();
                 }
                 bool isSuccess = false;
-                isSuccess = await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
+                isSuccess = await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, userId);
 
-                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                
+
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserProfileKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
                 return Ok(isSuccess);
             }
             catch (Exception ex)
@@ -361,19 +424,32 @@ namespace Spider_EMT.Controller
         [HttpPost("UpdateUserAccess")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserAccess([FromBody] ProfilePagesAccessDTO profilePagesAccessDTO)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (profilePagesAccessDTO == null)
                 {
                     return BadRequest();
                 }
 
-                await _navigationRepository.UpdateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
-                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                await _navigationRepository.UpdateUserAccessAsync(profilePagesAccessDTO, userId);
+
+                
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserProfileKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -385,11 +461,22 @@ namespace Spider_EMT.Controller
         [HttpPost("CreateUserProfile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUserProfile([FromBody] ProfileUserAPIVM profileUsersData)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (profileUsersData == null)
                 {
                     return BadRequest();
@@ -421,7 +508,7 @@ namespace Spider_EMT.Controller
                     IsActiveDirectoryUser = profileUsersData.IsActiveDirectoryUser,
                 };
 
-                await _navigationRepository.CreateUserProfileAsync(profileUser, await _currentUserService.GetCurrentUserIdAsync());
+                await _navigationRepository.CreateUserProfileAsync(profileUser, userId);
 
                 return Ok();
             }
@@ -434,19 +521,44 @@ namespace Spider_EMT.Controller
         [HttpPost("UpdateUserProfile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserProfile([FromBody] ProfileUserAPIVM profileUserAPIVM)
         {
             try
             {
-                if (profileUserAPIVM == null)
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
                 {
-                    return BadRequest();
+                    return Unauthorized("JWT Token is missing");
                 }
+                var user = await _currentUserService.GetCurrentUserAsync(jwtToken);
+                if (user == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
+                if (profileUserAPIVM == null || string.IsNullOrEmpty(profileUserAPIVM.Email))
+                {
+                    return BadRequest("Invalid user profile data");
+                }
+
+                // Fetch target user by email from profileUserAPIVM
+                var targetUser = await _currentUserService.GetUserByEmailAsync(profileUserAPIVM.Email);
+                if(targetUser == null)
+                {
+                    return NotFound($"User with email {profileUserAPIVM.Email} not found.");
+                }
+
+                // Fetch the role of the target user
+                var targetUserRole = await _currentUserService.GetUserRoleAsync(profileUserAPIVM.Email);
+                if (targetUserRole == null)
+                {
+                    return NotFound("Target user does not have an associated role.");
+                }
+
                 bool isSuccess = false;
-                var user = await _currentUserService.GetCurrentUserAsync();
-                var userRole = await _currentUserService.GetCurrentUserRolesAsync();
-                if (user.RoleAssignmentEnabled == false && userRole.RoleName == BaseUserRoleName && profileUserAPIVM.ProfileSiteData.ProfileName != userRole.RoleName)
+                
+                if (user.RoleAssignmentEnabled == true && targetUserRole.RoleName == BaseUserRoleName && profileUserAPIVM.ProfileSiteData.ProfileName != targetUserRole.RoleName)
                 {
                     var allPagesData = await _navigationRepository.GetAllPagesAsync();
                     List<PageSiteVM> pageSiteVMs = new List<PageSiteVM>();
@@ -479,16 +591,16 @@ namespace Spider_EMT.Controller
                         ProfileData = profileUserAPIVM.ProfileSiteData
                     };
 
-                    isSuccess = await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
+                    isSuccess = await _navigationRepository.CreateUserAccessAsync(profilePagesAccessDTO, user.Id);
                 }
                 if (isSuccess)
                 {
-                    string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM, await _currentUserService.GetCurrentUserIdAsync());
-
+                    string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserProfileAsync(profileUserAPIVM, user.Id);
+                    
                     // Remove the cached item to force a refresh next time
-                    _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
-                    _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
-                    _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+                    _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserProfileKey);
+                    _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
+                    _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserCategoriesKey);
 
                     if (!string.IsNullOrEmpty(profileUserAPIVM.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
                     {
@@ -529,17 +641,28 @@ namespace Spider_EMT.Controller
         [HttpPost("CreateNewCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateNewCategory([FromBody] CategoryPagesAccessDTO categoryPagesAccessDTO)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (categoryPagesAccessDTO == null)
                 {
                     return BadRequest();
                 }
 
-                await _navigationRepository.CreateNewCategoryAsync(categoryPagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
+                await _navigationRepository.CreateNewCategoryAsync(categoryPagesAccessDTO, userId);
                 return Ok();
             }
             catch (Exception ex)
@@ -551,19 +674,31 @@ namespace Spider_EMT.Controller
         [HttpPost("UpdateCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryPagesAccessDTO categoryPagesAccessDTO)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (categoryPagesAccessDTO == null)
                 {
                     return BadRequest();
                 }
 
-                await _navigationRepository.UpdateCategoryAsync(categoryPagesAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
-                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                await _navigationRepository.UpdateCategoryAsync(categoryPagesAccessDTO, userId);
+                
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserCategoriesKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -575,22 +710,33 @@ namespace Spider_EMT.Controller
         [HttpPost("AssignProfileCategories")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AssignProfileCategories([FromBody] ProfileCategoryAccessDTO profileCategoryAccessDTO)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (profileCategoryAccessDTO == null)
                 {
                     return BadRequest();
                 }
 
                 // Method Call for assigning categories to profiles
-                await _navigationRepository.AssignProfileCategoriesAsync(profileCategoryAccessDTO, await _currentUserService.GetCurrentUserIdAsync());
-
+                await _navigationRepository.AssignProfileCategoriesAsync(profileCategoryAccessDTO, userId);
+                
                 // Remove the cached item to force a refresh next time
-                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserCategoriesKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
                 return Ok();
             }
             catch (Exception ex)
@@ -656,12 +802,23 @@ namespace Spider_EMT.Controller
 
         [HttpGet("GetSettingsData")]
         [ProducesResponseType(typeof(ProfileUserAPIVM), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetSettingsData()
         {
             try
             {
-                ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetSettingsDataAsync(await _currentUserService.GetCurrentUserIdAsync());
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
+                ProfileUserAPIVM profileUserAPIVM = await _navigationRepository.GetSettingsDataAsync(userId);
                 return Ok(profileUserAPIVM);
             }
             catch (Exception ex)
@@ -672,11 +829,22 @@ namespace Spider_EMT.Controller
 
         [HttpPost("UpdateSettingsData")]
         [ProducesResponseType(typeof(SettingsAPIVM), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateSettingsData(SettingsAPIVM userSettings)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 // Validate the password
                 if (!string.IsNullOrEmpty(userSettings.SettingsPassword) && (!Regex.IsMatch(userSettings.SettingsPassword, passwordPattern) || userSettings.SettingsPassword != userSettings.SettingsReTypePassword))
                 {
@@ -703,10 +871,10 @@ namespace Spider_EMT.Controller
                     PasswordHash = hashedPassword != null ? hashedPassword : string.Empty,
                 };
 
-                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(profileUser, await _currentUserService.GetCurrentUserIdAsync());
-
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateSettingsDataAsync(profileUser, userId);
+                
                 // Remove the cached item to force a refresh next time
-                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserProfileKey);
 
                 if (!string.IsNullOrEmpty(profileUser.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
                 {
@@ -758,22 +926,33 @@ namespace Spider_EMT.Controller
         [HttpPost("UpdateUserVerification")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserVerification([FromBody] UserVerifyApiVM userVerifyApiVM)
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 if (userVerifyApiVM == null)
                 {
                     return BadRequest();
                 }
 
-                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserVerificationAsync(userVerifyApiVM, await _currentUserService.GetCurrentUserIdAsync());
-
+                string PreviousProfilePhotoPath = await _navigationRepository.UpdateUserVerificationAsync(userVerifyApiVM, userId);
+                
                 // Remove the cached item to force a refresh next time
-                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserCategoriesKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserProfileKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserCategoriesKey);
 
                 if (!string.IsNullOrEmpty(userVerifyApiVM.Userimgpath) && !string.IsNullOrEmpty(PreviousProfilePhotoPath))
                 {
@@ -792,16 +971,27 @@ namespace Spider_EMT.Controller
         [HttpPost("CreateBaseUserAccess")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateBaseUserAccess()
         {
             try
             {
+                var jwtToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (string.IsNullOrEmpty(jwtToken))
+                {
+                    return Unauthorized("JWT Token is missing");
+                }
+                var userId = await _currentUserService.GetCurrentUserIdAsync(jwtToken);
+                if (userId == null)
+                {
+                    return Unauthorized("User is not authenticated.");
+                }
                 bool isSuccess = false;
-                isSuccess = await _navigationRepository.CreateBaseUserAccessAsync(BaseUserRoleName, await _currentUserService.GetCurrentUserIdAsync());
-
-                _cacheProvider.Remove(CacheKeys.CurrentUserProfileKey);
-                _cacheProvider.Remove(CacheKeys.CurrentUserPagesKey);
+                isSuccess = await _navigationRepository.CreateBaseUserAccessAsync(BaseUserRoleName, userId);
+                
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserProfileKey);
+                _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserPagesKey);
                 return Ok(isSuccess);
             }
             catch (Exception ex)

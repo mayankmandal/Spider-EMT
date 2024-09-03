@@ -5,7 +5,47 @@
     TempData["NavigationalPageName"] = "Access Denied";
 }
 
-<div>
-    <h6>Access Denied</h6>
-    <p>You do not have permission to access the page: @ViewData["ReturnUrl"]</p>
+
+<div class="mb-2" style="display:flex; flex-direction:column;justify-content:space-evenly;">
+    <form method="post">
+        <div class="container form-control pt-4 pb-2" style="height:auto; background-color: #f4f0ec; width:45rem;">
+            <div class="container form-control border-2 mb-2" style="display:flex; justify-content:space-around;height:auto; flex-direction:column;">
+                <div class="row pb-1 pt-2">
+                    <div style="color:#17a2b8; text-align:center; font-size:1.7rem;">Access Denied</div>
+                    <div>
+                        <hr />
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title fw-bold">Access Denied</div>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger fw-bold"></div>
+
+                        <div>
+                            <h6>Access Denied</h6>
+                            <p>You do not have permission to access the page: @ViewData["ReturnUrl"]</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
+
+
+
+@section scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

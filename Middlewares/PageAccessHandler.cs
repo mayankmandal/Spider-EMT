@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+using Newtonsoft.Json;
+using Spider_EMT.Data.Account;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
 using Spider_EMT.Utility;
@@ -11,12 +11,10 @@ namespace Spider_EMT.Middlewares
     public class PageAccessHandler : AuthorizationHandler<PageAccessRequirement>
     {
         private readonly ICurrentUserService _currentUserService;
-        private readonly IMemoryCache _cacheProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public PageAccessHandler(IMemoryCache cacheProvider, ICurrentUserService currentUserService, IHttpContextAccessor httpContextAccessor)
+        public PageAccessHandler(ICurrentUserService currentUserService, IHttpContextAccessor httpContextAccessor)
         {
             _currentUserService = currentUserService;
-            _cacheProvider = cacheProvider;
             _httpContextAccessor = httpContextAccessor;
         }
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PageAccessRequirement requirement)
@@ -25,19 +23,55 @@ namespace Spider_EMT.Middlewares
             if (user == null)
             {
                 context.Fail();
+                // RedirectToLogin();
                 return;
-            }
-            if (!_cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out List<PageSiteVM> pages))
-            {
-                var accessToken = _currentUserService.GetJWTCookie();
-                if (!string.IsNullOrEmpty(accessToken))
-                {
-                     await _currentUserService.FetchAndCacheUserPermissions(accessToken);
-                    _cacheProvider.TryGetValue(CacheKeys.CurrentUserPagesKey, out pages);
-                }
             }
 
             var currentPage = _httpContextAccessor.HttpContext.Request.Path.Value;
+
+            // Allow access to the MFA setup page without MFA claim and Login Two Factor With Authenticator
+            if(currentPage.Equals(Constants.Page_LoginTwoFactorWithAuthenticator, StringComparison.OrdinalIgnoreCase) || currentPage.Equals(Constants.Page_AuthenticatorWithMFASetup, StringComparison.OrdinalIgnoreCase))
+            {
+                context.Succeed(requirement);
+                return;
+            }
+
+            // Check for MFA Claim in user claims
+            var hasMfaClaim = _httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == "amr" && c.Value == "mfa");
+            if (!hasMfaClaim)
+            {
+                context.Fail();
+                HandleAccessDenied(context);
+                return;
+            }
+
+            // Check if MFA is required and whether the user has completed MFA verfification
+            if(IsMFARequired(user) && !IsMFAVerified(user))
+            {
+                context.Fail();
+                RedirectToMFASetup();
+                return;
+            }
+
+            // Try to get pages from session
+            var pagesJson = _httpContextAccessor.HttpContext.Session.GetString(SessionKeys.CurrentUserPagesKey);
+            List<PageSiteVM> pages = !string.IsNullOrEmpty(pagesJson) ? JsonConvert.DeserializeObject<List<PageSiteVM>>(pagesJson) : null; ;
+
+            if (pages == null)
+            {
+                // If pages are not in session, fetch and store them in session
+                var accessToken = _currentUserService.GetJWTCookie(Constants.JwtAMRTokenName);
+                if (!string.IsNullOrEmpty(accessToken))
+                {
+                    await _currentUserService.FetchAndCacheUserPermissions(accessToken);
+                    pagesJson = _httpContextAccessor.HttpContext.Session.GetString(SessionKeys.CurrentUserPagesKey);
+                    if (!string.IsNullOrEmpty(pagesJson))
+                    {
+                        pages = JsonConvert.DeserializeObject<List<PageSiteVM>>(pagesJson);
+                    }
+                }
+            }
+
             if (pages != null && pages.Any(page => page.PageUrl.Equals(currentPage, StringComparison.OrdinalIgnoreCase)))
             {
                 context.Succeed(requirement);
@@ -47,22 +81,35 @@ namespace Spider_EMT.Middlewares
                 HandleAccessDenied(context, currentPage);
             }
         }
+
+        private bool IsMFARequired(ApplicationUser user)
+        {
+            return !user.TwoFactorEnabled; // MFA is required if Two-Factor Authentication is not enabled
+        }
+
+        private bool IsMFAVerified(ApplicationUser user)
+        {
+            // Check if the user has already completed MFA verification during this session
+            return _httpContextAccessor.HttpContext.User.HasClaim(c => c.Type == "amr" && c.Value == "mfa");
+        }
+
+        private void RedirectToMFASetup()
+        {
+            _currentUserService.UserContext.Response.Redirect("/Account/LoginTwoFactorWithAuthenticator");
+        }
+
         private void HandleAccessDenied(AuthorizationHandlerContext context, string currentPage = null)
         {
             context.Fail();
-            if (_currentUserService.UserContext.User.Identity.IsAuthenticated)
+            var isAuthenticated = _currentUserService.UserContext.User.Identity.IsAuthenticated;
+            var accessDeniedUrl = isAuthenticated ? "/Account/AccessDenied" : "/Account/Login";
+
+
+            if (!string.IsNullOrEmpty(currentPage) && isAuthenticated)
             {
-                var accessDeniedUrl = "/Account/AccessDenied";
-                if (!string.IsNullOrEmpty(currentPage))
-                {
-                    accessDeniedUrl += $"?returnUrl={currentPage}";
-                }
-                _currentUserService.UserContext.Response.Redirect(accessDeniedUrl);
+                accessDeniedUrl += $"?returnUrl={currentPage}";
             }
-            else
-            {
-                _currentUserService.UserContext.Response.Redirect("/Account/Login");
-            }
+            _currentUserService.UserContext.Response.Redirect(accessDeniedUrl);
         }
     }
 }

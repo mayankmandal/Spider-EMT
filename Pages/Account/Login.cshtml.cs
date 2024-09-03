@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spider_EMT.Data.Account;
 using Spider_EMT.Models.ViewModels;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
 
 namespace Spider_EMT.Pages.Account
 {
@@ -111,7 +112,7 @@ namespace Spider_EMT.Pages.Account
             // Role and claim management
             var claims = await _currentUserService.GetCurrentUserClaimsAsync(user);
             var accessToken = _currentUserService.GenerateJSONWebToken(claims);
-            _currentUserService.SetJWTCookie(accessToken);
+            _currentUserService.SetJWTCookie(accessToken, Constants.JwtCookieName);
 
             // Fetch and cache user permissions from API
             // await _currentUserService.FetchAndCacheUserPermissions(accessToken);

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spider_EMT.Configuration.Authorization.Models;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
+using System.Security.Claims;
 
 namespace Spider_EMT.Pages.Account
 {
@@ -69,8 +71,21 @@ namespace Spider_EMT.Pages.Account
 
             if (result.Succeeded)
             {
-                _currentUserService.RefreshCurrentUserAsync();
-                if (user.UserVerificationSetupEnabled != true)
+                // Add the MFA claim (amr = mfa) after successful MFA login
+                var claims = new List<Claim>
+                {
+                    new Claim("amr", "mfa") // Add the MFA Claim - amr - Authentication Methods References
+                };
+
+                // Regenerate the JWT token with the updated claim
+                var jwtToken = _currentUserService.GenerateJSONWebToken(claims);
+                _currentUserService.SetJWTCookie(jwtToken, Constants.JwtAMRTokenName);
+
+                // _currentUserService.RefreshCurrentUserAsync();
+                
+                // user = await _currentUserService.GetCurrentUserAsync();
+
+                if (user.UserVerificationSetupEnabled == true)
                 {
                     TempData["success"] = "Please complete your user verification setup.";
                     return RedirectToPage("/Account/UserVerificationSetup");

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Spider_EMT.Data.Account;
@@ -17,20 +16,15 @@ namespace Spider_EMT.Repository.Domain
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMemoryCache _memoryCache;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IHttpClientFactory _clientFactory;
 
-        private const string CurrentUserKey = "CurrentUser";
-        private const string CurrentUserClaimsKey = "CurrentUserClaims";
-
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole<int>> roleManager, IHttpClientFactory httpClientFactory)
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor,IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole<int>> roleManager, IHttpClientFactory httpClientFactory)
         {
             _httpContextAccessor = httpContextAccessor;
-            _memoryCache = memoryCache;
             _configuration = configuration;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -45,40 +39,55 @@ namespace Spider_EMT.Repository.Domain
 
         public async Task<ApplicationUser> GetCurrentUserAsync(ApplicationUser? user = null)
         {
-            if (!_memoryCache.TryGetValue(CurrentUserKey, out ApplicationUser currentUser))
+            if (!_httpContextAccessor.HttpContext.Session.TryGetValue(SessionKeys.CurrentUserKey, out byte[] currentUserData))
             {
+                // Session key not found, fetch user data
                 if (user == null)
                 {
-                    var token = GetJWTCookie();
+                    // Retrieve JWT or other identifier
+                    var token = GetJWTCookie(Constants.JwtCookieName);
                     if (!string.IsNullOrEmpty(token))
                     {
                         var principal = GetPrincipalFromToken(token);
                         var emailClaim = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                         if (!string.IsNullOrEmpty(emailClaim))
                         {
-                            currentUser = await _userManager.FindByEmailAsync(emailClaim);
+                            var currentUser = await _userManager.FindByEmailAsync(emailClaim);
                             if (currentUser != null)
                             {
-                                var cacheEntryOptions = new MemoryCacheEntryOptions
-                                {
-                                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                                };
-                                _memoryCache.Set(CurrentUserKey, currentUser, cacheEntryOptions);
+                                _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(currentUser)));
+                                return currentUser;
                             }
                         }
                     }
+                    return null; // No user found, return null
                 }
                 else
                 {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    };
-                    _memoryCache.Set(CurrentUserKey, user, cacheEntryOptions);
-                    currentUser = user;
+                    // Set the session with the provided user
+                    _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(user)));
                 }
             }
-            return currentUser;
+            else
+            {
+                // Retrieve and deserialize the user data from the session
+                user = JsonConvert.DeserializeObject<ApplicationUser>(Encoding.UTF8.GetString(currentUserData));
+            }
+            return user;
+        }
+        
+        public async Task<ApplicationUser> GetCurrentUserAsync(string jwtToken)
+        {
+            if (!string.IsNullOrEmpty(jwtToken))
+            {
+                var principal = GetPrincipalFromToken(jwtToken);
+                var emailClaim = principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                if (!string.IsNullOrEmpty(emailClaim))
+                {
+                    return await _userManager.FindByEmailAsync(emailClaim);
+                }
+            }
+            return null; // Return null if no user found
         }
 
         public async Task<int> GetCurrentUserIdAsync()
@@ -91,16 +100,25 @@ namespace Spider_EMT.Repository.Domain
             return user.Id;
         }
 
+        public async Task<int> GetCurrentUserIdAsync(string? jwtToken = null)
+        {
+            var user = await GetCurrentUserAsync(jwtToken);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User is not authenticated");
+            }
+            return user.Id;
+        }
+
         // Method to refresh the cache on demand
         public async Task RefreshCurrentUserAsync()
         {
-            _memoryCache.Remove(CurrentUserKey);
-            await GetCurrentUserAsync();
+            _httpContextAccessor.HttpContext.Session.Remove(SessionKeys.CurrentUserKey);
         }
 
-        public async Task<UserRoleInfo> GetCurrentUserRolesAsync()
+        public async Task<UserRoleInfo> GetCurrentUserRolesAsync(string jwtToken)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetCurrentUserAsync(jwtToken);
             if (user == null)
             {
                 throw new InvalidOperationException("User is not authenticated");
@@ -143,12 +161,19 @@ namespace Spider_EMT.Repository.Domain
             return jwtToken;
         }
 
-        public void SetJWTCookie(string token)
+        public void SetJWTCookie(string token, string name)
         {
             if (_httpContextAccessor.HttpContext != null)
             {
-                var session = _httpContextAccessor.HttpContext.Session;
-                session.SetString(Constants.JwtCookieName, token);  // Store token in session
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // Ensure cookies are sent only over HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddHours(3) // Token expiration time
+                };
+                // _httpContextAccessor.HttpContext.Session.SetString(name, token);  // Store token in session
+                _httpContextAccessor.HttpContext.Response.Cookies.Append(name, token, cookieOptions);
             }
             else
             {
@@ -156,12 +181,11 @@ namespace Spider_EMT.Repository.Domain
             }
         }
 
-        public string GetJWTCookie()
+        public string GetJWTCookie(string name)
         {
             if (_httpContextAccessor.HttpContext != null)
             {
-                var session = _httpContextAccessor.HttpContext.Session;
-                return session.GetString(Constants.JwtCookieName);  // Retrieve token from session
+                return _httpContextAccessor.HttpContext.Session.GetString(name);  // Retrieve token from session
             }
             else
             {
@@ -177,31 +201,23 @@ namespace Spider_EMT.Repository.Domain
             // Fetch pages
             var pagesResponse = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserPages");
             var pages = JsonConvert.DeserializeObject<List<PageSiteVM>>(pagesResponse);
-            _memoryCache.Set(CacheKeys.CurrentUserPagesKey, pages, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddSeconds(10),
-                SlidingExpiration = TimeSpan.FromSeconds(10),
-                Size = 1024
-            });
+
+            _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserPagesKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(pages)));
 
             // Fetch categories
             var categoriesResponse = await client.GetStringAsync($"{_configuration["ApiBaseUrl"]}/Navigation/GetCurrentUserCategories");
             var categories = JsonConvert.DeserializeObject<List<CategoryDisplayViewModel>>(categoriesResponse);
-            _memoryCache.Set(CacheKeys.CurrentUserCategoriesKey, categories, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddSeconds(10),
-                SlidingExpiration = TimeSpan.FromSeconds(10),
-                Size = 1024
-            });
+            _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserCategoriesKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(categories)));
         }
 
         public async Task<IList<Claim>> GetCurrentUserClaimsAsync(ApplicationUser user)
         {
-            if (!_memoryCache.TryGetValue(CurrentUserClaimsKey, out IList<Claim> claims))
+            
+            if (!_httpContextAccessor.HttpContext.Session.TryGetValue(SessionKeys.CurrentUserClaimsKey, out byte[] claimsData))
             {
                 if (user != null)
                 {
-                    claims = new List<Claim>
+                    var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                         new Claim(ClaimTypes.Email, user.Email)
@@ -213,16 +229,56 @@ namespace Spider_EMT.Repository.Domain
                         claims.Add(new Claim(ClaimTypes.Role, role));
                     }
 
-                    var cacheEntryOptions = new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-                    };
-                    _memoryCache.Set(CurrentUserClaimsKey, claims, cacheEntryOptions);
-
+                    _httpContextAccessor.HttpContext.Session.Set(SessionKeys.CurrentUserClaimsKey, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(claims)));
                     await GetCurrentUserAsync(user);
+
+                    return claims;
                 }
             }
-            return claims;
+            else
+            {
+                JsonConvert.DeserializeObject<IList<Claim>>(Encoding.UTF8.GetString(claimsData));
+            }
+            return null;
+        }
+
+        public async Task<ApplicationUser> GetUserByEmailAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+            }
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"No user found with the email: {email}");
+            }
+            return user;
+        }
+
+        public async Task<UserRoleInfo> GetUserRoleAsync(string email)
+        {
+            var user = await GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User is not found.");
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            if(roles == null || roles.Count == 0)
+            {
+                throw new InvalidOperationException("User does not have any roles assigned.");
+            }
+            var roleName = roles.First();
+            var role = await _roleManager.FindByNameAsync(roleName);
+            if (role == null)
+            {
+                throw new InvalidOperationException("Role not found.");
+            }
+            return new UserRoleInfo
+            {
+                RoleId = role.Id,
+                RoleName = role.Name,
+            };
         }
 
         private string CreateRefreshToken()

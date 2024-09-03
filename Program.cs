@@ -2,7 +2,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Spider_EMT.Configuration;
 using Spider_EMT.Configuration.Authorization.Models;
 using Spider_EMT.Configuration.IService;
@@ -127,18 +126,15 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
         client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
     });
 
+    services.AddDistributedMemoryCache(); // Use a distributed cache if for scaling out application
+
     services.AddSession(options =>
     {
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
         options.Cookie.HttpOnly = true;
-        options.IdleTimeout = TimeSpan.FromHours(8);
         options.Cookie.IsEssential = true;
     });
 
-    // Add memory cache services
-    services.AddMemoryCache();
-
-    // Add lazy cache services
-    services.AddLazyCache();
 
     // Add AutoMapper with configuration
     services.AddAutoMapper(typeof(AutoMapperConfig));
@@ -163,9 +159,6 @@ void ConfigureServices(IServiceCollection services, IConfiguration configuration
     services.AddScoped<INavigationRepository, NavigationRepository>();
     services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
     services.AddScoped<IUniquenessCheckService, UniquenessCheckService>();
-
-    // Add response caching
-    services.AddResponseCaching();
 }
 
 void Configure(WebApplication app)
@@ -185,9 +178,6 @@ void Configure(WebApplication app)
             ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=600");
         }
     });
-
-    // Use response caching middleware
-    app.UseResponseCaching();
 
     // Use HTTPS redirection and static files middleware
     app.UseHttpsRedirection();
