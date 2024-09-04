@@ -126,10 +126,6 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr, status, error) {
-                console.error("Error response:", xhr);
-                console.error("Status:", status);
-                console.error("Error:", error);
-
                 // Default error message if response.message is not defined
                 var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "An error occurred";
                 toastr.error(errorMessage);

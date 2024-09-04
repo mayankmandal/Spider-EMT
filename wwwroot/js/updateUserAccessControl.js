@@ -147,9 +147,6 @@ $(document).ready(function () {
         $.ajax({
             url: $(this).attr('action'),
             type: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + tokenC
-            },
             data: $(this).serialize(),
             success: function (response) {
                 if (response.success) {
@@ -160,8 +157,10 @@ $(document).ready(function () {
                     toastr.error(response.message);
                 }
             },
-            error: function (response) {
-                toastr.error(response.message);
+            error: function (xhr,status, error) {
+                // Default error message if response.message is not defined
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "An error occurred";
+                toastr.error(errorMessage);
             }
         });
     });
