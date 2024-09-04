@@ -1162,7 +1162,7 @@ namespace Spider_EMT.Repository.Domain
                 int NumberOfRowsAffected = 0;
 
                 ProfileUserAPIVM profileUserExisting = new ProfileUserAPIVM();
-                string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath from AspNetUsers u WHERE U.Id = {CurrentUserId}";
+                string commandText = $"SELECT u.IdNumber, u.FullName, u.Email, u.MobileNo, u.Username, u.Userimgpath, u.IsActive from AspNetUsers u WHERE U.Id = {CurrentUserId}";
                 DataTable dataTable = SqlDBHelper.ExecuteSelectCommand(commandText, CommandType.Text);
 
                 if (dataTable.Rows.Count > 0)
@@ -1170,12 +1170,13 @@ namespace Spider_EMT.Repository.Domain
                     DataRow dataRow = dataTable.Rows[0];
                     profileUserExisting = new ProfileUserAPIVM
                     {
-                        IdNumber = dataRow["IdNumber"].ToString(),
-                        FullName = dataRow["FullName"].ToString(),
-                        Email = dataRow["Email"].ToString(),
-                        MobileNo = dataRow["MobileNo"].ToString(),
-                        Username = dataRow["Username"].ToString(),
-                        Userimgpath = dataRow["Userimgpath"].ToString(),
+                        IdNumber = dataRow["IdNumber"] != DBNull.Value ? dataRow["IdNumber"].ToString() : string.Empty,
+                        FullName = dataRow["FullName"] != DBNull.Value ? dataRow["FullName"].ToString() : string.Empty,
+                        Email = dataRow["Email"] != DBNull.Value ? dataRow["Email"].ToString() : string.Empty,
+                        MobileNo = dataRow["MobileNo"] != DBNull.Value ? dataRow["MobileNo"].ToString() : string.Empty,
+                        Username = dataRow["Username"] != DBNull.Value ? dataRow["Username"].ToString() : string.Empty,
+                        Userimgpath = dataRow["Userimgpath"] != DBNull.Value ? dataRow["Userimgpath"].ToString() : string.Empty,
+                        IsActive = dataRow["IsActive"] != DBNull.Value && Convert.ToBoolean(dataRow["IsActive"]),
                     };
                 }
 
@@ -1188,6 +1189,7 @@ namespace Spider_EMT.Repository.Domain
                     new SqlParameter("@NewMobileNumber", SqlDbType.VarChar, 15) { Value = GetDbValue(userVerifyApiVM.MobileNo, profileUserExisting.MobileNo) },
                     new SqlParameter("@NewUsername", SqlDbType.VarChar, 100) { Value = GetDbValue(userVerifyApiVM.Username, profileUserExisting.Username) },
                     new SqlParameter("@NewUserimgpath", SqlDbType.VarChar, 255) { Value = GetDbValue(userVerifyApiVM.Userimgpath, profileUserExisting.Userimgpath) },
+                    new SqlParameter("@NewIsActive", SqlDbType.Bit) { Value = 1 }, // Makes User Active with User Verification Setup completion
                     new SqlParameter("@NewUpdateUserId", SqlDbType.Int) { Value = CurrentUserId },
                     new SqlParameter("@NewCreateUserId", SqlDbType.Int) { Value = CurrentUserId }
                 };

@@ -50,30 +50,26 @@ namespace Spider_EMT.Pages.Account
             }
 
             await _currentUserService.SignInManager.SignOutAsync();
-            var result = await _currentUserService.SignInManager.PasswordSignInAsync(CredentialData.Email, CredentialData.Password, CredentialData.RememberMe, false);
-            if (user.EmailConfirmed && user.TwoFactorEnabled)
-            {
-                await ManageUserClaimsAndPermissions(user);
-                return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator", new { RememberMe = CredentialData.RememberMe });
-            }
-
-            /*// Extra Temp Login for direct Login
+            var result = await _currentUserService.SignInManager.PasswordSignInAsync(user.Email, CredentialData.Password, CredentialData.RememberMe, false);
             if (result.Succeeded)
             {
-                // Redirect to the dashboard page after successful login
-                return RedirectToPage("/Dashboard");
-            }*/
-
-            if (result.Succeeded && !result.RequiresTwoFactor)
-            {
-                TempData["success"] = $"{user.Email} - Login successful.";
-                await ManageUserClaimsAndPermissions(user);
-                if (user.TwoFactorEnabled)
+                if (user.EmailConfirmed && user.TwoFactorEnabled)
                 {
-                    TempData["success"] = $"{user.Email} - Login successful. Please complete two-factor authentication";
+                    await ManageUserClaimsAndPermissions(user);
                     return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator", new { RememberMe = CredentialData.RememberMe });
                 }
-                return RedirectToPage("/Account/AuthenticatorWithMFASetup");
+
+                if (result.Succeeded && !result.RequiresTwoFactor)
+                {
+                    TempData["success"] = $"{user.Email} - Login successful.";
+                    await ManageUserClaimsAndPermissions(user);
+                    if (user.TwoFactorEnabled)
+                    {
+                        TempData["success"] = $"{user.Email} - Login successful. Please complete two-factor authentication";
+                        return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator", new { RememberMe = CredentialData.RememberMe });
+                    }
+                    return RedirectToPage("/Account/AuthenticatorWithMFASetup");
+                }
             }
             else
             {
@@ -97,8 +93,8 @@ namespace Spider_EMT.Pages.Account
                     TempData["error"] = $"{user.Email} - Failed to login.";
                     ModelState.AddModelError("Login", "Failed to Login.");
                 }
-                return Page();
             }
+            return Page();
         }
         public IActionResult OnPostLoginExternally(string provider)
         {

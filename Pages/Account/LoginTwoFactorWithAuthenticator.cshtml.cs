@@ -57,6 +57,14 @@ namespace Spider_EMT.Pages.Account
                 ModelState.AddModelError("AuthenticatorSetup", "User not found.");
                 return RedirectToPage("/Account/Login");
             }
+
+            // Check if NormalizedUserName and NormalizedEmail are not the same
+            if (user.NormalizedUserName != user.NormalizedEmail)
+            {
+                user.NormalizedUserName = user.NormalizedEmail;
+                await _currentUserService.UserManager.UpdateNormalizedUserNameAsync(user);
+            }
+
             if (!user.EmailConfirmed)
             {
                 TempData["error"] = "Please confirm your email before setting up two-factor authentication.";
@@ -74,7 +82,7 @@ namespace Spider_EMT.Pages.Account
                 // Add the MFA claim (amr = mfa) after successful MFA login
                 var claims = new List<Claim>
                 {
-                    new Claim("amr", "mfa") // Add the MFA Claim - amr - Authentication Methods References
+                    new Claim(Constants.ClaimAMRKey, Constants.ClaimAMRValue) // Add the MFA Claim - amr - Authentication Methods References
                 };
 
                 // Regenerate the JWT token with the updated claim
@@ -85,7 +93,7 @@ namespace Spider_EMT.Pages.Account
                 
                 // user = await _currentUserService.GetCurrentUserAsync();
 
-                if (user.UserVerificationSetupEnabled == true)
+                if (user.UserVerificationSetupEnabled == true || user.UserVerificationSetupEnabled == null)
                 {
                     TempData["success"] = "Please complete your user verification setup.";
                     return RedirectToPage("/Account/UserVerificationSetup");

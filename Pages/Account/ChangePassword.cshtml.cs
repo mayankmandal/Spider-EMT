@@ -7,7 +7,7 @@ using Spider_EMT.Repository.Skeleton;
 
 namespace Spider_EMT.Pages.Account
 {
-    // [Authorize(Policy = "PageAccess")]
+    [Authorize(Policy = "PageAccess")]
     public class ChangePasswordModel : PageModel
     {
         private readonly ICurrentUserService _currentUserService;

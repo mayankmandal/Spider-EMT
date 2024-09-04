@@ -10,6 +10,7 @@ using Spider_EMT.Utility;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 
 namespace Spider_EMT.Pages.Account
@@ -41,6 +42,14 @@ namespace Spider_EMT.Pages.Account
                 ModelState.AddModelError("AuthenticatorSetup", "User not found.");
                 return RedirectToPage("/Account/Login");
             }
+
+            // Check if NormalizedUserName and NormalizedEmail are not the same
+            if (user.NormalizedUserName != user.NormalizedEmail)
+            {
+                user.NormalizedUserName = user.NormalizedEmail;
+                await _currentUserService.UserManager.UpdateNormalizedUserNameAsync(user);
+            }
+
             if (!user.EmailConfirmed)
             {
                 TempData["error"] = "Please confirm your email before setting up two-factor authentication.";
@@ -82,9 +91,19 @@ namespace Spider_EMT.Pages.Account
                 var result = await _currentUserService.UserManager.SetTwoFactorEnabledAsync(user, true);
                 if (result.Succeeded)
                 {
+                    // Add the MFA claim (amr = mfa) after successful MFA login
+                    var claims = new List<Claim>
+                    {
+                        new Claim(Constants.ClaimAMRKey, Constants.ClaimAMRValue) // Add the MFA Claim - amr - Authentication Methods References
+                    };
+
+                    // Regenerate the JWT token with the updated claim
+                    var jwtToken = _currentUserService.GenerateJSONWebToken(claims);
+                    _currentUserService.SetJWTCookie(jwtToken, Constants.JwtAMRTokenName);
+
                     _currentUserService.RefreshCurrentUserAsync();
                     Succeeded = true;
-                    
+
                     // API call
                     var client = _clientFactory.CreateClient();
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", JWTCookieHelper.GetJWTCookie(HttpContext));

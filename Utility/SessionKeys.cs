@@ -12,7 +12,7 @@
     {
         public static string GetJWTCookie(HttpContext httpContext)
         {
-            return httpContext.Session.GetString(Constants.JwtCookieName);
+            return httpContext.Request.Cookies[Constants.JwtCookieName];
         }
     }
 }

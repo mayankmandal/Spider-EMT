@@ -23,5 +23,6 @@ namespace Spider_EMT.Repository.Skeleton
         Task<int> GetCurrentUserIdAsync(string jwtToken = null);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
         Task<UserRoleInfo> GetUserRoleAsync(string email);
+        ClaimsPrincipal GetPrincipalFromToken(string token);
     }
 }

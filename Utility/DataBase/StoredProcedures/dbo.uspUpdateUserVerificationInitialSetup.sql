@@ -18,6 +18,7 @@ ALTER PROCEDURE [dbo].[uspUpdateUserVerificationInitialSetup]
 	@NewMobileNumber VARCHAR(15) = NULL,
 	@NewUsername VARCHAR(100) = NULL,
 	@NewUserimgpath VARCHAR(255) = NULL,
+	@NewIsActive BIT = NULL,
 	@NewUpdateUserId INT = 0,
 	@NewCreateUserId INT = 0
 AS
@@ -50,6 +51,8 @@ BEGIN
                 SET @sqlUpdate += 'CreateUserId = @NewCreateUserId, ';
             IF @NewUserimgpath IS NOT NULL
                 SET @sqlUpdate += 'Userimgpath = @NewUserimgpath, ';
+			IF @NewIsActive IS NOT NULL
+                SET @sqlUpdate += 'IsActive = @NewIsActive, ';
 
 			SET @sqlUpdate += 'UpdateDate = GETDATE(), CreateDate = GETDATE(), ';
 			-- Remove the trailing comma and space
@@ -60,10 +63,10 @@ BEGIN
 
 			-- Execute the update query
             EXEC sp_executesql @sqlUpdate,
-                N'@NewIdNumber VARCHAR(10), @NewFullName VARCHAR(200), @NewMobileNumber VARCHAR(15), 
+                N'@NewIdNumber VARCHAR(10), @NewFullName VARCHAR(200), @NewMobileNumber VARCHAR(15), @NewIsActive BIT,
                   @NewUsername VARCHAR(100), @NewCreateUserId INT, @NewUpdateUserId INT, @NewUserimgpath VARCHAR(255), 
 				  @UserId INT',
-                @NewIdNumber, @NewFullName, @NewMobileNumber, 
+                @NewIdNumber, @NewFullName, @NewMobileNumber, @NewIsActive,
                 @NewUsername, @NewCreateUserId, @NewUpdateUserId, @NewUserimgpath,
 				@UserId;
 

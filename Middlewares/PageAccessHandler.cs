@@ -19,25 +19,35 @@ namespace Spider_EMT.Middlewares
         }
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PageAccessRequirement requirement)
         {
-            var user = await _currentUserService.GetCurrentUserAsync();
-            if (user == null)
+            // var user = await _currentUserService.GetCurrentUserAsync();
+            /*if (user.ChangePassword != null && user.ChangePassword == true)
             {
+                // Set the redirection URL in the HttpContext.Items 
+                _httpContextAccessor.HttpContext.Items["RedirectUrl"] = "/Account/ChangePassword";
                 context.Fail();
-                // RedirectToLogin();
                 return;
-            }
-
+            }*/
+            
             var currentPage = _httpContextAccessor.HttpContext.Request.Path.Value;
 
             // Allow access to the MFA setup page without MFA claim and Login Two Factor With Authenticator
-            if(currentPage.Equals(Constants.Page_LoginTwoFactorWithAuthenticator, StringComparison.OrdinalIgnoreCase) || currentPage.Equals(Constants.Page_AuthenticatorWithMFASetup, StringComparison.OrdinalIgnoreCase))
+            if (currentPage.Equals(Constants.Page_LoginTwoFactorWithAuthenticator, StringComparison.OrdinalIgnoreCase) || currentPage.Equals(Constants.Page_AuthenticatorWithMFASetup, StringComparison.OrdinalIgnoreCase))
             {
                 context.Succeed(requirement);
                 return;
             }
 
+            var jwtToken = _currentUserService.GetJWTCookie(Constants.JwtAMRTokenName);
+            var principal = _currentUserService.GetPrincipalFromToken(jwtToken);
+            if (principal == null)
+            {
+                context.Fail();
+                HandleAccessDenied(context);
+                return;
+            }
+
             // Check for MFA Claim in user claims
-            var hasMfaClaim = _httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == "amr" && c.Value == "mfa");
+            var hasMfaClaim = principal.Claims.Any(c => c.Type == Constants.ClaimAMRKey && c.Value == Constants.ClaimAMRValue);
             if (!hasMfaClaim)
             {
                 context.Fail();
@@ -45,22 +55,34 @@ namespace Spider_EMT.Middlewares
                 return;
             }
 
+            var user = await _currentUserService.GetCurrentUserAsync();
             // Check if MFA is required and whether the user has completed MFA verfification
-            if(IsMFARequired(user) && !IsMFAVerified(user))
+            if (IsMFARequired(user) && !IsMFAVerified(user))
             {
                 context.Fail();
                 RedirectToMFASetup();
                 return;
             }
 
+            if (currentPage.Equals(Constants.Page_UserVerificationSetup, StringComparison.OrdinalIgnoreCase))
+            {
+                // Pass for this screen, screen used for setting IsActive Flag
+            }
+            else if (user.IsActive == null || user.IsActive == false)
+            {
+                context.Fail();
+                HandleAccessDenied(context);
+                return;
+            }
+
             // Try to get pages from session
             var pagesJson = _httpContextAccessor.HttpContext.Session.GetString(SessionKeys.CurrentUserPagesKey);
-            List<PageSiteVM> pages = !string.IsNullOrEmpty(pagesJson) ? JsonConvert.DeserializeObject<List<PageSiteVM>>(pagesJson) : null; ;
+            List<PageSiteVM> pages = !string.IsNullOrEmpty(pagesJson) ? JsonConvert.DeserializeObject<List<PageSiteVM>>(pagesJson) : null;
 
             if (pages == null)
             {
                 // If pages are not in session, fetch and store them in session
-                var accessToken = _currentUserService.GetJWTCookie(Constants.JwtAMRTokenName);
+                var accessToken = _currentUserService.GetJWTCookie(Constants.JwtCookieName);
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     await _currentUserService.FetchAndCacheUserPermissions(accessToken);

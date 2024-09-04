@@ -8,8 +8,12 @@
         public const string JwtRefreshTokenName = "_next-session-token";
         public const string JwtAMRTokenName = "_next-amr-value";
 
+        public const string ClaimAMRKey = "http://schemas.microsoft.com/claims/authnmethodsreferences";
+        public const string ClaimAMRValue = "mfa";
+
         public const string Page_LoginTwoFactorWithAuthenticator = "/Account/LoginTwoFactorWithAuthenticator";
         public const string Page_AuthenticatorWithMFASetup = "/Account/AuthenticatorWithMFASetup";
+        public const string Page_UserVerificationSetup = "/Account/UserVerificationSetup";
 
         public const string BaseUserRoleName = "Base User Access"; // Needs Attention for Change if required for string value
 
