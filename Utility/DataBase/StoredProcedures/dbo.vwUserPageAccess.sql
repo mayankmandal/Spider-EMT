@@ -12,6 +12,7 @@ INNER JOIN tblPage p WITH (NOLOCK) ON p.PageId = u.PageId
 INNER JOIN AspNetUserRoles tbup WITH (NOLOCK) on tbup.RoleId = u.ProfileId 
 
 UNION
+
 -- For Category's Pages Data
 SELECT 
   DISTINCT 

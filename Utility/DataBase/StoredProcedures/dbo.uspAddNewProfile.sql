@@ -22,6 +22,10 @@ BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
+
+		-- Start a transaction
+        BEGIN TRANSACTION;
+
         -- Check is same name Profile already exists
         IF NOT EXISTS (SELECT 1 FROM [dbo].[AspNetRoles] WITH (NOLOCK) WHERE [Name] = @NewProfileName)
 			BEGIN
@@ -31,14 +35,28 @@ BEGIN
 
 				-- Retrieve the newly generated ProfileId
 				SET @UserIdentity = SCOPE_IDENTITY(); -- Get the last inserted identity value
+
+				-- Commit the transaction if all operations succeed
+				COMMIT TRANSACTION;
+
 			END
         ELSE
         BEGIN
+            -- Rollback transaction if the profile already exists
+            IF @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+
             -- ProfileId does not exist, return an error code
             SELECT -1 AS RowsAffected; -- Indicate that the profile already exists
+
         END
     END TRY
     BEGIN CATCH
+
+		-- If an error occurs, rollback the transaction
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
         -- Handle exceptions
         SELECT
             ERROR_NUMBER() AS ErrorNumber,

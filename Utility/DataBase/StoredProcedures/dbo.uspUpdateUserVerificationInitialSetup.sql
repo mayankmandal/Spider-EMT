@@ -23,16 +23,19 @@ ALTER PROCEDURE [dbo].[uspUpdateUserVerificationInitialSetup]
 	@NewCreateUserId INT = 0
 AS
 BEGIN
-    
+
     SET NOCOUNT ON;
+	-- Construct the dynamic update query
+	DECLARE @sqlUpdate NVARCHAR(MAX);
 
     BEGIN TRY
-        -- Check if UserId exists
-        IF EXISTS (SELECT 1 FROM [AspNetUsers] WHERE Id = @UserId)
-        BEGIN
-			-- Construct the dynamic update query
-			DECLARE @sqlUpdate NVARCHAR(MAX);
+		-- Start transaction
+        BEGIN TRANSACTION;
 
+        -- Check if UserId exists
+        IF EXISTS (SELECT 1 FROM [AspNetUsers] WITH (NOLOCK) WHERE Id = @UserId)
+        BEGIN
+			
 			SET @sqlUpdate = 'UPDATE [AspNetUsers] SET ';
 
 			-- Append each field if the corresponding parameter is NOT NULL
@@ -76,7 +79,7 @@ BEGIN
 			IF @@rowcount = 1
 			BEGIN
 				IF EXISTS(
-					SELECT 1 FROM [AspNetUsers]
+					SELECT 1 FROM [AspNetUsers] WITH (NOLOCK)
 					WHERE 
 						ID = @UserId AND
 						EmailConfirmed = 1 AND
@@ -92,28 +95,44 @@ BEGIN
 					SET UserVerificationSetupEnabled = 1
 					WHERE Id = @UserId;
 
+					-- Commit transaction
+                    COMMIT TRANSACTION;
+
 					-- Return the number of rows affected
 					SELECT @@rowcount AS RowsAffected;
 				END
 				ELSE
 				BEGIN
+					-- Rollback transaction as condition is not met
+                    ROLLBACK TRANSACTION;
+
 					-- Condition not met, return -1
 					SELECT -1 AS RowsAffected;
 				END
 			END
 			ELSE
 			BEGIN
+				-- Rollback transaction if no rows were affected
+                ROLLBACK TRANSACTION;
+
 				-- No rows affected, return -1
 				SELECT -1 AS RowsAffected;
 			END
 		END
 		ELSE
         BEGIN
+			-- Rollback transaction if UserId does not exist
+            ROLLBACK TRANSACTION;
+
             -- UserId does not exist
             SELECT -1 AS RowsAffected;
         END
     END TRY
     BEGIN CATCH
+		-- Rollback transaction if there is an error
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
         -- Handle exceptions
         SELECT
             ERROR_NUMBER() AS ErrorNumber,

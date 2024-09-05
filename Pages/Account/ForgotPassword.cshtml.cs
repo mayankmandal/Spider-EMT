@@ -54,7 +54,7 @@ namespace Spider_EMT.Pages.Account
                 protocol: Request.Scheme
                 );
 
-            await _emailService.SendAsync(_configuration["EmailServiceSender"], user.Email, "Reset Password", $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            await _emailService.SendAsync(_configuration["EmailServiceSender"], user.Email, "Reset Password", $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}' target='_blank'>clicking here</a>.");
 
             return RedirectToPage("./ForgotPasswordConfirmation");
         }

@@ -19,15 +19,15 @@ namespace Spider_EMT.Middlewares
         }
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PageAccessRequirement requirement)
         {
-            // var user = await _currentUserService.GetCurrentUserAsync();
-            /*if (user.ChangePassword != null && user.ChangePassword == true)
+            var user = await _currentUserService.GetCurrentUserAsync();
+            if (user.ChangePassword != null && user.ChangePassword == true)
             {
                 // Set the redirection URL in the HttpContext.Items 
                 _httpContextAccessor.HttpContext.Items["RedirectUrl"] = "/Account/ChangePassword";
                 context.Fail();
                 return;
-            }*/
-            
+            }
+
             var currentPage = _httpContextAccessor.HttpContext.Request.Path.Value;
 
             // Allow access to the MFA setup page without MFA claim and Login Two Factor With Authenticator
@@ -55,7 +55,7 @@ namespace Spider_EMT.Middlewares
                 return;
             }
 
-            var user = await _currentUserService.GetCurrentUserAsync();
+            user = await _currentUserService.GetCurrentUserAsync();
             // Check if MFA is required and whether the user has completed MFA verfification
             if (IsMFARequired(user) && !IsMFAVerified(user))
             {

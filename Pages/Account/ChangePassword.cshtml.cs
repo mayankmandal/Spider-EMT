@@ -66,6 +66,12 @@ namespace Spider_EMT.Pages.Account
                     TempData["error"] = $"Invalid attempt. Please check your input and try again.";
                     return RedirectToPage("/Account/Login");
                 }
+                // Check if NormalizedUserName and NormalizedEmail are not the same
+                if (user.NormalizedUserName != user.NormalizedEmail)
+                {
+                    user.NormalizedUserName = user.NormalizedEmail;
+                    await _currentUserService.UserManager.UpdateNormalizedUserNameAsync(user);
+                }
                 if (ChangePasswordVMData.NewPassword == null )
                 {
                     ModelState.AddModelError("ChangePasswordVMData.NewPassword", "New Password is empty");

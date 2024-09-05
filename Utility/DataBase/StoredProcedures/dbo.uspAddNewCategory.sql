@@ -23,13 +23,26 @@ BEGIN
 	DECLARE @UserIdentity INT; -- Declare variable to store ProfileId
 	
     BEGIN TRY
+
+		-- Start the transaction
+        BEGIN TRANSACTION;
+
         -- Insert User Profile
         INSERT INTO [dbo].[tblPageCatagory](CatagoryName, CreateDate, CreateUserId, UpdateDate, UpdateUserId) VALUES (@NewCategoryName, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId);
 		-- Retrieve the newly generated ProfileId
 		SET @UserIdentity = SCOPE_IDENTITY(); -- Get the last inserted identity value
+
+		-- If everything is successful, commit the transaction
+        COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+
+		-- If an error occurs, rollback the transaction
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
         -- Handle exceptions
         SELECT
             ERROR_NUMBER() AS ErrorNumber,

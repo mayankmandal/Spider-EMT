@@ -6,33 +6,6 @@
     $('#profileIdHidden').val(selectedProfileId);     // Set ProfileName to selected profile id
 }
 $(document).ready(function () {
-
-    $('#togglePasswordVisibility').on('click', function () {
-        var passwordInput = $('#ProfileUsersData_Password');
-        var icon = $(this);
-
-        if (passwordInput.attr('type') === 'password') {
-            passwordInput.attr('type', 'text');
-            icon.removeClass('fa-eye-slash').addClass('fa-eye');
-        } else {
-            passwordInput.attr('type', 'password');
-            icon.removeClass('fa-eye').addClass('fa-eye-slash');
-        }
-    });
-
-    $('#toggleReTypePasswordVisibility').on('click', function () {
-        var passwordInput = $('#ProfileUsersData_ReTypePassword');
-        var icon = $(this);
-
-        if (passwordInput.attr('type') === 'password') {
-            passwordInput.attr('type', 'text');
-            icon.removeClass('fa-eye-slash').addClass('fa-eye');
-        } else {
-            passwordInput.attr('type', 'password');
-            icon.removeClass('fa-eye').addClass('fa-eye-slash');
-        }
-    });
-
     $('#profile-img-file-input').change(function () {
         // Get the selected file
         var file = this.files[0];

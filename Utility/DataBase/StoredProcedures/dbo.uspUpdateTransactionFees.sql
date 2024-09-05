@@ -22,6 +22,9 @@ BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
+		-- Start transaction
+        BEGIN TRANSACTION;
+
         -- Update transaction fees
         UPDATE [dbo].[tblRefTxnFee]
         SET
@@ -41,9 +44,16 @@ BEGIN
             [dbo].[tblRefTxnFee]
         WHERE
             [TxnFeeId] = @TransactionFeeId;
+			
+		-- Commit transaction
+        COMMIT TRANSACTION;
     END TRY
 
     BEGIN CATCH
+		-- Rollback transaction if there is an error
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
         -- Handle exceptions
         SELECT
             ERROR_NUMBER() AS ErrorNumber,

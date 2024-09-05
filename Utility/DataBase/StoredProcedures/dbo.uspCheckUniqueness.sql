@@ -13,28 +13,29 @@ GO
 ALTER PROCEDURE [dbo].[uspCheckUniqueness]
     -- Add the parameters for the stored procedure here
 	@TableId INT,
-	@Field VARCHAR(50),
-    @Value VARCHAR(100)
+	@Field NVARCHAR(50),
+    @Value NVARCHAR(100)
 AS
 BEGIN
     
     SET NOCOUNT ON;
 
     BEGIN TRY
-	DECLARE @query NVARCHAR(MAX);
+		DECLARE @query NVARCHAR(MAX);
+
 		IF @TableId = 1
 		BEGIN
-			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM AspNetUsers WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
+			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM AspNetUsers WITH (NOLOCK) WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
 			EXEC sp_executesql @query, N'@Value VARCHAR(100)', @Value;
 		END
 		ELSE IF @TableId = 2
 		BEGIN
-			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM AspNetRoles WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
+			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM AspNetRoles WITH (NOLOCK) WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
 			EXEC sp_executesql @query, N'@Value VARCHAR(100)', @Value;
 		END
 		ELSE IF @TableId = 3
 		BEGIN
-			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM tblPageCatagory WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
+			SET @query = N'SELECT CASE WHEN EXISTS (SELECT 1 FROM tblPageCatagory WITH (NOLOCK) WHERE ' + @Field + ' = @Value) THEN 0 ELSE 1 END AS IsUnique';
 			EXEC sp_executesql @query, N'@Value VARCHAR(100)', @Value;
 		END
 

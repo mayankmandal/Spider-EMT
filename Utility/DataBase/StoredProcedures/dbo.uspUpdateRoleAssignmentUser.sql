@@ -19,27 +19,40 @@ AS
 BEGIN
     
     SET NOCOUNT ON;
-	DECLARE @OldProfileId INT;
 
     BEGIN TRY
+		-- Start transaction
+        BEGIN TRANSACTION;
+
         -- Check if UserId exists
-        IF EXISTS (SELECT 1 FROM [AspNetUsers] WHERE Id = @UserId)
+        IF EXISTS (SELECT 1 FROM [AspNetUsers] WITH (NOLOCK) WHERE Id = @UserId)
 			BEGIN
 				UPDATE AspNetUsers SET RoleAssignmentEnabled = @NewRoleAssignmentEnabled, 
 				UpdateDate = GETDATE(),
 				UpdateUserId = @NewUpdateUserId
 				WHERE Id = @UserId
 
+				-- Commit transaction
+				COMMIT TRANSACTION;
+
 				-- Return the number of rows affected
 				SELECT @@ROWCOUNT AS RowsAffected;
 			END
 		ELSE
         BEGIN
+			-- UserId does not exist
+            IF @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+
             -- UserId does not exist
             SELECT -1 AS RowsAffected;
         END
     END TRY
     BEGIN CATCH
+		-- Rollback transaction if there is an error
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
         -- Handle exceptions
         SELECT
             ERROR_NUMBER() AS ErrorNumber,

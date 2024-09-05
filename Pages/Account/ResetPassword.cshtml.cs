@@ -59,6 +59,12 @@ namespace Spider_EMT.Pages.Account
             {
                 return RedirectToPage("./ResetPasswordConfirmation"); // Not to reveal that  user does not exist
             }
+            // Check if NormalizedUserName and NormalizedEmail are not the same
+            if (user.NormalizedUserName != user.NormalizedEmail)
+            {
+                user.NormalizedUserName = user.NormalizedEmail;
+                await _currentUserService.UserManager.UpdateNormalizedUserNameAsync(user);
+            }
             var result = await _currentUserService.UserManager.ResetPasswordAsync(user, Input.Code, Input.Password);
             if (result.Succeeded)
             {

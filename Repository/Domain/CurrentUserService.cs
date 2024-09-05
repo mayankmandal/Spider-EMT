@@ -313,7 +313,6 @@ namespace Spider_EMT.Repository.Domain
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken validatedToken;
 
-
             try
             {
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);

@@ -22,15 +22,26 @@ BEGIN
     SET NOCOUNT ON;
 
     BEGIN TRY
+		-- Start the transaction
+        BEGIN TRANSACTION;
+
         -- Check if both @NewPageCatId and @NewPageId are not null
         IF @NewPageCatId IS NOT NULL AND @NewPageId IS NOT NULL
         BEGIN
 			INSERT INTO tblPageCategoryMap (PageId, PageCatId, CreateDate, CreateUserId, UpdateDate, UpdateUserId)
 			VALUES (@NewPageId, @NewPageCatId, GETDATE(), @NewCreateUserId, GETDATE(), @NewUpdateUserId)
         END
+
+		-- If everything is successful, commit the transaction
+        COMMIT TRANSACTION;
+
     END TRY
 
     BEGIN CATCH
+		-- If an error occurs, rollback the transaction
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
         -- Handle exceptions
         SELECT
             ERROR_NUMBER() AS ErrorNumber,
