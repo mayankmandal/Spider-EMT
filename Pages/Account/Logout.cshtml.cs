@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Spider_EMT.Repository.Skeleton;
+using Spider_EMT.Utility;
 
 namespace Spider_EMT.Pages.Account
 {
@@ -13,10 +14,25 @@ namespace Spider_EMT.Pages.Account
         {
             _currentUserService = currentUserService;
         }
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             await _currentUserService.SignInManager.SignOutAsync();
-            return RedirectToPage("/Account/Login");
+
+            // Clear the JWT token cookie
+            Response.Cookies.Delete(Constants.JwtCookieName);
+            Response.Cookies.Delete(Constants.JwtAMRTokenName);
+
+            // Invalidate the session
+            HttpContext.Session.Clear();
+
+            if (returnUrl != null)
+            {
+                return LocalRedirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToPage("/Account/Login");
+            }
         }
     }
 }

@@ -1,15 +1,28 @@
 ﻿@inject Spider_EMT.Repository.Skeleton.ICurrentUserService _currentUserService
-@if (_currentUserService.UserContext.User?.Identity?.IsAuthenticated ?? false)
-{
-    <form method="post" asp-page="/Account/Logout" style="display: inline;">
-        Welcome @_currentUserService.UserContext.User.Identity.Name (@User.Claims.FirstOrDefault(x => x.Type == "Position")) <a href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link" role="button">
-            <i class="fas fa-sign-out"></i> Logout
-        </a>
-    </form>
+
+@using Spider_EMT.Utility
+@inject IHttpContextAccessor HttpContextAccessor
+@functions {
+    public string GetTokenAMR(HttpContext context)
+    {
+        if (context == null)
+        {
+            return null;
+        }
+        // Retrieve the tokenC value from session
+        return JWTCookieHelper.GetJWTAMRToken(context);
+    }
 }
-else
-{
-    <a class="nav-link" asp-page="/Account/Login" role="button">
-        <i class="fas fa-sign-in"></i> Login
-    </a>
+
+@{
+    var tokenAMR = GetTokenAMR(HttpContextAccessor.HttpContext);
+    var principal = _currentUserService.GetPrincipalFromToken(tokenAMR);
+    @if (principal.Identity.IsAuthenticated)
+    {
+        <form method="post" asp-page="/Account/Logout" style="display: inline;">
+            <a class="nav-link logout-link" href="javascript:void(0);" onclick="event.preventDefault(); this.closest('form').submit();" role="button">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </form>
+    }
 }

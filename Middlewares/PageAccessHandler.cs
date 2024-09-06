@@ -20,6 +20,7 @@ namespace Spider_EMT.Middlewares
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PageAccessRequirement requirement)
         {
             var user = await _currentUserService.GetCurrentUserAsync();
+
             if (user.ChangePassword != null && user.ChangePassword == true)
             {
                 // Set the redirection URL in the HttpContext.Items 
@@ -39,7 +40,9 @@ namespace Spider_EMT.Middlewares
 
             var jwtToken = _currentUserService.GetJWTCookie(Constants.JwtAMRTokenName);
             var principal = _currentUserService.GetPrincipalFromToken(jwtToken);
-            if (principal == null)
+
+            // Check if user is not authenticated
+            if (principal == null || !principal.Identity.IsAuthenticated)
             {
                 context.Fail();
                 HandleAccessDenied(context);

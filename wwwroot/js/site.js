@@ -17,6 +17,29 @@ function getCurrentFormattedDateTime() {
     return formattedDateTime;
 }
 
+function logoutUser() {
+    // var logoutUrl = '@Url.Page("/Account/Logout", new { area = "Account" })';
+    // console.log('Logout URL:', logoutUrl); // Check if the URL is correct in the browser console
+
+    $.ajax({
+        type: 'POST',
+        url: '/Account/Logout',
+        data: {},
+        success: function (response) {
+            if (response.success) {
+                window.location.href = '@Url.Page("/Index", new { area = "" })'; // Redirect to home or desired page
+
+                toastr.success(response.message);
+            } else {
+                toastr.error(response.message);
+            }
+        },
+        error: function (response) {
+            toastr.error(response.message);
+        }
+    });
+}
+
 $(document).ready(function () {
     var currentYear = new Date().getFullYear();
     $('#copyright-year').text(currentYear);

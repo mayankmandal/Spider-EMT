@@ -14,5 +14,9 @@
         {
             return httpContext.Request.Cookies[Constants.JwtCookieName];
         }
+        public static string GetJWTAMRToken(HttpContext httpContext)
+        {
+            return httpContext.Request.Cookies[Constants.JwtAMRTokenName];
+        }
     }
 }

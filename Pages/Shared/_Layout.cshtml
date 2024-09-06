@@ -34,13 +34,12 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     @if (ViewData["Title"] == "" || ViewData["Title"] == "Login" || ViewData["Title"] == "Two Factor Authenticator" || ViewData["Title"] == "Logout" || ViewData["Title"] == "Email Confirmation" || ViewData["Title"] == "MFA Setup" || ViewData["Title"] == "Register User" || ViewData["Title"] == "User Verification Setup" || ViewData["Title"] == "User Role Assignment" || ViewData["Title"] == "Access Denied" || ViewData["Title"] == "Forgot Password Confirmation" || ViewData["Title"] == "Chart Collection")
     {
-        <partial name="_LoginStatusPartial" />
-        
+        @* Logout Part 1 *@
         <!-- Render only the body content for specific pages -->
         @RenderBody()
 
         @await Html.PartialAsync("_GetToken")
-
+        
         <!-- Scripts -->
         <!-- jQuery -->
         <script src="~/plugins/jquery/jquery.min.js" asp-append-version="true"></script>
@@ -117,12 +116,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <partial name="_LoginStatusPartial" />
+                        @* Logout Section 2 *@
+                        @await Html.PartialAsync("_LoginStatusPartial")
                     </li>
                 </ul>
             </nav>
             <!-- /.navbar -->
-
 
             <aside class="main-sidebar sidebar-dark-primary elevation-4 rounded">
                 @* @await Html.PartialAsync("_SidebarPartial") *@
@@ -319,6 +318,7 @@
         <script src="~/js/site.js" asp-append-version="true"></script>
         <script src="~/js/bootstrap-datepicker.min.js" asp-append-version="true"></script>
     }
+
     @await RenderSectionAsync("Scripts", required: false)
     @await Html.PartialAsync("_Notification")
 </body>
