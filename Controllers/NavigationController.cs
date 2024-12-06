@@ -17,7 +17,6 @@ namespace Spider_EMT.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class NavigationController : ControllerBase
     {
         #region Fields
