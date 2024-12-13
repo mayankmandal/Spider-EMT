@@ -3,7 +3,6 @@ WITH CombinedData AS (
   -- For Pages Data
   SELECT 
     DISTINCT 
-    u.ProfileId,
     p.PageId,
     p.PageUrl,
     p.PageDescription,
@@ -20,7 +19,6 @@ WITH CombinedData AS (
   -- For Category's Pages Data
   SELECT 
     DISTINCT 
-    u.ProfileId,
     p.PageId,
     p.PageUrl,
     p.PageDescription,
@@ -35,7 +33,6 @@ WITH CombinedData AS (
 )
 
 SELECT DISTINCT
-  cd.ProfileId,
   cd.PageId,
   cd.PageUrl,
   cd.PageDescription,

@@ -2,7 +2,6 @@ ALTER VIEW vwUserPageAccess AS
 -- For Direct Pages Data
 SELECT 
   DISTINCT 
-  u.ProfileId,
   p.PageId,
   p.PageUrl,
   p.PageDescription,
@@ -16,7 +15,6 @@ UNION
 -- For Category's Pages Data
 SELECT 
   DISTINCT 
-  u.ProfileId,
   p.PageId,
   p.PageUrl,
   p.PageDescription,
